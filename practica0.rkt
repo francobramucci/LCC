@@ -40,7 +40,7 @@
   ;(string-append "La respuesta es " (+ 21 21)) (+ 21 21) No es un string. Error de tipado.
   (string-append "La respuesta es " (number->string (+ 21 21))); Debemos tipar para poder operar
   (* (string-length "Hola") (string-length "Chau"))
-  (substring "Programar" 2 9)
+  (substring "Programar" 2 8)
   (string-ith "Macumbero" 4)
 ; Sección 4.2 Mezclando booleanos y números
 
@@ -61,3 +61,46 @@
 "Ejercicio 2"
 (define (dist-origen x y) (sqrt (+ (sqr x) (sqr y))))
 (dist-origen 4 3)
+
+"Ejercicio 3"
+(define (dist-between x1 y1 x2 y2) (sqrt (+ (sqr (- x2 x1)) (sqr (- y2 y1)))) )
+(dist-between 2 4 2 -4)
+
+"Ejercicio 4"
+(define (vol-cubo x) (* x x x))
+(vol-cubo 5)
+
+"Ejercicio 5"
+(define (area-cubo x) (* 6 x x))
+(area-cubo 5)
+
+"Ejercicio 6"
+(define (metro-pie x) (* x 3.28084))
+(metro-pie 10)
+
+"Ejercicio 7"
+(define (cel-far x) (+ (* x 9/5) 32) )
+(cel-far 1)
+
+"Ejercicio 8"
+(define (posible? a b c) (and (> (+ a c) b) (> (+ a b) c) (> (+ c b) a)) )
+(posible? 2 4 3)
+
+"Ejercicio 9"
+(define (pitagorica? a b c) (= (sqr c) (+ (sqr a) (sqr b))))
+(pitagorica? 3 4 7)
+
+"Ejercicio 10"
+(define (suma-long s1 s2) (+ (string-length s1) (string-length s2)))
+(suma-long "hola" "chau")
+
+"Ejercicio 11"
+(define (comienzaA? s) (string=? "A" (string-ith s 0)))
+(comienzaA? "Abertura")
+
+"Ejercicio 12"
+(define (poner s i) (string-append (substring s 0 i) "-" (substring s i (string-length s)) ))
+(poner "bocanada" 4)
+
+
+
