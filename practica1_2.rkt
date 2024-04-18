@@ -22,6 +22,14 @@
     )
   )
 
+(define (forma1 img)
+  (cond [(> (image-width img) (image-height img)) "Ancha"]
+        [(< (image-width img) (image-height img)) "Angosta"]
+        [(= (image-width img) (image-height img)) "Cuadrada"]
+    )
+  )
+(forma1 (rectangle 10 20 "solid" "red"))
+
 ; Ejercicio 2.4
 (define (trianclas a b c)
   (cond [(not(= (+ a b c) 180)) "La suma de los angulos interiores de un triangulo debe ser igual a 180°"]
@@ -80,13 +88,33 @@
 
 ; Ejercicio 6
 (define (sgn3 x)
-  (cond [(number? x) (sgn3 x)]
+  (cond [(number? x) (sgn2 x)]
         [x 1]
         [(not x) 0]
     )
   )
 (sgn3 #false)
 
+; Ejercicio 7,8 y 9
+
+(define (sgn4 x)
+  (cond [(number? x) (sgn2 x)]
+        [(image? x)
+         (cond [(< (image-width x) (image-height x)) -1]
+               [(> (image-width x) (image-height x))  1]
+               [(= (image-width x) (image-height x)) 0]
+         )
+        ]
+        [(string? x) (if (number? (string->number x)) (sgn2 (string->number x)) "La cadena no se puede convertir en un número")]
+        [else "Clase no soportada por la función"]
+  )
+)
+
+(sgn4 4)
+(sgn4 "-321")
+(sgn4 (rectangle 20 20 "solid" "blue"))
+(sgn4 #true)
+(sgn4 "31a")
 
 
 
