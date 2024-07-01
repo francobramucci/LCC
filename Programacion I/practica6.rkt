@@ -403,6 +403,66 @@
     )
   )
 
+; Ejercicio 14
+
+(define (cuadrados m ang)
+  (cond [(zero? m) (empty-scene 200 200 "white")]
+        [else (place-image (rotate ang (square (sqr m) "outline" "blue")) 100 100 (cuadrados (sub1 m) (+ ang 20)))]
+        )
+  )
+
+; Ejercicio 15
+
+(define (list-insert l e x)
+  (cond [(empty? l) (list e)]
+        [(zero? x) (cons e l)]
+        [else (cons (first l) (list-insert (rest l) e (sub1 x)))]
+        )
+  )
+
+(check-expect (list-insert (list 5 9 10 -2) 8 0) (list 8 5 9 10 -2))
+(check-expect (list-insert (list 5 9 10 -2) 8 2) (list 5 9 8 10 -2))
+(check-expect (list-insert (list 5 9 10 -2) 8 4) (list 5 9 10 -2 8))
+(check-expect (list-insert empty 8 3) (list 8))
+
+; Ejercicio 16
+
+(define (tomar l n)
+  (cond [(empty? l) empty]
+        [(zero? n) empty]
+        [else (cons (first l) (tomar (rest l) (sub1 n)))]
+        )
+  )
+
+(check-expect (tomar (list 5 2 1 9) 0) empty)
+(check-expect (tomar (list 5 2 1 9) 2) (list 5 2))
+(check-expect (tomar (list 5 2 1 9) 4) (list 5 2 1 9))
+(check-expect (tomar (list 5 2 1 9) 7) (list 5 2 1 9))
+
+; Ejercicio 17
+
+(define (eliminar-n l e n)
+  (cond [(empty? l) empty]
+        [(zero? n) l]
+        [else (if (equal? e (first l)) (eliminar-n (rest l) e (sub1 n)) (cons (first l) (eliminar-n (rest l) e n)) )]
+        )
+  )
+
+(check-expect (eliminar-n (list 1 2 1 1 1 2 1) 1 3) (list 2 1 2 1))
+(check-expect (eliminar-n (list 1 2 2 1 2) 1 3) (list 2 2 2))
+
+; Ejercicio 18
+
+(define (member-n l x n)
+  (cond [(and (empty? l) (zero? n)) #t]
+        [(empty? l) #f]
+        [else (if (equal? x (first l)) (member-n (rest l) x (sub1 n)) (member-n (rest l) x n) )]
+        )
+  )
+
+(check-expect (member-n (list 1 2 1 1 1 2 1) 1 5) #t)
+(check-expect (member-n (list 1 2 2 1 2) 1 3) #f)
+(check-expect (member-n (list 2 1 2 1 2 2) 2 3) #f)
 
 
 
