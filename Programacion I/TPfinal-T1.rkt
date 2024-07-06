@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname TP-T1-Bramucci-Marsilio) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp")) #f)))
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname TPfinal-T1) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp")) #f)))
 #| Trabajo Práctico Final - Tema 1
 
 Integrantes:
@@ -114,9 +114,9 @@ Integrantes:
 ; posibles valuaciones para dicho n en forma de lista de listas de Bool
 ; valuaciones :: Nat -> (List(List(Boolean)))
 ; Entrada: 2. Salida: (list (list #f #f) (list #f #t) (list #t #f) (list #t #t))
-(define (valuaciones n)
-    (lsupremo (addcolumns (expt 2 n)))
-)
+;(define (valuaciones n)
+;    (lsupremo (addcolumns (expt 2 n)))
+;)
 
 (check-expect (valuaciones 3)
               (list
@@ -130,8 +130,8 @@ Integrantes:
                (list #true #true #true))
               )
 
-; Una forma mucho más acotada de hacer la función valuaciones
-(define (valuaciones2 n)
+; Otra forma mucho más acotada de hacer la función valuaciones
+(define (valuaciones n)
   (local (
           (define (aux x acc)
             (cond [(zero? x) acc]
