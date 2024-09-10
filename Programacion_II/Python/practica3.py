@@ -65,7 +65,67 @@ def contdist(l):
     return len(eliminaDuplicados(l))
 
 #8
-def BusquedaDicotomica(l,s):
+# recursivo
+def busquedaDicotomicaRecursiva(l,s):
+    def aux(l, ini, end, s): # [22,23] 0, 1, 50 
+        mid = (ini+end) // 2 # mid = 0+1/2 = 0.5 
+        if s == l[mid]: #l[mid] = l[1] = 22 < 50
+            return True
+        if ini == end: # ini = 0, end = 1, False 
+            return False
+        else:
+            if s > l[mid]:
+                return aux(l, mid+1, end, s) # aux([1,2], 0, 1, 13)
+            else:
+                return aux(l, ini, max(mid-1, 0), s)
+    return aux(l, 0, len(l)-1, s)
+
+# iterativo
+def binarySearchIterativa(l,s):
     ini = 0
-    end = length(l)-1
+    end = len(l)-1
     mid = (ini+end) // 2
+    while end-ini >= 0 and l[mid] != s:
+        mid = (ini+end) // 2
+        if s > l[mid]:
+            ini = mid + 1
+        else: 
+            end = mid - 1
+    return s == l[mid]
+
+#9
+def showChars(s):
+    for e in s:
+        print(s)
+
+#10
+# recursivo
+def contar(l, x):
+    largo = len(l) - 1
+    def aux(l, x, i):
+        if i > largo:
+            return 0
+        if l[i] == x:
+            return aux(l, x, i+1) + 1
+        else:
+            return aux(l, x, i+1)
+    return aux(l, x, 0)
+
+# iterativo
+def contarIt(c, s):
+    cont = 0
+    for e in s:
+        if c == e:
+            cont += 1   
+    return cont
+
+#11
+def countVowels(s):
+    cont = 0
+    vowels = ['a', 'A', 'e', 'E', 'i', 'I', 'o', 'O', 'u', 'U']
+    for e in s:
+        if e in vowels:
+            cont += 1
+    return cont
+
+#12

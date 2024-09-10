@@ -29,4 +29,11 @@ def fahrtocelcius():
     for i in range(0,120,10):
         r = (i-32)*5/9
         print("Fahrenheit: ", i, "\tCelsius: ", r)
+
+
+#12
+# def criba():
+#     arr = [0]*1000000
+#     for 
+
         
