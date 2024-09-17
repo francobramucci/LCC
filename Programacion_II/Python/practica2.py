@@ -32,8 +32,23 @@ def fahrtocelcius():
 
 
 #12
-# def criba():
-#     arr = [0]*1000000
-#     for 
+def criba():
+    MAX = 1000000
+    arr = [0] * MAX
+    arr[0] = 1
+    arr[1] = 1
+    for i in range(1,MAX):
+        if arr[i] == 0:
+            for j in range(2*i, MAX, i):
+                arr[j] = 1
+    return arr
+
+def es_prime(n):
+    primos = criba()
+    if not(primos[n]):
+        return True
+    return False
+
+
 
         
