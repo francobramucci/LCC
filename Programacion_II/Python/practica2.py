@@ -30,15 +30,15 @@ def fahrtocelcius():
         r = (i-32)*5/9
         print("Fahrenheit: ", i, "\tCelsius: ", r)
 
-
 #12
 def criba():
-    MAX = 1000000
+    MAX = 1000
     arr = [0] * MAX
     arr[0] = 1
     arr[1] = 1
     for i in range(1,MAX):
         if arr[i] == 0:
+            print(i)
             for j in range(2*i, MAX, i):
                 arr[j] = 1
     return arr
