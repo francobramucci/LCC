@@ -1,4 +1,20 @@
 #1
+def pares25(n=25):
+    if n > 1:
+        print(2*n)
+        pares(n-1)
+    else:
+        print(2)
+
+#2.1
+def pares100(n=100):
+    if n > 1:
+        print(2*n)
+        pares(n-1)
+    else:
+        print(2)
+
+#2.2
 def pares(n):
     if n > 1:
         print(n*2)
@@ -6,8 +22,6 @@ def pares(n):
     else: 
         print(2)
 
-# pares(25)
-# pares(5)
 
 #3
 def paresmasq(n,m):
@@ -21,16 +35,17 @@ def paresmasq(n,m):
     else:
         print(m+2) 
 
-#paresmasq(5,5)
+#4
+def sumf50(n=50):
+    if n == 0:
+        return 0
+    return n + sumf50(n-1)
 
-#4 y 5 
+#5 
 def sumallnat(n):
     if n == 0:
         return 0
-    else:
-        return sumallnat(n-1) + n
-
-#print(sumallnat(50))
+    return sumallnat(n-1) + n
 
 #6
 def sumabetw(n,m):
@@ -38,20 +53,14 @@ def sumabetw(n,m):
         return m
     else:
         return sumabetw(n,m-1) + m
-        
-#print(sumabetw(10,15))
 
 #7
 def duplica(name):
     return name*2
 
-print(duplica("Federico"))
-
 #8
 def repeat(name,n):
     return name*n
-
-print(repeat("Perey", 12))
 
 #9
 def suma(x,y):
@@ -77,5 +86,3 @@ def calcu():
     if op == 4: print(cociente(x,y))
     calcu()
 
-
-calcu()
