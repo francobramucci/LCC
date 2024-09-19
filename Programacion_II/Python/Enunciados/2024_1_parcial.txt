@@ -1,0 +1,22 @@
+Parcial 1
+
+No estará permitido el uso de sentencias break o return dentro de los bucles.
+
+1) Definir la función cantVeces que dada una lista l y un elemento e devuelva
+cuántas veces aparece el elemento e en la lista.
+
+a) Definir cantVeces usando while
+b) Definir cantVeces usando for
+c) Definir cantVeces de forma recursiva
+
+2) Definir la función elementosDistintos tal que dada una lista y un elemento
+devuelva los elementos distintos de e sin repetir. 
+Por ejemplo elementosDistintos([1,2,1,2,3,3,2,1], 1) devolverá [2,3].
+
+3) Definir de forma recursiva la función cantDistintos que dada una lista l y un
+elemento e devuelva la cantidad de elementos distintos de e sin repetir.
+Por ejemplo cantDistintos([1,2,1,1,1,2,3,3,3,2], 1) devolverá 2
+
+4) Es posible definir elementosDistintos de forma recurisva? Hacerlo en caso de 
+ser posible. En caso contrario justificar por qué no es posible.
+
