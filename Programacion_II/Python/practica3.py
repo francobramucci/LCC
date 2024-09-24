@@ -70,9 +70,9 @@ def busquedaDicotomicaRecursiva(l,s):
     def aux(l, ini, end, s): # [22,23] 0, 1, 50 
         mid = (ini+end) // 2 # mid = 0+1/2 = 0.5 
         if s == l[mid]: #l[mid] = l[1] = 22 < 50
-            return True
+            return mid
         if ini == end: # ini = 0, end = 1, False 
-            return False
+            return -1
         else:
             if s > l[mid]:
                 return aux(l, mid+1, end, s) # aux([1,2], 0, 1, 13)
@@ -91,7 +91,9 @@ def binarySearchIterativa(l,s):
             ini = mid + 1
         else: 
             end = mid - 1
-    return s == l[mid]
+    if l[mid] == s:        
+        return mid
+    return -1
 
 #9
 def showChars(s):
@@ -129,5 +131,38 @@ def countVowels(s):
     return cont
 
 #12
-    
+def countWordsLongerThan(s):
+    cont = 0
+    res = 0
+    for i in range(len(s)):
+        if s[i] == ' ' :
+            if cont > 5:
+                res += 1
+            cont = 0
+        else:
+            cont += 1        
+    if cont > 5:
+        res += 1
+    return res
+
+#13
+#a 
+# carta: (Numero, Palo)
+def esPoker(c1, c2, c3, c4, c5):
+    res = False
+    l = [0]*12
+    l[c1[0]] += 1
+    l[c2[0]] += 1
+    l[c3[0]] += 1
+    l[c4[0]] += 1
+    l[c5[0]] += 1
+    for e in l:
+        if e == 4:
+            res = True
+    return res
+
+#14
+#a
+# tiempo : (Horas, Minutos, Segundos)
+        
 
