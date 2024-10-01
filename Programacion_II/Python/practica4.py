@@ -1,3 +1,4 @@
+from random import *
 #1
 #a
 def ocurrencias(l,e):
@@ -75,14 +76,149 @@ def buscarOinsertar(l,e):
         return i+1
 
 #4
-def diccio(l: list[tuple]) -> dict:
+def tuplelist_to_dict(l: list) -> dict:
     a = {}
     for e in l:
         a[e[0]] = e[1]
         print(a[e[0]])
     return a
 
+#5a
+def count_string(s):
+    words = s.split()
+    d = {}
+    for e in words:
+        if e not in d.keys():
+            d[e] = 1
+        else:
+            d[e] += 1
+    return d
 
+#5b
+def count_char(s: str):
+    d = {}
+    for i in range(len(s)):
+        if s[i] not in d.keys():
+            d[s[i]] = 1
+        else:
+            d[s[i]] += 1
+    return d
+
+#5c
+def dice_prob(n: int):
+    d = {}
+    for i in range(n):
+        dado1 = randint(1,6)
+        dado2 = randint(1,6)
+        suma = dado1 + dado2
+        if suma not in d.keys():
+            d[suma] = 1
+        else:
+            d[suma] += 1
+
+#6
+def larger_string(s):
+    words = s.split()
+    d = {}
+    for i in range(len(s)):
+        if s[i] not in d.keys():
+            d[s[i]] = ''
+    
+    for e in words:
+        length = len(e)
+        for i in range(len(e)):
+            if len(d[e[i]]) < length:
+                d[e[i]] = e
+    return d
+
+#7a
+def students_average(d: dict, n: str) -> int:
+    suma = 0
+    for e in d[n]:
+        suma += e
+    return suma / len(d[n])
+
+#7b
+def best_average(d: dict) -> str:
+    best_note = 0
+    best_student = ''
+    for k in d.keys():
+        ave = students_average(d, k)
+        if ave > best_note:
+            best_note = ave
+            best_student = k
+    return best_student
+
+#8
+def synonyms_replace(s: str, d: dict):
+    # s.lower()
+    words = s.split()
+    res = []
+    for e in words:
+        if e in d.keys():
+            synonyms = d[e]
+            rand = randint(0, len(synonyms)-1) 
+            res.append(synonyms[rand])
+        else:
+            res.append(e)
+    
+    return ' '.join(res)
+
+def total_buy(prices: dict, amounts: dict):
+    suma = 0
+    for k in amounts.keys():
+        suma += amounts[k] * prices[k]
+    return suma
+
+#10
+def delete_dups(l: list) -> set:
+    s = set()
+    s.update(l)
+    return s
+
+#11
+def string_intersection(s1, s2):
+    words1 = s1.split()
+    words2 = s2.split()
+    a = set()
+    b = set()
+    a.update(words1)
+    b.update(words2)
+
+    return a&b
+
+#12
+def not_in_both(s1, s2):
+    onlys1 = s1-s2
+    onlys2 = s2-s1
+
+    return onlys1|onlys2
+
+#13
+def lower_than_nth(l: list, n: int):
+    l.sort()
+    nth = l[n]
+    s = set()
+    for i in range(nth):
+        if i not in l:
+            s.add(i)
+    return s
+
+#14
+def organizar_reunion(d: dict):
+    res = set(range(1,31))
+    for k in d.keys():
+        s = set()
+        s.update(d[k])
+        res &= s
+    return res 
+
+# if __name__ == "__main__"
+#   main()
+
+
+        
+    
             
 
 
