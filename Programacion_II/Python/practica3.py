@@ -75,8 +75,7 @@ def busquedaDicotomicaRecursiva(l,s):
             return -1
         else:
             if s > l[mid]:
-                return aux(l, mid+1, end, s) # aux([1,2], 0, 1, 13)
-            else:
+                return aux(l, mid+1, end, s) # aux([1,2], 0, 1, 13) else:
                 return aux(l, ini, max(mid-1, 0), s)
     return aux(l, 0, len(l)-1, s)
 
@@ -164,5 +163,56 @@ def esPoker(c1, c2, c3, c4, c5):
 #14
 #a
 # tiempo : (Horas, Minutos, Segundos)
-        
+def sumaTiempo(t1, t2):
+    segundos = t1[2] + t2[2]
+    minutos = t1[1] + t2[2] + segundos // 60 
+    horas = t1[0] + t2[0] + minutos // 60
+    j
+    return (horas, minutos % 60, segundos % 60)
+
+#15
+def diaSiguiente1(t):
+    year = t[2]
+    mes = t[1]
+    dia = t[0]
+    bisiesto = (year % 400 == 0 or (year % 4 == 0 and year % 100 != 0))
+    meses_31 = [1,3,5,7,8,10,12]
+    if mes == 2 and dia == 28:
+        if bisiesto:
+            return (dia+1, mes, year)
+        return (1, mes + 1, year)
+    if (mes == 2 and dia == 29) or (mes in meses_31 and dia == 31) or (mes not in meses_31 and dia == 30):
+        if(mes == 12):
+            return (1, 1, year + 1)
+        return (1, mes + 1, year)
+
+#16
+def diaSiguiente2(t):
+    meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    mes_number = meses.index(t[1]) + 1
+    t_number = diaSiguiente1((t[0], mes_number, t[2]))
+
+    return (t_number[0], meses[t_number[1] - 1], t_number[2])
+
+#17a
+def encajan(f1, f2):
+    return f1[0] == f2[0] or f1[0] == f2[1] or f1[1] == f2[0] or f1[1] == f2[1]
+
+#17b
+def encajanString(s):
+    l = []
+    for i in range(len(s)):
+        if s[i].isdigit():
+            l.append(s[i])
+
+    return encajan((l[0],l[1]), (l[2], l[3]))
+
+
+
+
+
+
+
+
+
 
