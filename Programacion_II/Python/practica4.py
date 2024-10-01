@@ -75,7 +75,7 @@ def buscarOinsertar(l,e):
         return i+1
 
 #4
-def diccio(l):
+def diccio(l: list[tuple]) -> dict:
     a = {}
     for e in l:
         a[e[0]] = e[1]
