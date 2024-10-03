@@ -4,7 +4,7 @@ def char_rotation(n: int)-> dict:
     for e in range(680):
         c = chr(e)
         if e > 96 and e < 123:
-            d[c] = chr(97 + (e+n) % 26)
+            d[c] = chr(97 + ((e+n-97) % 26))
         else: 
             d[c] = c
     return d
