@@ -16,7 +16,7 @@ def guardarDatos(d: dict, p: str):
     with open(p, "w+") as f:
         for key, value in d.items():
             pair = key + ', ' + value + '\n'
-            f.write(pair)
+            f.write(f"{key},{value}\n")
 
 def main(p1, p2):
     dict_from_file = cargarDatos(p1)
