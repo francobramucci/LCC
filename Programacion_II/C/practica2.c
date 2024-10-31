@@ -102,6 +102,64 @@ void ternas_pitagoricas(){
     }
 }
 
+#define secret 8
+
+void secreto(){
+    int intentos = 15, flag = 0;
+
+    while(intentos >= 0 && !flag){
+        int adivinanza;
+        printf("Ingrese un numero: ");
+        scanf("%i", &adivinanza);
+        if(adivinanza == secret){
+            printf("Numero adivinado\n");
+            flag = 1;
+        }
+        if(adivinanza > secret) printf("El numero es mayor\n");
+        if(adivinanza < secret) printf("El numero es menor\n");
+        intentos--;
+    }
+
+    if(!flag) printf("Número no adivinado");
+}
+
+void ej7(){
+    int i = 0;
+    char c = 'T';
+    char b[6] = "bucle";
+
+    for(c += 32; i < 5; i++, c--){
+        b[6] = b[i+1]; 
+        b[i+1] = '\0';
+        printf("%s %i %c\n", b, 5-i, !(i % 2) ? c-32 : c);
+        b[i+1] = b[6];
+        b[6] = '\0';
+    }
+
+}
+
+
+
+// Tomar por teclado un arreglo y un k e intercambiar los primeros k elementos por los ultimos. 
+
+void swap_array(){
+    int arr[100], aux[100], k, n;
+    printf("Ingrese cantidad de elementos (n <= 100): ");
+    scanf("%i", &n);
+    printf("Ingrese elementos: ");
+    for(int i = 0; i < n; i++){
+        int v;
+        scanf("%i", &v);
+        arr[i] = v;
+    }
+    printf("Ingrese k: ");
+    if(scanf("%i", &k) != 1) printf("Valor invalido\n");
+
+
+    for(int i = k, j = 0; i < n; i++,j++) aux[j] = arr[i];
+    for(int i = 0, j = n-k; i < k; i++,j++) aux[j] = arr[i];
+    for(int i = 0; i < n; i++) printf("%i ", aux[i]);
+}
 
 
 int main(){
@@ -113,6 +171,8 @@ int main(){
     // suma_4(10);   
     // ternas_pitagoricas();
     
+    ej7();
+    swap_array();
 
     return 0;
 }
