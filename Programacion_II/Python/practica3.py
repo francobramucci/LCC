@@ -167,7 +167,6 @@ def sumaTiempo(t1, t2):
     segundos = t1[2] + t2[2]
     minutos = t1[1] + t2[2] + segundos // 60 
     horas = t1[0] + t2[0] + minutos // 60
-    j
     return (horas, minutos % 60, segundos % 60)
 
 #15
