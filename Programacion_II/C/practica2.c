@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 // Ejercicio 1 
 void mostrarDado(){
@@ -33,7 +34,7 @@ void mostrarDado(){
     }
 }
 
-//Ejercicio 2
+// Ejercicio 2
 void mostrarHabitaciones(){
     int nHab;
     printf("1.Azul - 2.Roja - 3.Verde - 4.Rosa - 5.Gris\n");
@@ -62,7 +63,7 @@ void mostrarHabitaciones(){
     }
 }
 
-//Ejercicio 3
+// Ejercicio 3
 // 1.
 
 double suma_f1(int n){
@@ -105,9 +106,9 @@ void ternas_pitagoricas(){
 #define secret 8
 
 void secreto(){
-    int intentos = 15, flag = 0;
+    int intentos = 16, flag = 0;
 
-    while(intentos >= 0 && !flag){
+    while(intentos-- && !flag){
         int adivinanza;
         printf("Ingrese un numero: ");
         scanf("%i", &adivinanza);
@@ -117,7 +118,6 @@ void secreto(){
         }
         if(adivinanza > secret) printf("El numero es mayor\n");
         if(adivinanza < secret) printf("El numero es menor\n");
-        intentos--;
     }
 
     if(!flag) printf("Número no adivinado");
@@ -137,8 +137,6 @@ void ej7(){
     }
 
 }
-
-
 
 // Tomar por teclado un arreglo y un k e intercambiar los primeros k elementos por los ultimos. 
 
@@ -161,6 +159,151 @@ void swap_array(){
     for(int i = 0; i < n; i++) printf("%i ", aux[i]);
 }
 
+// Ejercicio 8
+
+void collatz(){
+    int n = 0, cont = 0;
+    printf("\nIngrese un numero >= 1: ");
+    scanf("%d", &n);
+    if (n < 1){ printf("Error"); return; }
+    printf("\nEl valor inicial es %i\n", n);
+    while(n != 1){
+        n = (n % 2 == 0) ? n/2 : 3*n+1;
+        printf("El siguiente valor es %i\n", n);
+        cont++;
+    }
+    printf("Valor final %i, numero de pasos %i\n",n ,cont);
+
+}
+
+// Ejercicio 9
+
+void fill_array(){
+    int array[100];
+    for(int i = 0; i<= 100; i++) { array[i] = i; printf("%i ", array[i]); }
+}
+
+// Ejercicio 10
+
+void fill_even(){
+    int array[50];
+    for(int i = 100, j = 0; i <= 200; i += 2, j++){ array[j] = i; printf("%i ", array[j]); }
+}
+
+// Ejercicio 11
+void fill_mult3(){
+    int array[50];
+    for(int i = 50, j = 0; i >= 1 ; i--, j++){ array[j] = 3*i; printf("%i ", array[j]); }
+}
+
+// Ejercicio 12
+
+void search(){
+    int arr[10], n, pos = -1;
+    printf("\nIngrese los elementos del arreglo: ");
+    for(int i = 0; i<10; i++) scanf("%d", &arr[i]);
+    printf("Ingrese el numero a encontrar: ");
+    scanf("%d", &n);
+
+    for(int i = 0; i<10; i++) (arr[i] == n) ? pos = i: pos; 
+    (pos == -1) ? printf("Error") : printf("El numero se encuentra en la posicion: %i\n", pos);
+}
+
+// Ejercicio 13
+void sum_great30(){
+    int n;
+    printf("Ingrese un entero entre 5 y 100: ");
+    scanf("%d", &n);
+    if(n < 5 || n > 100){ printf("Error\n"); return; }
+    
+    int array[100], cont = 0;
+    printf("Ingrese los elementos del arreglo: ");
+    for(int i = 0; i < n; i++){ scanf("%d", &array[i]); cont+= array[i]; }
+    printf("La suma de elementos del array es %s a 30.\n", (cont > 30) ? "mayor" : "menor");
+}
+
+// Ejercicio 14
+
+void count_until_neg(){
+    int n = 0, max = 0, maxi = 0, array[100] = { 0 };
+    printf("Ingrese valores: ");
+    while(n >= 0){
+        scanf("%d", &n);
+        array[n]++;
+    }
+    for(int i = 0; i <= 100; i++) if(array[i] > max){ max = array[i]; maxi = i; };
+    printf("\nEl valor mas veces ingresado es %i con un total de %i veces.\n", maxi, max);
+}
+
+// Ejercicio 15
+int sumaArr(int arr[100], int n){
+    int cont = 0;
+    for(int i = 0; i < n; i++) cont += arr[i];
+    printf("La suma de los elementos del arreglo es %i.\n", cont);
+    return cont;
+}
+
+// Ejercicio 16
+int prodAlt(int arr[100], int n){
+    int cont = 1;
+    for(int i = 0; i < n; i+=2) cont *= arr[i];
+    printf("El producto de los elementos de indice par es %i.\n", cont);
+    return cont;
+}
+
+// Ejercicio 18
+int char_in_string(char s[100], char c){
+    int flag = 0;
+    for(int i = 0; i < strlen(s); i++) if(s[i] == c) flag = 1;
+    return flag;
+}
+
+// Ejercicio 19
+int times_in_string(char s[100], char c){
+    int cont = 0;
+    for(int i = 0; i < strlen(s); i++) if(s[i] == c) cont++;
+    return cont;
+}
+
+// Ejercicio 20
+void print_reverse(){
+    char s[100];
+    printf("Ingrese la palabra: ");
+    scanf("%s", s);
+    for(int i = strlen(s)-1; i >= 0; i--) printf("%c", s[i]);
+    printf("\n");
+}
+
+// Ejercicio 21
+int is_capicua(char s[100]){
+    int flag = 1;
+    for(int i = 0, j = strlen(s)-1; j >= 0; i++, j--) if(s[i] != s[j]) flag = 0;
+    return flag;
+}
+
+// Ejercicio 22
+int is_pangrama(char s[100]){
+    int arr[26] = { 0 }, flag = 1;
+    for(int i = 0; i < strlen(s); i++) arr[s[i] - 97] = 1;
+    for(int i = 0; i < 26; i++) if(arr[i] == 0) flag = 0;
+    return flag;
+}
+
+// Ejercicio 23
+
+int is_included(char s1[100], char s2[100]){
+    int flag = 0;
+    for(int i = 0; i <= strlen(s1)-strlen(s2); i++){
+        if(s1[i] == s2[0]){
+            int k = 0;
+            while(s1[i+k] == s2[k] || k == strlen(s2)) k++;
+            if(k == strlen(s2)) flag = 1;
+        }
+    }
+    return flag;
+}
+
+
 
 int main(){
     // mostrarDado();
@@ -170,9 +313,20 @@ int main(){
     // suma_f3(25);
     // suma_4(10);   
     // ternas_pitagoricas();
-    
-    ej7();
-    swap_array();
+    // ej7();
+    // swap_array();
+    // collatz();
+    // search();
+    // sum_great30();
+    // count_until_neg();
+    // int arr[50] = {20,10,20,30,40};
+    // sumaArr(arr, 5);
+    // prodAlt(arr, 5);
+    // printf("La letra %s en la palabra.\n", (char_in_string("hola", 'j')) ? "esta" : "no esta");
+    // print_reverse();
+    // printf("La palabra %s capicua.\n", (is_capicua("awaiawa")) ? "es" :  "no es");
+    // printf("La palabra %s pangrama.\n", (is_pangrama("murcielago")) ? "es" :  "no es");
+    printf("%i\n", is_included("holanda", "landa"));
 
     return 0;
 }
