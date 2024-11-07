@@ -296,14 +296,12 @@ int is_included(char s1[100], char s2[100]){
     for(int i = 0; i <= strlen(s1)-strlen(s2); i++){
         if(s1[i] == s2[0]){
             int k = 0;
-            while(s1[i+k] == s2[k] || k == strlen(s2)) k++;
-            if(k == strlen(s2)) flag = 1;
+            while(s1[i+k] == s2[k] && k != strlen(s2)-1) k++; // h h, k=0, o o, k=1, l l k=2, a a k=3
+            if(k == strlen(s2)-1) flag = 1;
         }
     }
     return flag;
 }
-
-
 
 int main(){
     // mostrarDado();
