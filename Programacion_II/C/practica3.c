@@ -33,10 +33,10 @@ void tipo_valor(){
     int a = 3;
     int* ptr = &a;
     int* qtr = vector ;
-    printf("a = %d, &a = %p, *a = error, ptr = %p\n", a, &a, ptr);
-    printf("&ptr = %p, *ptr = %d, qtr = %p, &qtr = %p\n", &ptr, *ptr , qtr, &qtr);
-    printf("*qtr = %d, vector = %p, &vector = %p, *vector = %d\n", *qtr, vector, &vector, *vector);
-    printf("++qtr = %p, ++*qtr = %d, ++*vector = %d, *&ptr = %p\n", ++qtr, ++*qtr, ++*vector, *&ptr);
+    printf("a = %d (int), &a = %p (int*), *a = error, ptr = %p (int*)\n", a, &a, ptr);
+    printf("&ptr = %p (int**), *ptr = %d (int), qtr = %p, &qtr = %p (int**)\n", &ptr, *ptr , qtr, &qtr);
+    printf("*qtr = %d (int), vector = %p (int*) , &vector = %p int(*)[5], *vector = %d\n", *qtr, vector, &vector, *vector);
+    printf("++qtr = %p (int*), ++*qtr = %d (int), ++*vector = %d (int), *&ptr = %p (int*)\n", ++qtr, ++*qtr, ++*vector, *&ptr);
 }
 
 // Ejercicio 3
@@ -83,13 +83,16 @@ void ej_3(){
 
 // Ejercicio 4
 // 1
-void initialize(int* a, int* b) {
-    if (*a >0) *b = 1; else *b = 0;
+void initialize(int a, int* b) {
+    if (a > 0) 
+        *b = 1; 
+    else
+        *b = 0;
 }
 
 int main1() {
     int a = -10, b = 20;
-    initialize(&a, &b);
+    initialize(a, &b);
     printf (" %d %d \n", a, b);
     return 0;
 }

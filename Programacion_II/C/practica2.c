@@ -303,6 +303,11 @@ int is_included(char s1[100], char s2[100]){
     return flag;
 }
 
+int sumadigitos(int n){
+    if(n >= 0 && n<=9) return n;
+    return n%10 + sumadigitos(n/10);
+}
+
 int main(){
     // mostrarDado();
     // mostrarHabitaciones();
@@ -325,6 +330,7 @@ int main(){
     // printf("La palabra %s capicua.\n", (is_capicua("awaiawa")) ? "es" :  "no es");
     // printf("La palabra %s pangrama.\n", (is_pangrama("murcielago")) ? "es" :  "no es");
     printf("%i\n", is_included("holanda", "landa"));
+    printf("Suma digitos: %i\n", sumadigitos(932));
 
     return 0;
 }
