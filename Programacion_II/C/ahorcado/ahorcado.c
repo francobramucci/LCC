@@ -41,18 +41,40 @@ char* elegir_palabra(FILE* archivo, int cant_lineas){
 void mostrar_palabra(char* palabra){
     for(int i = 0; palabra[i] != '\0'; i++)
         printf("%c ", palabra[i]);
+    printf("\n");
 }
 
+//char entrada(int* intentos){
+//    char c = '0'; 
+//    printf("Ingrese una letra: "); 
+//    while(c < 97 || c > 122 || intentos[c % 26]){
+//        fflush(stdin);
+//        scanf("%c", &c);
+//        c = tolower(c);
+//        printf("!!%c!!", c);
+//        //clear();
+//        if(c < 97 || c > 122)
+//            printf("Ingrese un caracter valido: ");
+//        else if(intentos[c % 26])
+//            printf("Ingrese una letra que no haya ingresado: ");
+//        else printf("Ingrese una letra: ");   
+//    }
+//    //clear();
+//    return c;
+//}
 char entrada(int* intentos){
-    int c = '0';
+    char c;
+    printf("Ingrese una letra: ");
+    scanf("%c%*[^\n]%*c", &c);
+    clear();
     while(c < 97 || c > 122 || intentos[c % 26]){
-        printf("Ingrese una letra: "); 
-        c = tolower(scanf("%d", &c));
-        if(c < 97 || c > 122 )
-            printf("Ingrese un caracter valido.\n");
-        if(intentos[c % 26])
-            printf("Ingrese una letra que no haya ingresado");
-        //clear();
+        //getchar();
+        if(c < 97 || c > 122)
+            printf("Ingrese un caracter valido: ");
+        if(intentos[c%26])
+            printf("Ingrese una letra que no haya ingresado: ");
+        scanf("%c%*[^\n]%*c", &c); 
+        clear();
     }
 
     return c;
@@ -80,9 +102,9 @@ int vs_maquina(char* secreto){
     adivinanza[i] = '\0';
 
     while(strcmp(adivinanza, secreto) != 0 && vidas){
+        printf("Vidas: %d. ", vidas);
         mostrar_palabra(adivinanza);
         char letra = entrada(intentos);
-        printf("letra: %c", letra);
         intentos[letra % 26] = 1;
         if(!comprobar_letra(letra, adivinanza, secreto))
             vidas--;
@@ -96,15 +118,21 @@ int main(int argc, char const *argv[]){
         printf("Ingrese el archivo lemario.\n");
         return 1;
     }
-
+    clear();
+    
     FILE* archivo = fopen(argv[1], "r");
     assert(archivo != NULL);
     int cant_lineas_archivo = cant_lineas(archivo);
     char* palabra_secreta = elegir_palabra(archivo, cant_lineas_archivo); 
-    vs_maquina(palabra_secreta);
+    fclose(archivo);
 
+   // int victoria = vs_maquina(palabra_secreta);
+   // if(victoria) printf("Ganaste\n");
+   // else printf("Perdiste. La palabra secreta era: %s\n", palabra_secreta);
+
+    int intentos[27] = {};
+    while(1) printf("Letra: %c\n", entrada(intentos));
     free(palabra_secreta);
-
 
     return 0;
 }
