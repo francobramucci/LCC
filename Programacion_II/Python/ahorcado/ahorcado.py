@@ -17,28 +17,24 @@ def menu() -> int:
 def clear():
     print("\n"*90)
 
-def lineas_archivo(s:str) -> int:
-    f = open(s, "r")
+def lineas_archivo(archivo) -> int:
     i = 0
-    for l in f:
+    for l in archivo:
         i += 1
-    f.close()
     return i
 
-def elegir_palabra(lemario:str) -> str:
-    f = open(lemario, "r")
-    j = 1
+def elegir_palabra(archivo, cant_lineas:int) -> str:
+    archivo.seek(0) 
 
-    cant_lineas = lineas_archivo(lemario)
+    j = 1
     num_pal = randint(1, cant_lineas)
     
     while j != num_pal:
-        f.readline()
+        archivo.readline()
         j += 1
 
-    palabra_elegida = f.readline()
+    palabra_elegida = archivo.readline()
     palabra_elegida = palabra_elegida[:len(palabra_elegida) - 1]
-    f.close()
 
     return palabra_elegida
 
@@ -85,8 +81,7 @@ def mostrar_tablero(adivinanza:list[str], vidas:int, elegidas:set):
     print()
 
     
-def vs_maquina(lemario: str) -> tuple[bool,str]:
-    palabra_secreta = elegir_palabra(lemario)
+def jugar(palabra_secreta:str) -> tuple[bool,str]:
     correctas = letras_correctas(palabra_secreta)
     cant_diferentes = len(correctas.keys())
     vidas = 6
@@ -108,18 +103,36 @@ def vs_maquina(lemario: str) -> tuple[bool,str]:
         return (True, palabra_secreta)
     return (False, palabra_secreta)
 
-#def vs_jugador():
-    
+def ingresar_palabra() -> str:
+    incorrecto = 1
+    palabra = ""
+    while incorrecto:
+        incorrecto = 0
+        palabra = input("Ingrese la palabra secreta:")
+        for letra in palabra:
+            if not letra.isalpha():
+                incorrecto = 1
+    return palabra
 
+def mensaje_resultado(resultado:tuple[bool, str]):
+    print("Ganaste, la palabra era" if resultado[0] else "Perdiste, la palabra era", f'"{resultado[1]}"')
+    input("Presione enter para continuar:")
 
 def main(lemario):
     modo = menu()
+    palabra_secreta = ''
     while modo != 3:
         if modo == 1:
+            archivo = open(lemario, "r")
+            largo = lineas_archivo(archivo)
             clear()
-            resultado = vs_maquina(lemario)
-            print("Ganaste, la palabra era" if resultado[0] else "Perdiste, la palabra era", f'"{resultado[1]}"')
-            input("Presione enter para continuar:")
+            palabra_secreta = elegir_palabra(archivo, largo)
+        
+        if modo == 2:
+            palabra_secreta = ingresar_palabra()
+        
+        resultado = jugar(palabra_secreta)
+        mensaje_resultado(resultado);
         modo = menu()
 
 if __name__ == "__main__":
