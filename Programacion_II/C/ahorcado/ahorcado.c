@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
-#include <ctype.h>
 
 #define LARGO_MAXIMO 50
 
@@ -44,28 +43,10 @@ void mostrar_palabra(char* palabra){
     printf("\n");
 }
 
-//char entrada(int* intentos){
-//    char c = '0'; 
-//    printf("Ingrese una letra: "); 
-//    while(c < 97 || c > 122 || intentos[c % 26]){
-//        fflush(stdin);
-//        scanf("%c", &c);
-//        c = tolower(c);
-//        printf("!!%c!!", c);
-//        //clear();
-//        if(c < 97 || c > 122)
-//            printf("Ingrese un caracter valido: ");
-//        else if(intentos[c % 26])
-//            printf("Ingrese una letra que no haya ingresado: ");
-//        else printf("Ingrese una letra: ");   
-//    }
-//    //clear();
-//    return c;
-//}
 char entrada(int* intentos){
     char c;
     printf("Ingrese una letra: ");
-    scanf("%c%*[^\n]%*c", &c);
+    scanf(" %c%*[^\n]", &c);
     clear();
     while(c < 97 || c > 122 || intentos[c % 26]){
         //getchar();
@@ -73,7 +54,7 @@ char entrada(int* intentos){
             printf("Ingrese un caracter valido: ");
         if(intentos[c%26])
             printf("Ingrese una letra que no haya ingresado: ");
-        scanf("%c%*[^\n]%*c", &c); 
+        scanf(" %c%*[^\n]", &c); 
         clear();
     }
 
@@ -82,7 +63,7 @@ char entrada(int* intentos){
 
 int comprobar_letra(char letra, char* adivinanza, char* secreto){
     int acierto = 0;
-    for(int i = 0; i < strlen(secreto); i++){
+    for(int i = 0; i < (int)strlen(secreto); i++){
         if(letra == secreto[i]){
             adivinanza[i] = letra;
             acierto = 1;
@@ -126,12 +107,10 @@ int main(int argc, char const *argv[]){
     char* palabra_secreta = elegir_palabra(archivo, cant_lineas_archivo); 
     fclose(archivo);
 
-   // int victoria = vs_maquina(palabra_secreta);
-   // if(victoria) printf("Ganaste\n");
-   // else printf("Perdiste. La palabra secreta era: %s\n", palabra_secreta);
+    int victoria = vs_maquina(palabra_secreta);
+    if(victoria) printf("Ganaste\n");
+    else printf("Perdiste. La palabra secreta era: %s\n", palabra_secreta);
 
-    int intentos[27] = {};
-    while(1) printf("Letra: %c\n", entrada(intentos));
     free(palabra_secreta);
 
     return 0;
