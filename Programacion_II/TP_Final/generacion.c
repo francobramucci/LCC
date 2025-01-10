@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include "generacion.h"
+// TODO:: Comentar el codigo, hacer los .h, makefile, archivo con disposiciones anteriores, chequear valgrind.
+
 
 typedef struct {
 	int x;
@@ -8,13 +8,20 @@ typedef struct {
 } pair;
 
 typedef struct {
+	int dimension;
 	char** matriz;
+	int cantObstaculosFijos;
 	int cantObstaculosAleatorios;
+	pair inicio;
+	pair final;
 } Tablero;
 
 FILE* abrir_archivo (char *ruta, char *modo){
 	FILE* archivo = fopen(ruta, modo);
-	assert(archivo != NULL);
+	if(archivo == NULL){
+		fprintf(stderr, "El archivo no existe o ha ocurrido un problema al abrirlo.\n");
+		exit(1);
+	}
 
 	return archivo;
 }
@@ -33,60 +40,162 @@ void llenar_matriz_con_char (char **matriz, int n, char valor){
 			matriz[i][j] = valor;
 }
 
-// Asegurarse de que la cantidad de obstaculos posibilita una solución y que 
-// no hay obstaculos ni en el inicio ni en el final y que la posicion de inicio
-// no coincida con la del objetivo.
-int validar_entrada(char **matriz, int dimension, int cantObstaculos, pair ini, pair fin){
-	if(cantObstaculos <= dimension * dimension - 2){
-		printf("La cantidad de obstaculos debe ser menor que la dimension^2-2\n");
-		return 1;
-	}
-	if(matriz[ini.x][ini.y] != '1'){
-		printf("No debe haber obstaculos en la posicion de inicio\n");
-		return 1;
-	}
-	if(matriz[fin.x][fin.y] != '1'){
-		printf("No debe haber obstaculos en la posicion del objetivo\n");
-		return 1;
-	}
-	if(ini.x != fin.x || ini.y != fin.y){
-		printf("La posicion de inicio no debe coincidir con la del objetivo\n");
-		return 1;
-	}
-
-	return 0;
+int dentro_cuadrado(pair cord, int n){
+	return cord.x > 0 && cord.x <= n && cord.y > 0 && cord.y <= n;
 }
 
-// Se lee el archivo con el formato propuesto. Se guarda la informacion en una 
-Tablero *obtener_informacion (FILE *archivo){
-		
-	Tablero* tab = malloc(sizeof(Tablero));
+void liberar_tablero(Tablero* tab){
+	int dim = tab->dimension;
+	for(int i = 0; i < dim; i++)
+		free(tab->matriz[i]);
+
+	free(tab->matriz);
+	free(tab);
+}
+
+void limpiar(Tablero* tab, FILE* archivo){
+	liberar_tablero(tab);
+	fclose(archivo);
+}
+
+void validar_entrada(Tablero* tab, FILE* archivo){
+	int dimension = tab->dimension;
+	int cantObstaculos = tab->cantObstaculosFijos + tab->cantObstaculosAleatorios;
+	pair ini = tab->inicio, fin = tab->final;
 	
+	if(!dentro_cuadrado(ini, dimension) || !dentro_cuadrado(fin, dimension)){
+		fprintf(stderr, "\nError: La posicion de inicio y final deben estar dentro del cuadrado de la dimension dada.\n");
+		limpiar(tab, archivo);
+		exit(1);
+	}
+
+	if(tab->matriz[ini.x - 1][ini.y - 1] == '1')
+		cantObstaculos--;
+
+	if(tab->matriz[fin.x - 1][fin.y - 1] == '1')
+		cantObstaculos--;
+
+	if(cantObstaculos > dimension * dimension - 2){
+		fprintf(stderr, "\nError: La cantidad de obstaculos debe ser menor que la dimension^2 - 2\n");
+		limpiar(tab, archivo);
+		exit(1);
+	}
+	if(ini.x == fin.x && ini.y == fin.y){
+		fprintf(stderr, "Error: La posicion de inicio no debe coincidir con la del objetivo.\n");
+		limpiar(tab, archivo);
+		exit(1);
+	}
+	
+}
+
+void leer_dimension(FILE *archivo, Tablero* tab){
 	int dimension;
 	fscanf(archivo, "%*s %d %*[^\n]", &dimension);
+	
+	tab->dimension = dimension;
+}
 
-	inicializar_matriz_cuadrada(&tab->matriz, dimension);
-	llenar_matriz_con_char (tab->matriz, dimension, '0');
-
-	int x;
-	int y;
-	int cantFijos = 0;
+void leer_obstaculos_fijos(FILE *archivo, Tablero* tab){
+	int x, y, cantFijos = 0, dimension;
+	dimension = tab->dimension;
 
 	while(fscanf(archivo, " (%d,%d)", &x, &y) != 0){
-		if(x > 0 && x < dimension && y > 0 && y < dimension){
+		if(x > 0 && x <= dimension && y > 0 && y <= dimension){
 			tab->matriz[x-1][y-1] = '1';
 			cantFijos++;
 		}
 	}
 	
-	pair ini, fin;
-	fscanf(archivo, "%*[^\n] %d (%d,%d) %*s (%d,%d)", &tab->cantObstaculosAleatorios, &ini.x, &ini.y, &fin.x, &fin.y);
-	assert(validar_entrada(tab->matriz, dimension, cantFijos + tab->cantObstaculosAleatorios, ini, fin) != 1);
+	tab->cantObstaculosFijos = cantFijos;
+}
+
+void leer_cant_obstaculos_aleatorios(FILE *archivo, Tablero *tab){
+	int cantAleatorios;
+	fscanf(archivo, "%*[^\n] %d", &cantAleatorios);
+
+	tab->cantObstaculosAleatorios = cantAleatorios;
+}
+
+void leer_posicion_inicio(FILE *archivo, Tablero *tab){
+	pair ini; 
+	fscanf(archivo, " %*[^\n] (%d,%d)", &ini.x, &ini.y);
+	
+	tab->inicio = ini;
+}
+
+void leer_posicion_final(FILE *archivo, Tablero *tab){
+	pair fin; 
+	fscanf(archivo, " %*[^\n] (%d,%d)", &fin.x, &fin.y);
+	
+	tab->final = fin;
+}
+
+Tablero *obtener_informacion(FILE *archivo){
 		
-	tab->matriz[ini.x][ini.y] = 'I';
-	tab->matriz[fin.x][fin.y] = 'X';
+	Tablero* tab = malloc(sizeof(Tablero));
+	
+	leer_dimension(archivo, tab);
+	int dimension = tab->dimension;
+
+	inicializar_matriz_cuadrada(&tab->matriz, dimension);
+	llenar_matriz_con_char (tab->matriz, dimension, '0');
+
+	leer_obstaculos_fijos(archivo, tab);
+	int cantFijos = tab->cantObstaculosFijos;
+	
+	leer_cant_obstaculos_aleatorios(archivo, tab);
+	int cantAleatorios = tab->cantObstaculosAleatorios;
+	
+	leer_posicion_inicio(archivo, tab);
+	leer_posicion_final(archivo, tab);
+	pair ini, fin;
+
+	ini = tab->inicio;
+	fin = tab->final;
+
+	validar_entrada(tab, archivo);
+
+	tab->matriz[ini.x - 1][ini.y - 1] = 'I';
+	tab->matriz[fin.x - 1][fin.y - 1] = 'X';
 
 	return tab;
+}
+
+int generar_aleatorio(int n){
+	return rand() % n;
+}
+
+void colocar_obstaculos_aleatorios (Tablero* tab){
+	srand(time(NULL));
+	int x, y, dim, cantAleatorios;
+	
+	char** matriz = tab->matriz;
+	cantAleatorios = tab->cantObstaculosAleatorios;
+	dim = tab->dimension;
+	
+	while(cantAleatorios--){
+		x = generar_aleatorio(dim);
+		y = generar_aleatorio(dim);
+
+		while(matriz[x][y] != '0'){
+			x = generar_aleatorio(dim);
+			y = generar_aleatorio(dim);
+		}
+		matriz[x][y] = '1';
+	}
+
+}
+
+void impimir_tablero(Tablero* tab, FILE* laberinto){
+	int dimension = tab->dimension;
+	char** matriz = tab->matriz;
+	for(int i = 0; i < dimension; i++){
+		for(int j = 0; j < dimension; j++){
+			fprintf(laberinto, "%c", matriz[i][j]);
+		}
+		fprintf(laberinto, "\n");
+	}
+
 }
 
 
@@ -95,12 +204,17 @@ int main(int argc, char **argv){
 		printf("Ingrese el archivo con la informacion del tablero\n");
 		return 1;
 	}
-	FILE* archivo = abrir_archivo(argv[1], "r");
-	
-	Tablero* tablero;
-	tablero = obtener_informacion(archivo);
-	
+	FILE* entrada = abrir_archivo(argv[1], "r");
 
+	Tablero* tablero;
+	tablero = obtener_informacion(entrada);
+	colocar_obstaculos_aleatorios(tablero);
+
+	FILE* laberinto = abrir_archivo("laberinto.txt", "w+");
+	impimir_tablero(tablero, laberinto);
+	
+	limpiar(tablero, entrada);
+	fclose(laberinto);
 
 	return 0;
 }
