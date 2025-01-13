@@ -14,7 +14,7 @@ int main(int argc, char **argv){
 	
 	int dimension = tablero->dimension;
 
-	FILE* laberinto = abrir_archivo("laberinto.txt", "w+");
+	FILE* laberinto = abrir_archivo("SalidaLaberinto.txt", "w+");
 	impimir_matriz(tablero->matriz, dimension, dimension, laberinto);
 	
 	liberar_tablero(tablero);
