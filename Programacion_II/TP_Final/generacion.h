@@ -3,6 +3,7 @@
 
 #include "utils.h"
 
+
 /*
  * Almacena informacion sobre el tablero (dimension y cantidad de obstaculos
  * aleatorios) y una matriz donde se cargarán los obstaculos y las posiciones
@@ -12,22 +13,61 @@ typedef struct {
 	int dimension;
 	char** matriz;
 	int cantObstaculosAleatorios;
+	int cantObstaculosFijos;
+	pair inicio;
+	pair final;
 } Tablero;
 
 
 /*
- * Valida que se cumplan ciertas condiciones necesarias para el funcionamiento
- * del programa.
+ * Libera la memoria reservada del tablero y cierra el archivo de entrada.
  */
-void validar_entrada(int dimension, int cantObstaculos, pair ini, pair fin);
+void abortar(Tablero* tab, FILE* archivo);
+
+
+/*
+ * Recibe un archivo de entrada y lee y guarda un entero en un campo del
+ * tablero que representa la dimension.
+ */
+void leer_dimension(FILE *archivo, Tablero* tab);
+
+
+/*
+ * Lee de la entrada pares ordenados que representan los obstaculos fijos y
+ * marca dichas posiciones en la matriz cuadrada del tablero. En caso de que
+ * alguna posicion sea invalida no se marca en el tablero y no se cuenta el
+ * obstaculo.
+ */
+void leer_cant_obstaculos_aleatorios(FILE *archivo, Tablero *tab);
+
+
+/*
+ * Lee un par ordenado que representa la posicion inicial del laberinto y se
+ * almacena en un campo del tablero para su posterior verificacion.
+ */
+void leer_posicion_inicio(FILE *archivo, Tablero *tab);
+
+
+/*
+ * Lee un par ordenado que representa la posicion del objetivo del laberinto y
+ * se almacena en un campo del tablero para su posterior verificacion.
+ */
+void leer_posicion_final(FILE *archivo, Tablero *tab);
+
+
+/*
+ * Valida ciertas condiciones necesarias para el funcionamiento del programa.
+ * En caso de que haya un obstaculo en la posicion de inicio o final dicho
+ * obstaculo sera eliminado y no contado y se colocara la posicion de inicio o
+ * fin correspondiente. En caso de que alguna de estas condiciones necesarias
+ * no sea cumplida se terminara la ejecucion del programa.
+ */
+void validar_entrada(Tablero* tab, FILE* archivo);
 
 
 /*
  * Recibe un puntero a archivo y lee la informacion formateada de la forma
- * propuesta para luego guardarla en la estructura de tipo Tablero. Se
- * considera que si la posicion de inicio o final esta sobre un obstaculo
- * previamente fijado se sobreescribira dicha posicion con la de inicio o final
- * descartando al obstaculo
+ * propuesta para luego guardarla en la estructura de tipo Tablero. 
  */
 Tablero *obtener_informacion (FILE *archivo);
 
@@ -40,10 +80,10 @@ Tablero *obtener_informacion (FILE *archivo);
  */
 void colocar_obstaculos_aleatorios (Tablero* tab);
 
-void impimir_tablero(Tablero* tab, FILE* laberinto);
 
+/*
+ * Toma un puntero a tablero y libera la memoria reservada para este
+ */
 void liberar_tablero(Tablero* tab);
 
-
 #endif
-
