@@ -1,4 +1,5 @@
 #include "generacion.h"
+#include <sys/time.h>
 
 void liberar_tablero(Tablero* tab){
 	liberar_matriz(tab->matriz, tab->dimension);
@@ -10,8 +11,6 @@ void abortar(Tablero* tab, FILE* archivo){
 	fclose(archivo);
 	exit(1);
 }
-
-
 
 void validar_entrada(Tablero* tab, FILE* archivo){
 	int dimension = tab->dimension;
@@ -122,8 +121,15 @@ Tablero *obtener_informacion(FILE *archivo){
 	return tab;
 }
 
+void inicializar_rand(){
+	struct timeval tv;
+    gettimeofday(&tv, NULL);
+    unsigned int seed = tv.tv_sec * 1000 + tv.tv_usec / 1000; // Milisegundos
+    srand(seed);
+}
+
 void colocar_obstaculos_aleatorios (Tablero* tab){
-	srand(time(NULL));
+	inicializar_rand();
 	int x, y, dim, cantAleatorios;
 	
 	char** matriz = tab->matriz;
@@ -140,6 +146,5 @@ void colocar_obstaculos_aleatorios (Tablero* tab){
 		}
 		matriz[x][y] = '1';
 	}
-
 }
 

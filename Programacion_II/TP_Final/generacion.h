@@ -72,6 +72,9 @@ void validar_entrada(Tablero* tab, FILE* archivo);
 Tablero *obtener_informacion (FILE *archivo);
 
 
+void inicializar_rand();
+
+
 /*
  * Genera posiciones aleatorias para colocar los obstaculos en la matriz dentro
  * de la estructura Tablero. Se considera que una posicion valida de un
