@@ -1,5 +1,4 @@
 #include "generacion.h"
-#include <sys/time.h>
 
 void liberar_tablero(Tablero* tab){
 	liberar_matriz(tab->matriz, tab->dimension);
@@ -98,14 +97,13 @@ void leer_posicion_final(FILE *archivo, Tablero *tab){
 }
 
 Tablero *obtener_informacion(FILE *archivo){
-		
 	Tablero* tab = malloc(sizeof(Tablero));
 	
 	leer_dimension(archivo, tab);
 	int dimension = tab->dimension;
 
 	inicializar_matriz(&tab->matriz, dimension, dimension);
-	llenar_matriz_con_char (tab->matriz, dimension, dimension, '0');
+	llenar_matriz_con_char(tab->matriz, dimension, dimension, '0');
 
 	leer_obstaculos_fijos(archivo, tab);
 	leer_cant_obstaculos_aleatorios(archivo, tab);
@@ -125,16 +123,7 @@ Tablero *obtener_informacion(FILE *archivo){
 	return tab;
 }
 
-void inicializar_rand(){
-	struct timeval tiempoUnix;
-    gettimeofday(&tiempoUnix, NULL);
-	unsigned int tiempoUnixSegundos = tiempoUnix.tv_sec;
-	unsigned int tiempoUnixMicroSegundos = tiempoUnix.tv_usec;
-    unsigned int seed = tiempoUnixMicroSegundos + tiempoUnixSegundos * 1000000; // Si hay overflow se comienza de vuelta desde 0
-    srand(seed);
-}
-
-void colocar_obstaculos_aleatorios (Tablero* tab){
+void colocar_obstaculos_aleatorios(Tablero* tab){
 	inicializar_rand();
 	int x, y, dim, cantAleatorios;
 	

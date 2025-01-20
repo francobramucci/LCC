@@ -35,3 +35,6 @@ $ python3 main.py
 "make clean" limpiará todos los archivos objeto y el ejecutable main en el
 directorio build/.
 
+# Comentarios
+Este proyecto funciona para sistemas POSIX ya que se utiliza la
+función gettimeofday() definida en la cabecera <sys/time.h>.

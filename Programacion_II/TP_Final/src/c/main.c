@@ -1,6 +1,5 @@
 #include "generacion.h"
 
-
 int main(int argc, char **argv){
 	if(argc != 2){
 		printf("Ingrese el archivo con la informacion del tablero\n");

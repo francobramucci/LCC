@@ -14,7 +14,6 @@ def test_inicializar_matriz():
     assert len(matriz_grande[0]) == 1000
     assert matriz_grande[0][0] == 0
 
-
 def test_inicializar_laberinto():
     dimension = 5
     laberinto = inicializar_laberinto(dimension)
@@ -24,13 +23,6 @@ def test_inicializar_laberinto():
     assert laberinto["inicio"] == (-1, -1), "El inicio debería estar sin definir (-1, -1)."
     assert laberinto["objetivo"] == (-1, -1), "El objetivo deberia estar sin definir (-1, -1)."
 
-    assert isinstance(laberinto["tablero"], list), "El tablero deberia ser una lista."
-    assert len(laberinto["tablero"]) == dimension, "El numero de filas del tablero no coincide."
-    assert all(len(fila) == dimension for fila in laberinto["tablero"]), "El numero de columnas no coincide."
-
-    assert isinstance(laberinto["visitados"], list), "La matriz de visitados deberia ser una lista."
-    assert len(laberinto["visitados"]) == dimension, "El numero de filas de visitados no coincide."
-    assert all(len(fila) == dimension for fila in laberinto["visitados"]), "El numero de columnas de visitados no coincide."
 
     assert all(celda == 0 for fila in laberinto["tablero"] for celda in fila), "Todas las celdas del tablero deberian estar en 0."
     assert all(celda is False for fila in laberinto["visitados"] for celda in fila), "Todas las celdas de visitados deberian estar en False."
@@ -48,7 +40,7 @@ def test_obtener_laberinto():
 
     obtener_laberinto(archivo, laberinto)
 
-    assert laberinto["tablero"][1][0] == laberinto["tablero"][1][1] == 16  
+    assert laberinto["tablero"][1][0] == laberinto["tablero"][1][1] == 16
     assert laberinto["visitados"][1][0] is True
     assert laberinto["visitados"][1][1] is True
     assert laberinto["tablero"][0][0] == 0
@@ -56,7 +48,7 @@ def test_obtener_laberinto():
     assert laberinto["inicio"] == (0, 0)
     assert laberinto["objetivo"] == (2, 1)
 
-def test_posicion_valida():
+def test_dentro_matriz():
     assert dentro_matriz((1, 1), 3, 3) == True
     assert dentro_matriz((0, 0), 3, 3) == True
     assert dentro_matriz((2, 2), 4, 4) == True

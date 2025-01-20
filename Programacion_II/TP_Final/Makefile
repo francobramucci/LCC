@@ -16,5 +16,5 @@ $(BUILD_DIR):
 
 .PHONY: clean
 clean:
-	rm $(BUILD_DIR)*.o  $(BUILD_DIR)main
+	rm -rf $(BUILD_DIR)
 

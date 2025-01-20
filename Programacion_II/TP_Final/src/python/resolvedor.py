@@ -24,7 +24,7 @@ def abrir_archivo(path:str, modo:str):
 
     :returns: el objeto archivo.
     """
-    archivo = open(path, modo) 
+    archivo = open(path, modo)
     return archivo
 
 def inicializar_matriz(m:int, n:int, valor) -> list:
@@ -115,7 +115,7 @@ def dentro_matriz(pos:tuple[int, int], m:int, n:int) -> bool:
     :param m: cantidad de filas de la matriz.
     :param n: cantidad de columnas de la matriz.
 
-    :returns si el punto esta dentro de la matriz.
+    :returns: si el punto esta dentro de la matriz.
     """
     x = pos[0]
     y = pos[1]

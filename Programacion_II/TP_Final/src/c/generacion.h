@@ -3,7 +3,6 @@
 
 #include "utils.h"
 
-
 /*
  * Almacena informacion sobre el tablero (dimension y cantidad de obstaculos
  * aleatorios) y una matriz donde se cargarán los obstaculos y las posiciones
@@ -20,7 +19,7 @@ typedef struct {
 
 
 /*
- * Libera la memoria reservada del tablero y cierra el archivo de entrada.
+ * Libera la memoria reservada para el tablero y cierra el archivo de entrada.
  */
 void abortar(Tablero* tab, FILE* archivo);
 
@@ -58,7 +57,7 @@ void leer_posicion_final(FILE *archivo, Tablero *tab);
 /*
  * Valida ciertas condiciones necesarias para el funcionamiento del programa.
  * En caso de que haya un obstaculo en la posicion de inicio o final dicho
- * obstaculo sera eliminado y no contado y se colocara la posicion de inicio o
+ * obstaculo sera eliminado, no contado y se colocara la posicion de inicio o
  * fin correspondiente. En caso de que alguna de estas condiciones necesarias
  * no sea cumplida se terminara la ejecucion del programa.
  */
@@ -71,17 +70,6 @@ void validar_entrada(Tablero* tab, FILE* archivo);
  */
 Tablero *obtener_informacion (FILE *archivo);
 
-/*
- * Toma el tiempo unix en segundos y los microsegundos transcurridos en dicho
- * segundo. luego pasa los segundos a microsegundos y los suman. luego se toma
- * este valor como semilla de srand(). Esta semilla tiene variaciones en el
- * orden de microsegundos, por lo que para multiples ejecuciones en un mismo
- * segundo es seguro que el valor de la semilla cambiara y se generaran
- * combinaciones numericas diferentes. Si se hubiera optado por srand(time(NULL)) la
- * semilla cambiaria cada 1 segundo en cada ejecucion ya que time(NULL)
- * devolveria el mismo valor dentro de un mismo segundo.
- */
-void inicializar_rand();
 
 
 /*
