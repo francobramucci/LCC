@@ -67,11 +67,20 @@ void validar_entrada(Tablero* tab, FILE* archivo);
 
 /*
  * Recibe un puntero a archivo y lee la informacion formateada de la forma
- * propuesta para luego guardarla en la estructura de tipo Tablero. 
+ * propuesta para luego guardarla en la estructura de tipo Tablero.
  */
 Tablero *obtener_informacion (FILE *archivo);
 
-
+/*
+ * Toma el tiempo unix en segundos y los microsegundos transcurridos en dicho
+ * segundo. luego pasa los segundos a microsegundos y los suman. luego se toma
+ * este valor como semilla de srand(). Esta semilla tiene variaciones en el
+ * orden de microsegundos, por lo que para multiples ejecuciones en un mismo
+ * segundo es seguro que el valor de la semilla cambiara y se generaran
+ * combinaciones numericas diferentes. Si se hubiera optado por srand(time(NULL)) la
+ * semilla cambiaria cada 1 segundo en cada ejecucion ya que time(NULL)
+ * devolveria el mismo valor dentro de un mismo segundo.
+ */
 void inicializar_rand();
 
 
