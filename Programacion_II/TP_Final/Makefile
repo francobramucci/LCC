@@ -1,12 +1,20 @@
-CC=gcc
-CFLAGS= -O2 -Wall
-main: main.c generacion.o utils.o
-	$(CC) $(CFLAGS) -o main main.c generacion.o utils.o
-generacion.o: generacion.c generacion.h
-	$(CC) $(CFLAGS) -c generacion.c
-utils.o: utils.c utils.h
-	$(CC) $(CFLAGS) -c utils.c 
+
+CC = gcc
+CFLAGS = -O2 -Wall
+SRC_DIR = src/c/
+BUILD_DIR = build/
+
+$(BUILD_DIR)main: $(SRC_DIR)main.c $(BUILD_DIR)generacion.o $(BUILD_DIR)utils.o | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -o $@ $(SRC_DIR)main.c $(BUILD_DIR)generacion.o $(BUILD_DIR)utils.o
+$(BUILD_DIR)generacion.o: $(SRC_DIR)generacion.c $(SRC_DIR)generacion.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)utils.o: $(SRC_DIR)utils.c $(SRC_DIR)utils.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 .PHONY: clean
 clean:
-	rm -rf *.o
+	rm $(BUILD_DIR)*.o  $(BUILD_DIR)main
+

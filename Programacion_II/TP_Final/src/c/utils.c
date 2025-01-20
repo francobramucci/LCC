@@ -3,7 +3,7 @@
 FILE* abrir_archivo (char *ruta, char *modo){
 	FILE* archivo = fopen(ruta, modo);
 	if(archivo == NULL){
-		fprintf(stderr, "El archivo no existe o ha ocurrido un problema al abrirlo.\n");
+		fprintf(stderr, "El archivo %s no existe o ha ocurrido un problema al abrirlo.\n", ruta);
 		exit(1);
 	}
 

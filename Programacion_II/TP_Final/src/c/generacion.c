@@ -16,7 +16,11 @@ void validar_entrada(Tablero* tab, FILE* archivo){
 	int dimension = tab->dimension;
 	int cantObstaculos = tab->cantObstaculosFijos + tab->cantObstaculosAleatorios;
 	pair ini = tab->inicio, fin = tab->final;
-	
+
+	if(dimension < 2){
+		fprintf(stderr, "\nError: la dimension debe ser mayor a 1\n");
+		abortar(tab, archivo);
+	}
 	if(!dentro_matriz(ini, dimension, dimension) || !dentro_matriz(fin, dimension, dimension)){
 		fprintf(stderr, "\nError: La posicion de inicio y final deben estar dentro del cuadrado de la dimension dada.\n");
 		abortar(tab, archivo);
@@ -52,7 +56,7 @@ void leer_dimension(FILE *archivo, Tablero* tab){
 void leer_obstaculos_fijos(FILE *archivo, Tablero* tab){
 	int x, y, cantFijos = 0, dimension;
 	dimension = tab->dimension;
-	
+
 	while(fscanf(archivo, " (%d,%d)", &x, &y) != 0){
 		if(x > 0 && x <= dimension && y > 0 && y <= dimension){
 			tab->matriz[x-1][y-1] = '1';
@@ -122,9 +126,11 @@ Tablero *obtener_informacion(FILE *archivo){
 }
 
 void inicializar_rand(){
-	struct timeval tv;
-    gettimeofday(&tv, NULL);
-    unsigned int seed = tv.tv_sec * 1000 + tv.tv_usec / 1000; // Milisegundos
+	struct timeval tiempoUnix;
+    gettimeofday(&tiempoUnix, NULL);
+	unsigned int tiempoUnixSegundos = tiempoUnix.tv_sec;
+	unsigned int tiempoUnixMicroSegundos = tiempoUnix.tv_usec;
+    unsigned int seed = tiempoUnixMicroSegundos + tiempoUnixSegundos * 1000000;
     srand(seed);
 }
 

@@ -1,12 +1,12 @@
 dimension
-7
+100
 obstaculos fijos
 (1,2)
 (1,5)
 (2,4)
 obstaculos aleatorios
-20
+239
 posicion inicial
 (1,1)
 objetivo
-(5,4)
+(97,87)
