@@ -4,5 +4,8 @@
 # Ejecutable c
 main 
 
+# Archivo de salida
+SalidaLaberinto.txt
+
 # Directorio generado por python
 __pycache__/
