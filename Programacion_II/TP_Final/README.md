@@ -3,19 +3,19 @@ El programa en python ejecuta un código en C para generar un laberinto en un
 archivo llamado SalidaLaberinto.txt a partir de un archivo EntradaLaberinto.txt.
 El archivo de entrada cuenta con el siguiente formato:
 
-dimension
-n
-obstaculos fijos
-(x1,y1)
-(x2,y2)
-...
-(x3,y3)
-obstaculos aleatorios
-m
-posicion inicial
-(i1,i2)
-objetivo
-(o1,o2)
+dimension  
+n  
+obstaculos fijos  
+(x1,y1)  
+(x2,y2)  
+...  
+(x3,y3)  
+obstaculos aleatorios  
+m  
+posicion inicial  
+(i1,i2)  
+objetivo  
+(o1,o2)  
 
 En caso de no respetar el formato el programa no funcionará y devolverá error.
 Si no se quieren incluír obstaculos fijos los mismos pueden ser obviados.
@@ -28,8 +28,8 @@ demasiado baja, como la generación es aleatoria, el programa probablemente nunc
 termine.
 
 # Ejecución del programa
-$ make
-$ python3 main.py
+$ make  
+$ python3 main.py  
 
 "make" generará el ejecutable del archivo en el directorio build.
 "make clean" limpiará todos los archivos objeto y el ejecutable main en el
