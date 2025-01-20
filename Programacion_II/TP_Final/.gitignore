@@ -1,0 +1,8 @@
+# Archivos objeto
+*.o 
+
+# Ejecutable c
+main 
+
+# Directorio generado por python
+__pycache__/
