@@ -57,7 +57,7 @@ void leer_obstaculos_fijos(FILE *archivo, Tablero* tab){
 	int x, y, cantFijos = 0, dimension;
 	dimension = tab->dimension;
 
-	while(fscanf(archivo, " (%d,%d)", &x, &y) != 0){
+	while(fscanf(archivo, " (%d,%d)", &x, &y) == 2){
 		if(x > 0 && x <= dimension && y > 0 && y <= dimension){
 			tab->matriz[x-1][y-1] = '1';
 			cantFijos++;
@@ -78,7 +78,7 @@ void leer_cant_obstaculos_aleatorios(FILE *archivo, Tablero *tab){
 }
 
 void leer_posicion_inicio(FILE *archivo, Tablero *tab){
-	pair ini; 
+	pair ini;
 	if(fscanf(archivo, " %*[^\n] (%d,%d)", &ini.x, &ini.y) != 2){
 		fprintf(stderr, "\nError en la lectura del archivo.\n");
 		abortar(tab, archivo);
@@ -88,7 +88,7 @@ void leer_posicion_inicio(FILE *archivo, Tablero *tab){
 }
 
 void leer_posicion_final(FILE *archivo, Tablero *tab){
-	pair fin; 
+	pair fin;
 	if(fscanf(archivo, " %*[^\n] (%d,%d)", &fin.x, &fin.y) != 2){
 		fprintf(stderr, "\nError en la lectura del archivo.\n");
 		abortar(tab, archivo);
@@ -130,7 +130,7 @@ void inicializar_rand(){
     gettimeofday(&tiempoUnix, NULL);
 	unsigned int tiempoUnixSegundos = tiempoUnix.tv_sec;
 	unsigned int tiempoUnixMicroSegundos = tiempoUnix.tv_usec;
-    unsigned int seed = tiempoUnixMicroSegundos + tiempoUnixSegundos * 1000000;
+    unsigned int seed = tiempoUnixMicroSegundos + tiempoUnixSegundos * 1000000; // Si hay overflow se comienza de vuelta desde 0
     srand(seed);
 }
 
