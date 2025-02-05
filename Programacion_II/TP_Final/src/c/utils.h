@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <sys/time.h>
 
 // Almacena un par de enteros.
 typedef struct {
@@ -45,18 +44,12 @@ int dentro_matriz(pair cord, int m, int n);
  */
 void liberar_matriz(char **matriz, int m);
 
-
 /*
- * Toma el tiempo unix en segundos y los microsegundos transcurridos en dicho
- * segundo. Luego se toma la multiplicacion de estos valores como semilla de
- * srand(). Esta semilla tiene variaciones en el orden de microsegundos, por lo
- * que para multiples ejecuciones en un mismo segundo es seguro que el valor de
- * la semilla cambiara y se generaran combinaciones numericas diferentes. Si se
- * hubiera optado por srand(time(NULL)) la semilla cambiaria cada 1 segundo en
- * cada ejecucion ya que time(NULL) devolveria el mismo valor dentro de un
- * mismo segundo. Esto ultimo generaría disposiciones iguales de obstaculos
- * aleatorios en todas las ejecuciones dentro de un segundo, comportamiento no
- * deseado.
+ * Toma el tiempo Unix en segundos y le aplica la operacion XOR con
+ * clock() que devuelve la cantidad de ticks del reloj del procesador
+ * desde la ejecucion del programa. Esto aplica variabilidad extra
+ * para ejecuciones dentro de un mismo segundo. Luego se utiliza este
+ * valor como semilla para srand().
  */
 void inicializar_rand();
 
@@ -66,9 +59,11 @@ void inicializar_rand();
  */
 int generar_aleatorio(int n);
 
+
 /*
  * Imprime una matriz de m*n a una salida
  */
 void impimir_matriz(char **matriz, int m, int n, FILE* salida);
+
 #endif
 

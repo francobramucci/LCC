@@ -24,17 +24,20 @@ En caso de que el laberinto generado no admita solución, python ejecutará
 nuevamente al código en c. Eventualmente la disposición aleatoria de los
 obstaculos deberá permitir una solución. De otra forma el programa se ejecutará
 de forma infinita. Sin embargo, si la probabilidad de generar un camino es
-demasiado baja, como la generación es aleatoria, el programa probablemente nunca
-termine.
+demasiado baja, como la generación es aleatoria, el programa probablemente
+nunca termine.
 
 # Ejecución del programa
 $ make  
 $ python3 main.py  
 
-"make" generará el ejecutable del archivo en el directorio build.
-"make clean" limpiará todos los archivos objeto y el ejecutable main en el
-directorio build/.
+"make" generará el ejecutable del archivo en el directorio build. "make clean"
+limpiará todos los archivos objeto y el ejecutable main en el directorio
+build/.
+
+Si se intenta ejecutar el código de python antes de compilar el código C, el
+proyecto no funcionará.
 
 # Comentarios
-Este proyecto funciona para sistemas POSIX ya que se utiliza la
-función gettimeofday() definida en la cabecera <sys/time.h>.
+Solo se han usado librerias de ANSI C.
+

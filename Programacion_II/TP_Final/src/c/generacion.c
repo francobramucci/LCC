@@ -15,26 +15,28 @@ void validar_entrada(Tablero* tab, FILE* archivo){
 	int dimension = tab->dimension;
 	int cantObstaculos = tab->cantObstaculosFijos + tab->cantObstaculosAleatorios;
 	pair ini = tab->inicio, fin = tab->final;
+	int caminoMinimo = abs(ini.x - fin.x) + abs(ini.y - fin.y) - 1;
 
 	if(dimension < 2){
-		fprintf(stderr, "\nError: la dimension debe ser mayor a 1\n");
+		fprintf(stderr, "\nError: La dimension debe ser mayor a 1\n");
 		abortar(tab, archivo);
 	}
+
 	if(!dentro_matriz(ini, dimension, dimension) || !dentro_matriz(fin, dimension, dimension)){
 		fprintf(stderr, "\nError: La posicion de inicio y final deben estar dentro del cuadrado de la dimension dada.\n");
 		abortar(tab, archivo);
 	}
 
-	if(tab->matriz[ini.x - 1][ini.y - 1] == '1')
-		cantObstaculos--;
-
-	if(tab->matriz[fin.x - 1][fin.y - 1] == '1')
-		cantObstaculos--;
-
-	if(cantObstaculos > dimension * dimension - 2){
-		fprintf(stderr, "\nError: La cantidad de obstaculos debe ser menor que la dimension^2 - 2\n");
+	if(tab->matriz[ini.x - 1][ini.y - 1] == '1' || tab->matriz[fin.x - 1][fin.y - 1] == '1'){
+		fprintf(stderr, "\nError: No puede haber obstaculos en la posicion de inicio y final.\n");
 		abortar(tab, archivo);
 	}
+
+	if(cantObstaculos > dimension * dimension - caminoMinimo){
+		fprintf(stderr, "\nError: La cantidad de obstaculos debe aceptar alguna solucion.\n");
+		abortar(tab, archivo);
+	}
+
 	if(ini.x == fin.x && ini.y == fin.y){
 		fprintf(stderr, "Error: La posicion de inicio no debe coincidir con la del objetivo.\n");
 		abortar(tab, archivo);
@@ -45,7 +47,7 @@ void validar_entrada(Tablero* tab, FILE* archivo){
 void leer_dimension(FILE *archivo, Tablero* tab){
 	int dimension;
 	if(fscanf(archivo, "%*s %d %*[^\n]", &dimension) != 1){
-		fprintf(stderr, "\nError en la lectura del archivo.\n");
+		fprintf(stderr, "\nError en el formato del archivo.\n");
 		abortar(tab, archivo);
 	}
 	
@@ -57,10 +59,12 @@ void leer_obstaculos_fijos(FILE *archivo, Tablero* tab){
 	dimension = tab->dimension;
 
 	while(fscanf(archivo, " (%d,%d)", &x, &y) == 2){
-		if(x > 0 && x <= dimension && y > 0 && y <= dimension){
-			tab->matriz[x-1][y-1] = '1';
-			cantFijos++;
+		if(x < 1 || x > dimension || y < 1 || y > dimension){
+			fprintf(stderr, "\nError: El obstaculo debe estar dentro del cuadrado de %d x %d.\n", dimension, dimension);
+			abortar(tab, archivo);
 		}
+		tab->matriz[x-1][y-1] = '1';
+		cantFijos++;
 	}
 	
 	tab->cantObstaculosFijos = cantFijos;
@@ -69,7 +73,7 @@ void leer_obstaculos_fijos(FILE *archivo, Tablero* tab){
 void leer_cant_obstaculos_aleatorios(FILE *archivo, Tablero *tab){
 	int cantAleatorios;
 	if(fscanf(archivo, "%*[^\n] %d", &cantAleatorios) != 1){
-		fprintf(stderr, "\nError en la lectura del archivo.\n");
+		fprintf(stderr, "\nError en el formato del archivo.\n");
 		abortar(tab, archivo);
 	}
 
@@ -79,7 +83,7 @@ void leer_cant_obstaculos_aleatorios(FILE *archivo, Tablero *tab){
 void leer_posicion_inicio(FILE *archivo, Tablero *tab){
 	pair ini;
 	if(fscanf(archivo, " %*[^\n] (%d,%d)", &ini.x, &ini.y) != 2){
-		fprintf(stderr, "\nError en la lectura del archivo.\n");
+		fprintf(stderr, "\nError en el formato del archivo.\n");
 		abortar(tab, archivo);
 	}
 
@@ -89,7 +93,7 @@ void leer_posicion_inicio(FILE *archivo, Tablero *tab){
 void leer_posicion_final(FILE *archivo, Tablero *tab){
 	pair fin;
 	if(fscanf(archivo, " %*[^\n] (%d,%d)", &fin.x, &fin.y) != 2){
-		fprintf(stderr, "\nError en la lectura del archivo.\n");
+		fprintf(stderr, "\nError en el formato del archivo.\n");
 		abortar(tab, archivo);
 	}
 	

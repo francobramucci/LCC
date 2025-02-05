@@ -34,11 +34,7 @@ void liberar_matriz(char **matriz, int m){
 }
 
 void inicializar_rand(){
-	struct timeval tiempoUnix;
-    gettimeofday(&tiempoUnix, NULL);
-	unsigned int tiempoUnixSegundos = tiempoUnix.tv_sec;
-	unsigned int tiempoUnixMicroSegundos = tiempoUnix.tv_usec;
-    unsigned int seed = tiempoUnixMicroSegundos * tiempoUnixSegundos; // Si hay overflow se comienza de vuelta desde 0
+	unsigned int seed = (unsigned int)(time(NULL) ^ clock());
     srand(seed);
 }
 
