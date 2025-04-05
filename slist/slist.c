@@ -1,5 +1,4 @@
 #include "slist.h"
-#include <stdlib.h>
 
 SList slist_crear() {
   return NULL;
@@ -67,13 +66,20 @@ SList slist_insertar(SList lista, int dato, int posicion){
 	if(lista == NULL)
 		return nuevoNodo;
 
+	if(posicion == 0){
+		nuevoNodo->sig = lista;
+		return nuevoNodo;
+	}
+
 	SNodo *temp = lista;
-	for(int i = 0; temp->sig != NULL && i < posicion; temp = temp->sig, i++);
-	SNodo *aux = temp->sig->sig;
+	for(int i = 0; temp->sig != NULL && i < posicion-1; temp = temp->sig, i++);
+
+	SNodo *aux = temp->sig;
+
 	temp->sig = nuevoNodo;
 	nuevoNodo->sig = aux;
 
 	return lista;
 }
-		
+
 
