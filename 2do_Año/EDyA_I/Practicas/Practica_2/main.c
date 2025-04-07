@@ -1,4 +1,5 @@
 #include "slist.h"
+#include "dlist.h"
 
 static void imprimir_entero(int dato) {
 	printf("%d ", dato);
@@ -34,8 +35,21 @@ int main(int argc, char *argv[]) {
 	printf("\n");
 	slist_recorrer(segundaMitad, imprimir_entero);
 	puts("");
-
+	
 	slist_destruir(lista);
+
+	SListF *listF = slistf_crear();
+	slistf_agregar_inicio(listF, 19);
+	
+	printf("!%d!\n", listF->primero->dato);
+	
+	DList* dlist = dlist_crear();
+	dlist_agregar_inicio(dlist, 4);
+	dlist_agregar_inicio(dlist, 3);
+	dlist_agregar_inicio(dlist, 2);
+	dlist_agregar_inicio(dlist, 1);
+
+	dlist_recorrer(dlist, 1, imprimir_entero);
 
 	return 0;
 }

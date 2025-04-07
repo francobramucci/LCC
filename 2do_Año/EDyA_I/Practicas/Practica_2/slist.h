@@ -15,6 +15,12 @@ typedef struct _SNodo {
 
 typedef SNodo *SList;
 
+typedef struct SListF{
+	SNodo* primero;
+	SNodo* ultimo;
+} SListF;
+
+
 /**
  * Devuelve una lista vacía.
  */
@@ -109,5 +115,17 @@ SList slist_intercalar(SList lista1, SList lista2);
  * Dada una lista, devuelve el puntero a la segunda mitad de la lista
  */
 SList slist_partir(SList lista);
+
+SListF* slistf_crear();
+
+void slistf_agregar_inicio(SListF* lista, int dato);
+
+void slistf_agregar_final(SListF* lista, int dato);
+
+void slistf_recorrer_R_bad(SListF* lista, void(*funcion)(int));
+
+void slistf_recorrer_R_aux(SNodo* nodo, void(*funcion)(int));
+
+void slistf_recorrer_R_ok(SListF* lista, void(*funcion)(int));
 
 #endif /* __SLIST_H__ */

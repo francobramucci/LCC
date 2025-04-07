@@ -5,8 +5,7 @@ SList slist_crear() {
 }
 
 void slist_destruir(SList lista) {
-  SNodo *nodoAEliminar;
-  while (lista != NULL) {
+  SNodo *nodoAEliminar; while (lista != NULL) {
     nodoAEliminar = lista;
     lista = lista->sig;
     free(nodoAEliminar);
@@ -196,5 +195,56 @@ SList slist_partir(SList lista){
 	
 	return (temp->sig == NULL) ? mitad->sig : mitad;
 }
+
+SListF* slistf_crear(){
+	SListF *lista = malloc(sizeof(SListF));
+	lista->primero = NULL;
+	lista->ultimo = NULL;
+
+	return lista;
+}
+
+void slistf_agregar_inicio(SListF* lista, int dato){
+	SNodo *nuevoNodo = malloc(sizeof(SNodo));
+	nuevoNodo->dato = dato;
+	nuevoNodo->sig = lista->primero;
+	lista->primero = nuevoNodo;
+	if(lista->ultimo == NULL)
+		lista->ultimo = nuevoNodo;
+}
+
+void slistf_agregar_final(SListF* lista, int dato){
+	SNodo *nuevoNodo = malloc(sizeof(SNodo));
+	nuevoNodo->dato = dato;
+	nuevoNodo->sig = NULL;
+	lista->ultimo->sig = nuevoNodo;
+	if(lista->primero == NULL)
+		lista->primero = nuevoNodo;
+}
+
+void slistf_recorrer_R_bad(SListF* lista, void(*funcion)(int)){
+	if(lista->primero != NULL){
+		SListF* aux;
+		aux->primero = lista->primero->sig;
+		aux->ultimo = NULL;
+		slistf_recorrer_R_bad(aux, funcion);
+	}
+}
+
+void slistf_recorrer_R_aux(SNodo* nodo, void(*funcion)(int)){
+	if(nodo != NULL){
+		funcion(nodo->dato);
+		slistf_recorrer_R_aux(nodo->sig, funcion);
+	}
+}
+
+void slistf_recorrer_R_ok(SListF* lista, void(*funcion)(int)){
+	if(lista->primero != NULL)
+		slistf_recorrer_R_aux(lista->primero, funcion);
+}
+
+
+
+
 
 
