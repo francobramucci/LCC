@@ -18,7 +18,7 @@ int pila_es_vacia(Pila stack){
 }
 
 int pila_tope(Pila stack){
-	return stack->arr[stack->ultimo];
+	return stack->arr->direccion[stack->ultimo];
 }
 
 void pila_apilar(Pila stack, int dato){
@@ -27,7 +27,7 @@ void pila_apilar(Pila stack, int dato){
 	if(stack->ultimo == capacidad - 1)
 		arreglo_enteros_ajustar(stack->arr, capacidad*2);
 	stack->ultimo += 1;
-	stack->arr[stack->ultimo] = dato;
+	stack->arr->direccion[stack->ultimo] = dato;
 }
 
 void pila_desapilar(Pila stack){
@@ -36,8 +36,7 @@ void pila_desapilar(Pila stack){
 
 void pila_imprimir(Pila stack){
 	for(int i = 0; i <= stack->ultimo; i++){
-		printf("%d ", stack[i]);
+		printf("%d ", stack->arr->direccion[i]);
 	}
 }
-
 

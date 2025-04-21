@@ -20,7 +20,7 @@ void arreglo_enteros_escribir(ArregloEnteros* arreglo, int pos, int dato);
 int arreglo_enteros_capacidad(ArregloEnteros* arreglo);
 
 void arreglo_enteros_imprimir(ArregloEnteros* arreglo);
-;
+
 void arreglo_enteros_ajustar(ArregloEnteros* arreglo, int capacidad);
 
 #endif /* __ARREGLOS_INT_H__ */

@@ -27,7 +27,7 @@ int arreglo_enteros_capacidad(ArregloEnteros* arreglo){
 
 void arreglo_enteros_imprimir(ArregloEnteros* arreglo){
 	for(int i = 0; i < arreglo->capacidad; i++)
-		printf("%d\n", arreglo->capacidad[i]);
+		printf("%d\n", arreglo->direccion[i]);
 }
 
 void arreglo_enteros_ajustar(ArregloEnteros* arreglo, int capacidad){

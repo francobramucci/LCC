@@ -1,6 +1,4 @@
 #include "glist.h"
-#include <assert.h>
-#include <stdlib.h>
 
 /**
  * Devuelve una lista vacía.
@@ -24,7 +22,8 @@ void glist_destruir(GList list, FuncionDestructora destroy) {
 /**
  * Determina si la lista es vacía.
  */
-int glist_vacia(GList list) { return (list == NULL); }
+int glist_vacia(GList list) { return (list == NULL); 
+}
 
 /**
  * Agrega un elemento al inicio de la lista.

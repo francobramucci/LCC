@@ -1,6 +1,9 @@
 #ifndef __GLIST_H__
 #define __GLIST_H__
 
+#include <assert.h>
+#include <stdlib.h>
+
 typedef void (*FuncionDestructora)(void *dato);
 typedef void* (*FuncionCopia)(void *dato);
 typedef void (*FuncionVisitante)(void *dato);
@@ -10,7 +13,7 @@ typedef struct _GNode {
   struct _GNode *next;
 } GNode;
 
-typedef GNode *GList;
+typedef GNode* GList;
 
 /**
  * Devuelve una lista vacía.
@@ -38,4 +41,5 @@ GList glist_agregar_inicio(GList lista, void *dato, FuncionCopia copiar);
 void glist_recorrer(GList lista, FuncionVisitante visitar);
 
 GList glist_filtrar(GList lista, FuncionCopia c, int (*p)(void*);
+
 #endif /* __GLIST_H__ */
