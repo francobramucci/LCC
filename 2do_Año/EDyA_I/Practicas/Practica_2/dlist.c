@@ -14,11 +14,10 @@ void dlist_agregar_inicio(DList* lista, int dato){
 	nuevoNodo->sig = lista->primero;
 	nuevoNodo->ant = NULL;
 
-	if(list->primero == NULL){
+	if(lista->primero == NULL){
 		lista->primero = nuevoNodo;
-		return nuevoNodo;
 	}
-	else{	
+	else{
 		lista->primero->ant = nuevoNodo;
 		lista->primero = nuevoNodo;
 	}

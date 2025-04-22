@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 	
 	printf("!%d!\n", listF->primero->dato);
 	
-	DList* dlist = dlist_crear();
+	DList *dlist = dlist_crear();
 	dlist_agregar_inicio(dlist, 4);
 	dlist_agregar_inicio(dlist, 3);
 	dlist_agregar_inicio(dlist, 2);
