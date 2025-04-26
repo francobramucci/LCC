@@ -5,16 +5,17 @@
 #include <stdlib.h>
 
 typedef void (*FuncionDestructora)(void *dato);
-typedef void* (*FuncionCopia)(void *dato);
+typedef void *(*FuncionCopia)(void *dato);
 typedef void (*FuncionVisitante)(void *dato);
 typedef int (*Predicado)(void *dato);
+typedef int (*FuncionComparadora)(void *dato1, void *dato2);
 
 typedef struct _GNode {
-  void *data;
-  struct _GNode *next;
+        void *data;
+        struct _GNode *next;
 } GNode;
 
-typedef GNode* GList;
+typedef GNode *GList;
 
 /**
  * Devuelve una lista vacía.
