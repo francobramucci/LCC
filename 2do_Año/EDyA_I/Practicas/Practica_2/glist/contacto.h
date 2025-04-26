@@ -4,6 +4,7 @@
 /**
  * Estructura que representa un contacto.
  */
+#include "glist.h"
 typedef struct {
   char *nombre;
   char *tel;
@@ -13,7 +14,7 @@ typedef struct {
 /**
  * Crea un nuevo contacto.
  */
-Contacto *contacto_crear();
+Contacto *contacto_crear(char *nombre, char *telefono, unsigned int edad);
 
 /**
  * Crea una copia física del contacto.
@@ -36,5 +37,8 @@ void contacto_destruir(Contacto *contacto);
  * Imprime por pantalla un contacto.
  */
 void contacto_imprimir(Contacto *contacto);
+
+
+int contacto_mayor_a_60(Contacto *_contacto);
 
 #endif /* __CONTACTO_H__ */

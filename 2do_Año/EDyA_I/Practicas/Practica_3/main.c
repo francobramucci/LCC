@@ -12,7 +12,6 @@ void imprimir_entero(void* i){
 	printf("%d ", (*(int*)i));
 }
 
-
 int main(){
 	Pila p = pila_crear(10);
 	pila_apilar(p, 10);
@@ -24,6 +23,7 @@ int main(){
 	gp = gpila_apilar(gp, i, copiar_entero);
 	
 	gpila_imprimir(gp, imprimir_entero);
+	printf("\n");
 
 	return 0;
 }

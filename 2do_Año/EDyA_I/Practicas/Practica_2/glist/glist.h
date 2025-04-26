@@ -1,12 +1,13 @@
 #ifndef __GLIST_H__
 #define __GLIST_H__
-
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef void (*FuncionDestructora)(void *dato);
 typedef void* (*FuncionCopia)(void *dato);
 typedef void (*FuncionVisitante)(void *dato);
+typedef int (*Predicado)(void *dato);
 
 typedef struct _GNode {
   void *data;
@@ -40,6 +41,10 @@ GList glist_agregar_inicio(GList lista, void *dato, FuncionCopia copiar);
  */
 void glist_recorrer(GList lista, FuncionVisitante visitar);
 
-GList glist_filtrar(GList lista, FuncionCopia c, int (*p)(void*);
+/**
+ * Dada una lista de contactos y un predicado, devuelve una lista con los
+ * contactos que cumplen el predicado
+ */
+GList glist_filtrar(GList lista, FuncionCopia copy, Predicado predicado);
 
 #endif /* __GLIST_H__ */

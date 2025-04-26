@@ -23,8 +23,8 @@ GPila gpila_apilar(GPila gpila, void* dato, FuncionCopia copy){
 
 GPila gpila_desapilar(GPila gpila, FuncionDestructora destruir){
 	GPila cola = NULL;
-	if(!glist_vacia(gpila->lista)){
-		cola = gpila->sig;
+	if(!glist_vacia(gpila)){
+		cola = gpila->next;
 		destruir(gpila->data);
 		free(gpila);
 	}
