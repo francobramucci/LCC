@@ -1,8 +1,10 @@
 #include "btree.h"
 
+int max(int a, int b) {
+    return a > b ? a : b;
+}
 /**
- * Devuelve un arbol vacío.
- */
+ * Devuelve un arbol vacío. */
 BTree btree_crear() {
     return NULL;
 }
@@ -19,8 +21,7 @@ void btree_destruir(BTree nodo, FuncionDestructora destroy) {
     }
 }
 
-/**
- * Indica si el árbol es vacío.
+/** Indica si el árbol es vacío.
  */
 int btree_empty(BTree nodo) {
     return nodo == NULL;
@@ -110,4 +111,30 @@ BTree btree_copiar(BTree arbol, FuncionCopia copy) {
     copia = btree_unir(arbol->dato, btree_copiar(arbol->left, copy), btree_copiar(arbol->right, copy), copy);
 
     return copia;
+}
+
+int btree_altura(BTree arbol) {
+    if (btree_empty(arbol))
+        return -1;
+    int alturaSubArbolIzquierda = btree_altura(arbol->left);
+    int alturaSubArbolDerecha = btree_altura(arbol->right);
+    return max(alturaSubArbolDerecha, alturaSubArbolIzquierda) + 1;
+}
+
+int btree_nnodos_profundidad(BTree arbol, int profundidad) {
+    if (btree_empty(arbol))
+        return 0;
+    if (!profundidad)
+        return 1;
+    return btree_nnodos_profundidad(arbol->left, profundidad - 1) +
+           btree_nnodos_profundidad(arbol->right, profundidad - 1);
+}
+
+int btree_profundidad(BTree arbol, void *dato, FuncionComparadora comp) {
+    if (btree_empty(arbol))
+        return -1;
+    if (comp(dato, arbol->dato) == 0)
+        return 0;
+    int profundidad = max(btree_profundidad(arbol->left, dato, comp), btree_profundidad(arbol->right, dato, comp));
+    return profundidad == -1 ? -1 : profundidad + 1;
 }
