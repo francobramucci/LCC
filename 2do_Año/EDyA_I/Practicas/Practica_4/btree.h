@@ -52,4 +52,11 @@ int btree_buscar(BTree arbol, void *dato, FuncionComparadora comp);
 
 BTree btree_copiar(BTree arbol, FuncionCopia copy);
 
+int btree_altura(BTree arbol);
+int btree_nnodos_profundidad(BTree arbol, int profundidad);
+int btree_profundidad(BTree arbol, void *dato, FuncionComparadora comp);
+void* btree_sumar(BTree arbol, FuncionSuma suma, FuncionCero cero);
+void btree_recorrer_extra(BTree arbol, BTreeOrdenDeRecorrido orden, FuncionVisitanteExtra visit_extra, void* extra);
+void btree_recorrer_nivel(BTree arbol, int nivel, FuncionVisitante visit);
+void btree_recorrer_bfs(BTree arbol, FuncionVisitante visit);
 #endif /* __BTREE_H__ */
