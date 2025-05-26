@@ -108,5 +108,18 @@ BSTree bstree_eliminar(BSTree arbol, void* dato, FuncionComparadora comp, Funcio
 	}
 }
 
-void* bstree_k_esimo_menor(BSTree arbol, int k){
+int comparar_nodo(BTree arbol, void* data, FuncionComparadora c){
+	if(!arbol) return 1;
+	if(c(arbol->dato,data)) return 0;
+	return 1*comparar_nodo(arbol->left,data,c)*comparar_nodo(arbol->right);
+
+int bstree_validar(BTree arbol){
+	if(!arbol) return 1;
+	if(!comparar_nodo(arbol->left,arbol->dato)) return 0;
+	if(!comparar_nodo(arbol->right,arbol->dato)) return 0;
+	return 1*bstree_validar(arbol->left)*bstree_validar(arbol->right);
 }
+
+
+
+
