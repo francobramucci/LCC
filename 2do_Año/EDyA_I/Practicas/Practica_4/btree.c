@@ -3,10 +3,6 @@
 int max(int a, int b) {
     return a > b ? a : b;
 }
-
-typedef void* (*FuncionSuma)(void* dato1, void* dato2);
-typedef void* (*FuncionCero)();
-typedef void* (*FuncionVisitanteExtra)(void* dato, void* extra);
 /**
  * Devuelve un arbol vacío. */
 BTree btree_crear() {
@@ -143,13 +139,14 @@ int btree_profundidad(BTree arbol, void *dato, FuncionComparadora comp) {
     return profundidad == -1 ? -1 : profundidad + 1;
 }
 
-void* btree_sumar(BTree arbol, FuncionSuma suma, FuncionCero cero){
-	if (btree_empty(arbol))
-		return cero;
-	return suma(arbol->dato, suma(btree_sumar(arbol->left), btree_sumar(arbol->right)));
+void *btree_sumar(BTree arbol, FuncionSuma suma, FuncionCero cero) {
+    if (btree_empty(arbol))
+        return cero;
+    return suma(arbol->dato, suma(btree_sumar(arbol->left), btree_sumar(arbol->right)));
 }
 
-void btree_recorrer_extra(BTree arbol, BTreeOrdenDeRecorrido orden, FuncionVisitanteExtra visit_extra, void* extra){
+void btree_recorrer_extra(BTree arbol, BTreeOrdenDeRecorrido orden, FunctionVisitante visit,
+                          FuncionVisitanteExtra visit_extra, void *extra) {
     if (!btree_empty(arbol)) {
         switch (orden) {
         case BTREE_RECORRIDO_IN:
@@ -171,22 +168,18 @@ void btree_recorrer_extra(BTree arbol, BTreeOrdenDeRecorrido orden, FuncionVisit
     }
 }
 
-void btree_recorrer_nivel(BTree arbol, int nivel, FuncionVisitante visit){
-	if(btree_empty(arbol))
-		return;
-	if(nivel == 0)
-		visit(arbol->dato);
-	btree_recorrer_nivel(arbol->izq, nivel-1, visit);
-	btree_recorrer_nivel(arbol->der, nivel-1, visit);
+void btree_recorrer_nivel(BTree arbol, int nivel, FuncionVisitante visit) {
+    if (btree_empty(arbol))
+        return;
+    if (nivel == 0)
+        visit(arbol->dato);
+    btree_recorrer_nivel(arbol->left, nivel - 1, visit);
+    btree_recorrer_nivel(arbol->right, nivel - 1, visit);
 }
 
-void btree_recorrer_bfs(BTree arbol, FuncionVisitante visit){
-	if(!btree_empty(arbol)){
-		for(int altura = btree_altura(arbol), i = 0; i <= altura; i++)
-			btree_visitar_nivel(arbol, altura, visit);
-		}
-	}
+void btree_recorrer_bfs(BTree arbol, FuncionVisitante visit) {
+    if (!btree_empty(arbol)) {
+        for (int altura = btree_altura(arbol), i = 0; i <= altura; i++)
+            btree_recorrer_nivel(arbol, altura, visit);
+    }
 }
-
-
-

@@ -4,6 +4,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+typedef void *(*FuncionSuma)(void *dato1, void *dato2);
+typedef void *(*FuncionCero)();
+typedef void *(*FuncionVisitanteExtra)(void *dato, void *extra);
+
 struct _BTNodo {
         void *dato;
         struct _BTNodo *left;
@@ -55,8 +59,9 @@ BTree btree_copiar(BTree arbol, FuncionCopia copy);
 int btree_altura(BTree arbol);
 int btree_nnodos_profundidad(BTree arbol, int profundidad);
 int btree_profundidad(BTree arbol, void *dato, FuncionComparadora comp);
-void* btree_sumar(BTree arbol, FuncionSuma suma, FuncionCero cero);
-void btree_recorrer_extra(BTree arbol, BTreeOrdenDeRecorrido orden, FuncionVisitanteExtra visit_extra, void* extra);
+void *btree_sumar(BTree arbol, FuncionSuma suma, FuncionCero cero);
+void btree_recorrer_extra(BTree arbol, BTreeOrdenDeRecorrido orden, FuncionVisitante visit,
+                          FuncionVisitanteExtra visit_extra, void *extra);
 void btree_recorrer_nivel(BTree arbol, int nivel, FuncionVisitante visit);
 void btree_recorrer_bfs(BTree arbol, FuncionVisitante visit);
 #endif /* __BTREE_H__ */

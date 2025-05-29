@@ -1,16 +1,27 @@
 #ifndef __BSTREE_H__
 #define __BSTREE_H__
 
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef void *(*FuncionCopiadora)(void *dato);
 typedef int (*FuncionComparadora)(void *, void *);
 typedef void (*FuncionDestructora)(void *dato);
 typedef void (*FuncionVisitanteExtra)(void *dato, void *extra);
 
 typedef enum {
-  BTREE_RECORRIDO_IN,  /** Inorden */
-  BTREE_RECORRIDO_PRE, /** Preorden */
-  BTREE_RECORRIDO_POST /** Postorden */
+    BTREE_RECORRIDO_IN,  /** Inorden */
+    BTREE_RECORRIDO_PRE, /** Preorden */
+    BTREE_RECORRIDO_POST /** Postorden */
 } BSTreeRecorrido;
+
+struct _BST_Nodo {
+        void *dato;
+        struct _BST_Nodo *izq;
+        struct _BST_Nodo *der;
+};
 
 typedef struct _BST_Nodo *BSTree;
 
@@ -38,7 +49,14 @@ BSTree bstree_insertar(BSTree, void *, FuncionCopiadora, FuncionComparadora);
 /**
  * Recorrido DSF del arbol
  */
-void bstree_recorrer(BSTree, BSTreeRecorrido, FuncionVisitanteExtra,
-                     void *extra);
+void bstree_recorrer(BSTree, BSTreeRecorrido, FuncionVisitanteExtra, void *extra);
+
+int bstree_validar_aux(BSTree arbol, void **max, FuncionComparadora comp);
+
+int bstree_validar(BSTree arbol, FuncionComparadora comp);
+
+BSTree bstree_extraer_minimo(BSTree arbol);
+
+BSTree bstree_eliminar(BSTree arbol, void *dato, FuncionComparadora comp, FuncionDestructora destroy);
 
 #endif //__BSTREE_H__
