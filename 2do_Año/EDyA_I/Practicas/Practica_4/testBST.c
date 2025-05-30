@@ -73,8 +73,7 @@ int main() {
 
     // Creamos un arbol vacio y le insertamos las palabras
     BSTree arbol = bstree_crear();
-    for (int i = 0; i < N_PALABRAS; i++)
-        arbol = bstree_insertar(arbol, palabras[i], copiar_cadena, comparar_cadena);
+    for (int i = 0; i < N_PALABRAS; i++) arbol = bstree_insertar(arbol, palabras[i], copiar_cadena, comparar_cadena);
 
     // Imprimir el arbol inorden (alfabetico)
     printf("Recorrido inorden: ");
@@ -116,6 +115,8 @@ int main() {
 
     flag = bstree_validar(arbol, comparar_entero);
     printf("%s\n", flag ? "Es BST" : "No es BST");
+
+    imprimir_entero(bstree_k_esimo_menor(arbol, 2), u);
 
     bstree_destruir(arbol, destruir_entero);
 

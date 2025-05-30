@@ -1,4 +1,5 @@
 #include "bstree.h"
+#include <string.h>
 
 /**
  * Estructura del nodo del arbol de busqueda binaria.
@@ -107,20 +108,19 @@ BSTree bstree_padre_minimo_derecho(BSTree arbol) {
     if (arbol == NULL || arbol->der == NULL)
         return NULL;
     if (arbol->der->izq != NULL)
-        for (arbol = arbol->der; arbol->izq->izq != NULL; arbol = arbol->izq)
-            ;
+        for (arbol = arbol->der; arbol->izq->izq != NULL; arbol = arbol->izq);
     return arbol;
 }
 
-BSTree bstree_eliminar(BSTree arbol, void *dato, FuncionComparadora comp, FuncionDestructora destroy) {
+BSTree bstree_eliminar2(BSTree arbol, void *dato, FuncionComparadora comp, FuncionDestructora destroy) {
     if (arbol == NULL)
         return arbol;
 
     if (comp(dato, arbol->dato) > 0)
-        arbol->der = bstree_eliminar(arbol->der, dato, comp, destroy);
+        arbol->der = bstree_eliminar2(arbol->der, dato, comp, destroy);
 
     if (comp(dato, arbol->dato) < 0)
-        arbol->izq = bstree_eliminar(arbol->izq, dato, comp, destroy);
+        arbol->izq = bstree_eliminar2(arbol->izq, dato, comp, destroy);
 
     if (comp(dato, arbol->dato) == 0) {
         if (arbol->izq == NULL && arbol->der == NULL) {
@@ -151,4 +151,61 @@ BSTree bstree_eliminar(BSTree arbol, void *dato, FuncionComparadora comp, Funcio
         }
     }
     return arbol;
+}
+
+BSTree bstree_pop_minimo(BSTree arbol, void **punteroMinimo) {
+    if (arbol == NULL)
+        return NULL;
+    if (arbol->izq == NULL) {
+        *punteroMinimo = arbol->dato;
+        BSTree hijoDerecho = arbol->der;
+        free(arbol);
+        return hijoDerecho;
+    }
+    arbol->izq = bstree_pop_minimo(arbol->izq, punteroMinimo);
+    return arbol;
+}
+
+BSTree bstree_eliminar(BSTree arbol, void *dato, FuncionComparadora comp, FuncionDestructora destroy) {
+    if (arbol == NULL)
+        return NULL;
+    if (comp(dato, arbol->dato) > 0)
+        arbol->der = bstree_eliminar(arbol->der, dato, comp, destroy);
+    if (comp(dato, arbol->dato) < 0)
+        arbol->izq = bstree_eliminar(arbol->izq, dato, comp, destroy);
+    if (comp(dato, arbol->dato) == 0) {
+        if (arbol->izq == NULL && arbol->der == NULL) {
+            bstree_destruir(arbol, destroy);
+            return NULL;
+        }
+        if (arbol->izq != NULL && arbol->der != NULL) {
+            void *variableMinimo;
+            arbol->der = bstree_pop_minimo(arbol->der, &variableMinimo);
+            free(arbol->dato);
+            arbol->dato = variableMinimo;
+            return arbol;
+        } else {
+            BSTree nodoNoNulo = arbol->izq != NULL ? arbol->izq : arbol->der;
+            destroy(arbol->dato);
+            free(arbol);
+            return nodoNoNulo;
+        }
+    }
+    return arbol;
+}
+
+void *obtener_k_esimo_menor(BSTree arbol, int *punteroK) {
+    if (arbol == NULL)
+        return NULL;
+    void *res = obtener_k_esimo_menor(arbol->izq, punteroK);
+    if (res != NULL)
+        return res;
+    if (*punteroK == 1)
+        return arbol->dato;
+    *punteroK -= 1;
+    return obtener_k_esimo_menor(arbol->der, punteroK);
+}
+
+void *bstree_k_esimo_menor(BSTree arbol, int k) {
+    return obtener_k_esimo_menor(arbol, &k);
 }

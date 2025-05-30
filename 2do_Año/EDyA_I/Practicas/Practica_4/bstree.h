@@ -59,4 +59,8 @@ BSTree bstree_extraer_minimo(BSTree arbol);
 
 BSTree bstree_eliminar(BSTree arbol, void *dato, FuncionComparadora comp, FuncionDestructora destroy);
 
+void *obtener_k_esimo_menor(BSTree arbol, int *punteroK);
+
+void *bstree_k_esimo_menor(BSTree arbol, int k);
+
 #endif //__BSTREE_H__
