@@ -11,9 +11,9 @@
  * un entero para representar la altura del arbol (altura)
  */
 typedef struct _AVL_Nodo {
-  void* dato;
-  struct _AVL_Nodo* izq, * der;
-  int altura;
+        void *dato;
+        struct _AVL_Nodo *izq, *der;
+        int altura;
 } AVL_Nodo;
 
 /**
@@ -30,134 +30,132 @@ typedef struct _AVL_Nodo {
  * demas funciones.
  */
 struct _AVL {
-  AVL_Nodo* raiz;
-  FuncionCopiadora copia;
-  FuncionComparadora comp;
-  FuncionDestructora destr;
+        AVL_Nodo *raiz;
+        FuncionCopiadora copia;
+        FuncionComparadora comp;
+        FuncionDestructora destr;
 };
 
 /**
  * avl_crear: Retorna un arbol AVL vacio
  */
-AVL avl_crear(FuncionCopiadora copia, FuncionComparadora comp,
-  FuncionDestructora destr) {
-  AVL arbol = malloc(sizeof(struct _AVL));
-  assert(arbol != NULL);
-  arbol->raiz = NULL;
-  arbol->copia = copia;
-  arbol->comp = comp;
-  arbol->destr = destr;
-  return arbol;
+AVL avl_crear(FuncionCopiadora copia, FuncionComparadora comp, FuncionDestructora destr) {
+    AVL arbol = malloc(sizeof(struct _AVL));
+    assert(arbol != NULL);
+    arbol->raiz = NULL;
+    arbol->copia = copia;
+    arbol->comp = comp;
+    arbol->destr = destr;
+    return arbol;
 }
 
 /**
  * avl_destruir: Destruye el arbol y sus datos.
  */
-static void avl_nodo_destruir(AVL_Nodo* raiz, FuncionDestructora destr) {
-  if (raiz != NULL) {
-    // destruir los nodos en postorder
-    avl_nodo_destruir(raiz->izq, destr);
-    avl_nodo_destruir(raiz->der, destr);
-    destr(raiz->dato);
-    free(raiz);
-  }
+static void avl_nodo_destruir(AVL_Nodo *raiz, FuncionDestructora destr) {
+    if (raiz != NULL) {
+        // destruir los nodos en postorder
+        avl_nodo_destruir(raiz->izq, destr);
+        avl_nodo_destruir(raiz->der, destr);
+        destr(raiz->dato);
+        free(raiz);
+    }
 }
 void avl_destruir(AVL arbol) {
-  avl_nodo_destruir(arbol->raiz, arbol->destr);
-  free(arbol);
+    avl_nodo_destruir(arbol->raiz, arbol->destr);
+    free(arbol);
 }
 
 /**
  * avl_buscar: Retorna 1 si el dato se encuentra y 0 en caso contrario
  */
-static int avl_nodo_buscar(AVL_Nodo* raiz, FuncionComparadora comp,
-  void* dato) {
-  if (raiz == NULL)
-    return 0;
+static int avl_nodo_buscar(AVL_Nodo *raiz, FuncionComparadora comp, void *dato) {
+    if (raiz == NULL)
+        return 0;
 
-  int c = comp(dato, raiz->dato);
-  if (c < 0) // dato < raiz->dato
-    return avl_nodo_buscar(raiz->izq, comp, dato);
-  else if (c > 0) // dato > raiz->dato
-    return avl_nodo_buscar(raiz->der, comp, dato);
-  else // dato == raiz->dato
-    return 1;
+    int c = comp(dato, raiz->dato);
+    if (c < 0) // dato < raiz->dato
+        return avl_nodo_buscar(raiz->izq, comp, dato);
+    else if (c > 0) // dato > raiz->dato
+        return avl_nodo_buscar(raiz->der, comp, dato);
+    else // dato == raiz->dato
+        return 1;
 }
-int avl_buscar(AVL arbol, void* dato) {
-  return avl_nodo_buscar(arbol->raiz, arbol->comp, dato);
+int avl_buscar(AVL arbol, void *dato) {
+    return avl_nodo_buscar(arbol->raiz, arbol->comp, dato);
 }
 
 /**
  * avl_nodo_altura: Funcion interna que retorna la altura del arbol.
  * La altura del arbol vacio se define como -1.
  */
-static int avl_nodo_altura(AVL_Nodo* raiz) {
-  return (raiz == NULL ? -1 : raiz->altura);
+static int avl_nodo_altura(AVL_Nodo *raiz) {
+    return (raiz == NULL ? -1 : raiz->altura);
 }
 
 /**
  * avl_nodo_max_altura_hijos: Funcion interna que retorna la maxima altura de
  * los hijos.
  */
-static unsigned int avl_nodo_max_altura_hijos(AVL_Nodo* raiz) {
-  assert(raiz != NULL);
-  int alturaIzq = avl_nodo_altura(raiz->izq);
-  int alturaDer = avl_nodo_altura(raiz->der);
-  return (alturaIzq < alturaDer ? alturaDer : alturaIzq);
+static unsigned int avl_nodo_max_altura_hijos(AVL_Nodo *raiz) {
+    assert(raiz != NULL);
+    int alturaIzq = avl_nodo_altura(raiz->izq);
+    int alturaDer = avl_nodo_altura(raiz->der);
+    return (alturaIzq < alturaDer ? alturaDer : alturaIzq);
 }
 
 /**
  * avl_nodo_factor_balance: Funcion interna que retorna el factor de balance de
  * un nodo.
  */
-static int avl_nodo_factor_balance(AVL_Nodo* raiz) {
-  assert(raiz != NULL);
-  int factor = avl_nodo_altura(raiz->der) - avl_nodo_altura(raiz->izq);
-  assert(-2 <= factor && factor <= 2);
-  return factor;
+static int avl_nodo_factor_balance(AVL_Nodo *raiz) {
+    assert(raiz != NULL);
+    int factor = avl_nodo_altura(raiz->der) - avl_nodo_altura(raiz->izq);
+    assert(-2 <= factor && factor <= 2);
+    return factor;
 }
 
 /**
  * avl_nodo_rotacion_simple_izq: Funcion interna que realiza una rotacion simple
  * a izquierda y retorna la nueva raiz.
  */
-static AVL_Nodo* avl_nodo_rotacion_simple_izq(AVL_Nodo* raiz) {
-  AVL_Nodo* hijoDer = raiz->der;
-  assert(hijoDer != NULL);
-  // actualizar punteros
-  raiz->der = hijoDer->izq;
-  hijoDer->izq = raiz;
-  // actualizar alturas
-  raiz->altura = 1 + avl_nodo_max_altura_hijos(raiz);
-  hijoDer->altura = 1 + avl_nodo_max_altura_hijos(hijoDer);
-  return hijoDer;
+static AVL_Nodo *avl_nodo_rotacion_simple_izq(AVL_Nodo *raiz) {
+    AVL_Nodo *hijoDer = raiz->der;
+    assert(hijoDer != NULL);
+    // actualizar punteros
+    raiz->der = hijoDer->izq;
+    hijoDer->izq = raiz;
+    // actualizar alturas
+    raiz->altura = 1 + avl_nodo_max_altura_hijos(raiz);
+    hijoDer->altura = 1 + avl_nodo_max_altura_hijos(hijoDer);
+    return hijoDer;
 }
 
 /**
  * avl_nodo_rotacion_simple_der: Funcion interna que realiza una rotacion simple
  * a derecha y retorna la nueva raiz.
  */
-static AVL_Nodo* avl_nodo_rotacion_simple_der(AVL_Nodo* raiz) {
-  AVL_Nodo* hijoIzq = raiz->izq;
-  assert(hijoIzq != NULL);
-  raiz->izq = hijoIzq->der;
-  raiz->altura = 1 + avl_nodo_max_altura_hijos(raiz);
-  hijoIzq->altura = 1 + avl_nodo_max_altura_hijos(hijoIzq);
-
-  return hijoIzq;
+static AVL_Nodo *avl_nodo_rotacion_simple_der(AVL_Nodo *raiz) {
+    AVL_Nodo *hijoIzq = raiz->izq;
+    assert(hijoIzq != NULL);
+    raiz->izq = hijoIzq->der;
+    hijoIzq->der = raiz;
+    raiz->altura = 1 + avl_nodo_max_altura_hijos(raiz);
+    hijoIzq->altura = 1 + avl_nodo_max_altura_hijos(hijoIzq);
+    return hijoIzq;
 }
 
 /**
  * avl_nodo_crear: Funcion interna que crea un nuevo nodo y lo retorna.
  * La altura de un nodo hoja es 0.
  */
-static AVL_Nodo* avl_nodo_crear(void* dato, FuncionCopiadora copia) {
-  AVL_Nodo* nuevoNodo = malloc(sizeof(AVL_Nodo));
-  assert(nuevoNodo != NULL);
-  nuevoNodo->dato = copia(dato);
-  nuevoNodo->izq = nuevoNodo->der = NULL;
-  nuevoNodo->altura = 0;
-  return nuevoNodo;
+static AVL_Nodo *avl_nodo_crear(void *dato, FuncionCopiadora copia) {
+    AVL_Nodo *nuevoNodo = malloc(sizeof(AVL_Nodo));
+    assert(nuevoNodo != NULL);
+    nuevoNodo->dato = copia(dato);
+    nuevoNodo->izq = nuevoNodo->der = NULL;
+    nuevoNodo->altura = 0;
+    return nuevoNodo;
 }
 
 /**
@@ -165,49 +163,48 @@ static AVL_Nodo* avl_nodo_crear(void* dato, FuncionCopiadora copia) {
  *  - el factor de balance esta entre -2 y +2
  *  - los dos hijos cumplen la propiedad de AVL
  */
-static AVL_Nodo* avl_nodo_rebalancear(AVL_Nodo* raiz) {
+static AVL_Nodo *avl_nodo_rebalancear(AVL_Nodo *raiz) {
 
-  if (avl_nodo_factor_balance(raiz) == -2) { // desbalanceado a izquierda
+    if (avl_nodo_factor_balance(raiz) == -2) { // desbalanceado a izquierda
 
-    if (avl_nodo_factor_balance(raiz->izq) == 1) // desbalanceado LR
-      raiz->izq = avl_nodo_rotacion_simple_izq(raiz->izq);
+        if (avl_nodo_factor_balance(raiz->izq) == 1) // desbalanceado LR
+            raiz->izq = avl_nodo_rotacion_simple_izq(raiz->izq);
 
-    raiz = avl_nodo_rotacion_simple_der(raiz);
+        raiz = avl_nodo_rotacion_simple_der(raiz);
 
-  } else if (avl_nodo_factor_balance(raiz) == 2) { // desbalanceado a derecha
-    if (avl_nodo_factor_balance(raiz->der) == 1)
-      raiz->der = avl_nodo_rotacion_simple_der(raiz->der);
+    } else if (avl_nodo_factor_balance(raiz) == 2) {  // desbalanceado a derecha
+        if (avl_nodo_factor_balance(raiz->der) == -1) // desbalanceado RL
+            raiz->der = avl_nodo_rotacion_simple_der(raiz->der);
 
-    raiz = avl_nodo_rotacion_simple_izq(raiz);
-  }
+        raiz = avl_nodo_rotacion_simple_izq(raiz);
+    }
 
-  return raiz;
+    return raiz;
 }
 
 /**
  * avl_nodo_insertar: Inserta un dato no repetido en el arbol, manteniendo la
  * propiedad de los arboles AVL.
  */
-static AVL_Nodo* avl_nodo_insertar(AVL_Nodo* raiz, void* dato,
-  FuncionCopiadora copia, FuncionComparadora comp) {
+static AVL_Nodo *avl_nodo_insertar(AVL_Nodo *raiz, void *dato, FuncionCopiadora copia, FuncionComparadora comp) {
 
-  if (raiz == NULL) // insertamos el nuevo elemento
-    return avl_nodo_crear(dato, copia);
+    if (raiz == NULL) // insertamos el nuevo elemento
+        return avl_nodo_crear(dato, copia);
 
-  int c = comp(dato, raiz->dato);
-  if (c < 0) // el dato debe ir en el subarbol izq
-    raiz->izq = avl_nodo_insertar(raiz->izq, dato, copia, comp);
-  else if (c > 0) // el dato debe ir en el subarbol der
-    raiz->der = avl_nodo_insertar(raiz->der, dato, copia, comp);
-  else // no agregar elementos repetidos
-    return raiz;
+    int c = comp(dato, raiz->dato);
+    if (c < 0) // el dato debe ir en el subarbol izq
+        raiz->izq = avl_nodo_insertar(raiz->izq, dato, copia, comp);
+    else if (c > 0) // el dato debe ir en el subarbol der
+        raiz->der = avl_nodo_insertar(raiz->der, dato, copia, comp);
+    else // no agregar elementos repetidos
+        return raiz;
 
-  raiz->altura = 1 + avl_nodo_max_altura_hijos(raiz);
+    raiz->altura = 1 + avl_nodo_max_altura_hijos(raiz);
 
-  return avl_nodo_rebalancear(raiz);
+    return avl_nodo_rebalancear(raiz);
 }
-void avl_insertar(AVL arbol, void* dato) {
-  arbol->raiz = avl_nodo_insertar(arbol->raiz, dato, arbol->copia, arbol->comp);
+void avl_insertar(AVL arbol, void *dato) {
+    arbol->raiz = avl_nodo_insertar(arbol->raiz, dato, arbol->copia, arbol->comp);
 }
 
 /**
@@ -219,61 +216,101 @@ void avl_insertar(AVL arbol, void* dato) {
  * altura y el factor de balance de los nodos son correctos, y 0 en caso
  * contrario.
  */
-static int avl_nodo_validar_abb(AVL_Nodo* raiz, void* min, void* max,
-  FuncionComparadora comp) {
-  // si la raiz es vacia, retornar exitosamente
-  if (raiz == NULL)
-    return 1;
-  else {
-    // sino, validar intervalo
-    if (min != NULL && comp(raiz->dato, min) <= 0)
-      return 0;
-    if (max != NULL && comp(max, raiz->dato) <= 0)
-      return 0;
-    // y validar subarboles recursivamente
-    return (avl_nodo_validar_abb(raiz->izq, min, raiz->dato, comp) &&
-      avl_nodo_validar_abb(raiz->der, raiz->dato, max, comp));
-  }
+static int avl_nodo_validar_abb(AVL_Nodo *raiz, void *min, void *max, FuncionComparadora comp) {
+    // si la raiz es vacia, retornar exitosamente
+    if (raiz == NULL)
+        return 1;
+    else {
+        // sino, validar intervalo
+        if (min != NULL && comp(raiz->dato, min) <= 0)
+            return 0;
+        if (max != NULL && comp(max, raiz->dato) <= 0)
+            return 0;
+        // y validar subarboles recursivamente
+        return (avl_nodo_validar_abb(raiz->izq, min, raiz->dato, comp) &&
+                avl_nodo_validar_abb(raiz->der, raiz->dato, max, comp));
+    }
 }
-static int avl_nodo_validar_altura_y_balance(AVL_Nodo* raiz) {
-  // si la raiz es vacia, retornar exitosamente
-  if (raiz == NULL)
-    return 1;
-  // sino, validar subarboles recursivamente
-  int ret1 = avl_nodo_validar_altura_y_balance(raiz->izq);
-  int ret2 = avl_nodo_validar_altura_y_balance(raiz->der);
-  if (ret1 && ret2) {
-    // si ambos subarboles son validos, validar altura y balance de raiz
-    int altura = 1 + avl_nodo_max_altura_hijos(raiz);
-    int balance = avl_nodo_factor_balance(raiz);
-    if ((raiz->altura == altura) && (balance >= -1) && (balance <= 1))
-      return 1;
-  }
-  // en cualquier otro caso, retornar falso
-  return 0;
+static int avl_nodo_validar_altura_y_balance(AVL_Nodo *raiz) {
+    // si la raiz es vacia, retornar exitosamente
+    if (raiz == NULL)
+        return 1;
+    // sino, validar subarboles recursivamente
+    int ret1 = avl_nodo_validar_altura_y_balance(raiz->izq);
+    int ret2 = avl_nodo_validar_altura_y_balance(raiz->der);
+    if (ret1 && ret2) {
+        // si ambos subarboles son validos, validar altura y balance de raiz
+        int altura = 1 + avl_nodo_max_altura_hijos(raiz);
+        int balance = avl_nodo_factor_balance(raiz);
+        if ((raiz->altura == altura) && (balance >= -1) && (balance <= 1))
+            return 1;
+    }
+    // en cualquier otro caso, retornar falso
+    return 0;
 }
 int avl_validar(AVL arbol) {
-  return (avl_nodo_validar_altura_y_balance(arbol->raiz) &&
-    avl_nodo_validar_abb(arbol->raiz, NULL, NULL, arbol->comp));
+    return (avl_nodo_validar_altura_y_balance(arbol->raiz) &&
+            avl_nodo_validar_abb(arbol->raiz, NULL, NULL, arbol->comp));
 }
 
 /**
  * avl_recorrer: Recorrido DFS del arbol
  */
-static void avl_nodo_recorrer(AVL_Nodo* raiz, AVLRecorrido orden,
-  FuncionVisitanteExtra visita, void* extra) {
-  if (raiz != NULL) {
-    if (orden == AVL_RECORRIDO_PRE)
-      visita(raiz->dato, extra);
-    avl_nodo_recorrer(raiz->izq, orden, visita, extra);
-    if (orden == AVL_RECORRIDO_IN)
-      visita(raiz->dato, extra);
-    avl_nodo_recorrer(raiz->der, orden, visita, extra);
-    if (orden == AVL_RECORRIDO_POST)
-      visita(raiz->dato, extra);
-  }
+static void avl_nodo_recorrer(AVL_Nodo *raiz, AVLRecorrido orden, FuncionVisitanteExtra visita, void *extra) {
+    if (raiz != NULL) {
+        if (orden == AVL_RECORRIDO_PRE)
+            visita(raiz->dato, extra);
+        avl_nodo_recorrer(raiz->izq, orden, visita, extra);
+        if (orden == AVL_RECORRIDO_IN)
+            visita(raiz->dato, extra);
+        avl_nodo_recorrer(raiz->der, orden, visita, extra);
+        if (orden == AVL_RECORRIDO_POST)
+            visita(raiz->dato, extra);
+    }
 }
-void avl_recorrer(AVL arbol, AVLRecorrido orden, FuncionVisitanteExtra visita,
-  void* extra) {
-  avl_nodo_recorrer(arbol->raiz, orden, visita, extra);
+void avl_recorrer(AVL arbol, AVLRecorrido orden, FuncionVisitanteExtra visita, void *extra) {
+    avl_nodo_recorrer(arbol->raiz, orden, visita, extra);
+}
+
+AVL_Nodo *avl_pop_nodo_minimo(AVL_Nodo *raiz, void **punteroMinimoValor) {
+    if (raiz == NULL)
+        return NULL;
+    if (raiz->izq == NULL) {
+        *punteroMinimoValor = raiz->dato;
+        AVL_Nodo *hijoDer = raiz->der;
+        free(raiz);
+        return hijoDer;
+    }
+    raiz->izq = avl_pop_nodo_minimo(raiz->izq, punteroMinimoValor);
+    return raiz;
+}
+AVL_Nodo *avl_eliminar_nodo(AVL_Nodo *raiz, void *dato, FuncionComparadora comp, FuncionDestructora destroy) {
+    if (raiz == NULL)
+        return NULL;
+    if (comp(dato, raiz->dato) > 0)
+        raiz->der = avl_eliminar_nodo(raiz->der, dato, comp, destroy);
+    else if (comp(dato, raiz->dato) < 0)
+        raiz->izq = avl_eliminar_nodo(raiz->izq, dato, comp, destroy);
+    else {
+        if (raiz->izq == NULL && raiz->der == NULL) {
+            avl_nodo_destruir(raiz, destroy);
+            return NULL;
+        } else if (raiz->izq != NULL && raiz->der != NULL) {
+            void *minSubArbolDerecho = NULL;
+            raiz->der = avl_pop_nodo_minimo(raiz->der, &minSubArbolDerecho);
+            destroy(raiz->dato);
+            raiz->dato = minSubArbolDerecho;
+        } else {
+            AVL_Nodo *hijoNoVacio = raiz->izq != NULL ? raiz->izq : raiz->der;
+            destroy(raiz->dato);
+            free(raiz);
+            return hijoNoVacio;
+        }
+    }
+    raiz->altura = 1 + avl_nodo_max_altura_hijos(raiz);
+
+    return avl_nodo_rebalancear(raiz);
+}
+void avl_eliminar(AVL arbol, void *dato) {
+    arbol->raiz = avl_eliminar_nodo(arbol->raiz, dato, arbol->comp, arbol->destr);
 }

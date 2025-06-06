@@ -181,9 +181,8 @@ BSTree bstree_eliminar(BSTree arbol, void *dato, FuncionComparadora comp, Funcio
         if (arbol->izq != NULL && arbol->der != NULL) {
             void *variableMinimo;
             arbol->der = bstree_pop_minimo(arbol->der, &variableMinimo);
-            free(arbol->dato);
+            destroy(arbol->dato);
             arbol->dato = variableMinimo;
-            return arbol;
         } else {
             BSTree nodoNoNulo = arbol->izq != NULL ? arbol->izq : arbol->der;
             destroy(arbol->dato);
