@@ -1,11 +1,11 @@
 #ifndef __PILAS_H__
 #define __PILAS_H__
 
-#include "../Practica_1/arregloenteros.h"
+#include "../Arrays/arregloenteros.h"
 
 struct _Pila {
-	ArregloEnteros *arr;
-	int ultimo;
+        ArregloEnteros *arr;
+        int ultimo;
 };
 
 typedef struct _Pila *Pila;
@@ -24,4 +24,4 @@ void pila_desapilar(Pila stack);
 
 void pila_imprimir(Pila stack);
 
-#endif 
+#endif

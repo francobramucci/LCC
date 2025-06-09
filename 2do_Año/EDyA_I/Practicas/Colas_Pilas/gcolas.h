@@ -1,6 +1,6 @@
 #ifndef __GCOLAS_H__
 #define __GCOLAS_H__
-#include "../Practica_2/glist/glist.h"
+#include "../Listas/glist/glist.h"
 
 typedef struct {
         GNode *ultimo;
