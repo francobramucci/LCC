@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "dlist.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -60,7 +61,10 @@ int validar_lista(const char *lista) {
         case EST_ANTES_NUMERO:
             if (isspace(c))
                 continue;
-            estado = isdigit(c) ? EST_NUMERO : EST_ERROR;
+            if (c == ']')
+                estado = EST_FIN;
+            else
+                estado = isdigit(c) ? EST_NUMERO : EST_ERROR;
             break;
 
         case EST_NUMERO:
@@ -104,7 +108,18 @@ int validar_lista(const char *lista) {
     return estado == EST_FIN;
 }
 
-int parsear_defl(char *parametros, char **idPointer, int **listaPointer) {
+DList *lista_to_intdlist(char *lista) {
+    DList *dlist = dlist_crear();
+    char *num = strtok(lista, "[], ");
+    while (num != NULL) {
+        dlist_agregar_final(dlist, atoi(num));
+        num = strtok(NULL, "[], ");
+    }
+
+    return dlist;
+}
+
+int parsear_defl(char *parametros, char **idPointer, DList **dlistPointer) {
     char *id = strip(strtok(parametros, "="));
     char *lista = strtok(NULL, ";");
 
@@ -125,9 +140,74 @@ int parsear_defl(char *parametros, char **idPointer, int **listaPointer) {
         return 1;
     }
 
-    // list_to_intlist(lista);
+    *idPointer = id;
+    *dlistPointer = lista_to_intdlist(lista);
 
     return 0;
+}
+
+int validar_funcion(char *funcion) {
+    char *subFuncion = strtok(funcion, " ");
+    int esValido = 1;
+    while (subFuncion != NULL) {
+        if (!validar_identificador(subFuncion) || !find(subFuncion, tablaHash))
+            esValido = 0;
+        subFuncion = strtok(NULL, " ");
+    }
+    return esValido;
+}
+
+int validar_repeticiones(char *funcion) {
+    int contadorRepeticion = 0;
+    int esValido = 1;
+    while (*funcion != '\0' && contadorRepeticion >= 0 && esValido) {
+        char c = *funcion;
+        if (c == '<') {
+            if (*(funcion + 1) == '>')
+                esValido = 0;
+            contadorRepeticion++;
+        }
+        if (c == '>')
+            contadorRepeticion--;
+        funcion++;
+    }
+
+    return contadorRepeticion == 0 && esValido;
+}
+
+int validar_subfunciones(char *funcion) {
+    char *subFuncion = funcion;
+    while (subFuncion != NULL) {
+        int inicioSubFuncion = strspn(subFuncion, "<> ");
+        subFuncion += inicioSubFuncion;
+        int finalSubFuncion = strcspn(subFuncion, "<> ");
+        char temp = subFuncion[finalSubFuncion];
+        subFuncion[finalSubFuncion] = '\0';
+        validar_identificador(subFuncion);
+        subFuncion += finalSubFuncion;
+    }
+}
+
+int parsear_deff(char *parametros, char **idPointer, char **fcPointer) {
+    char *id = strip(strtok(parametros, "="));
+    char *funcion = strtok(NULL, ";");
+
+    if (funcion == NULL) {
+        printf("Entrada invalida. Debe incluirse el operador '='.");
+        return 1;
+    } else
+        funcion = strip(funcion);
+
+    if (!validar_identificador(id)) {
+        printf("Entrada invalida. El identificador debe ser una sola cadena y contener solo alfanumericos o el "
+               "caracter '_'.");
+        return 1;
+    }
+
+    if (!validar_funcion(funcion)) {
+        printf("Entrada invalida. Sintaxis de funcion incorrecta");
+        return 1;
+    }
 }
 
 int main() {
@@ -144,12 +224,15 @@ int main() {
             char *parametros = strtok(NULL, "");
 
             if (!strcmp(tipoDeSentencia, "defl")) {
-                char **identificador;
-                int **lista;
-                parsear_defl(parametros, identificador, lista);
+                char *identificador;
+                DList *dlist;
+                parsear_defl(parametros, &identificador, &dlist);
             }
 
             if (!strcmp(tipoDeSentencia, "deff")) {
+                char *identificador;
+                char *funcion;
+                parsear_deff(parametros, &identificador, &funcion);
             }
 
             if (!strcmp(tipoDeSentencia, "apply")) {
