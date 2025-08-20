@@ -9,36 +9,6 @@
  * Doble hash: mayor costo computacional al
  *
  * */
-int es_primo(int n) {
-    if (n <= 1)
-        return 0;
-    if (n <= 3)
-        return 1;
-    if (n % 2 == 0 || n % 3 == 0)
-        return 0;
-
-    int esPrimo = 1;
-
-    for (int i = 5; i * i <= n && esPrimo; i = i + 6) {
-        if (n % i == 0 || n % (i + 2) == 0)
-            esPrimo = 0;
-    }
-
-    return esPrimo;
-}
-
-int primo_mas_cercano(int n) {
-    int p = 0;
-
-    for (int i = 0; p == 0; i++) {
-        if (es_primo(n - i))
-            p = n - i;
-        else if (es_primo(n + i))
-            p = n + i;
-    }
-
-    return p;
-}
 
 typedef struct _Entrada {
         char *valor;
@@ -49,6 +19,7 @@ typedef struct {
         Entrada **tabla;
         int capacidad;
         int regionDirecciones;
+        int ocupados;
         int indiceRegionColisiones;
 } TablaHash;
 
@@ -64,7 +35,8 @@ unsigned hash(char *key, int largoTabla) {
 
 TablaHash *crear_tabla_hash(int capacidad) {
     TablaHash *tablaHash = malloc(sizeof(TablaHash));
-    tablaHash->regionDirecciones = primo_mas_cercano(ceil(0.86 * (float)capacidad));
+    tablaHash->capacidad = capacidad;
+    tablaHash->regionDirecciones = ceil(0.86 * (float)capacidad);
     tablaHash->tabla = calloc(capacidad, sizeof(Entrada *));
     tablaHash->indiceRegionColisiones = capacidad - 1;
 
@@ -103,11 +75,12 @@ void insertar(char *key, TablaHash *hashTable) {
     while (index != -1 && strcmp(tabla[index]->valor, key)) {
         indiceAnterior = index;
         index = tabla[index]->sig;
+        fprintf(stderr, "indiceAnterior: %d, index: %d", indiceAnterior, index);
     }
-
+    fprintf(stderr, "indiceAnterior: %d, index: %d", indiceAnterior, index);
     if (index == -1) {
         int indiceRegionColisiones = hashTable->indiceRegionColisiones;
-        while (indiceRegionColisiones > 0 && tabla[indiceRegionColisiones] != NULL)
+        while (tabla[indiceRegionColisiones] != NULL)
             indiceRegionColisiones--;
         hashTable->indiceRegionColisiones = indiceRegionColisiones;
         if (indiceRegionColisiones == -1) // Overflow
@@ -115,19 +88,6 @@ void insertar(char *key, TablaHash *hashTable) {
         tabla[indiceAnterior]->sig = indiceRegionColisiones;
         tabla[indiceRegionColisiones] = crear_entrada(key);
     }
-}
-
-void rehash(TablaHash *hashTable) {
-    TablaHash tablaVieja = *hashTable;
-    hashTable->capacidad = primo_mas_cercano(hashTable->capacidad * 2);
-    hashTable->indiceRegionColisiones = hashTable->capacidad - 1;
-    hashTable->tabla = calloc(hashTable->capacidad, sizeof(Entrada *));
-    hashTable->regionDirecciones = primo_mas_cercano(ceil(0.86 * (float)hashTable->capacidad));
-
-    for (int i = 0; i < tablaVieja.capacidad; i++) {
-        insertar(tablaVieja.tabla[i]->valor, hashTable);
-    }
-    free(tablaVieja.tabla);
 }
 
 void imprimir_tabla_hash(TablaHash *tabla) {
@@ -143,40 +103,33 @@ void imprimir_tabla_hash(TablaHash *tabla) {
 }
 
 int main() {
-    TablaHash *hTable = crear_tabla_hash(1217);
-    printf("Tamaño de region de direcciones: %d.\n", hTable->regionDirecciones);
+    TablaHash *hTable = crear_tabla_hash(11);
     char *p = "pepe";
     char *p1 = "pepe1";
     char *p2 = "pepe2";
-    char *p3 = "pepe3";
-    char *p4 = "pepe4";
-    char *p5 = "pepe5";
-    char *p6 = "pepe6";
-    char *p7 = "pepe7";
-    char *p8 = "pepe8";
-    char *p9 = "pepe9";
-    char *p10 = "pepe10";
-    char *p11 = "pepe11";
+    // char *p3 = "pepe3";
+    // char *p4 = "pepe4";
+    // char *p5 = "pepe5";
+    // char *p6 = "pepe6";
+    // char *p7 = "pepe7";
+    // char *p8 = "pepe8";
+    // char *p9 = "pepe9";
+    // char *p10 = "pepe10";
+    // char *p11 = "pepe11";
     insertar(p, hTable);
     insertar(p1, hTable);
     insertar(p2, hTable);
-    insertar(p3, hTable);
-    insertar(p4, hTable);
-    insertar(p5, hTable);
-    insertar(p6, hTable);
-    insertar(p7, hTable);
-    insertar(p8, hTable);
-    insertar(p9, hTable);
-    insertar(p10, hTable);
-    insertar(p11, hTable);
-    char stringArray[1300][10];
-    for (int i = 0; i < 1300; i++) {
-        sprintf(stringArray[i], "pepe%d", i);
-        insertar(stringArray[i], hTable);
-    }
-
+    // insertar(p3, hTable);
+    // insertar(p4, hTable);
+    // insertar(p5, hTable);
+    // insertar(p6, hTable);
+    // insertar(p7, hTable);
+    // insertar(p8, hTable);
+    // insertar(p9, hTable);
+    // insertar(p10, hTable);
+    // insertar(p11, hTable);
     imprimir_tabla_hash(hTable);
-    char *a = buscar("pepe390", hTable);
-    printf("\n%s", a);
+    char *a = buscar("pepe2", hTable);
+    printf("\b%s", a);
     return 0;
 }
