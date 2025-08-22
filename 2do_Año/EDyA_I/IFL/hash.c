@@ -130,18 +130,18 @@ void imprimir_tabla_hash(TablaHash *tabla) {
     }
 }
 
-int main() {
-    srand(1);
-    TablaHash *hTable = crear_tabla_hash(1217);
-    char stringArray[1200][100];
-    for (int i = 0; i < 1200; i++) {
-        sprintf(stringArray[i], "[%d, %d, %d, %d, %d, %d]", rand() % 100, rand() % 100, rand() % 100, rand() % 100,
-                rand() % 100, rand() % 100);
-        insertar(stringArray[i], stringArray[i], hTable);
-    }
-
-    imprimir_tabla_hash(hTable);
-    char *a = buscar("[49, 18, 12, 34, 84, 30]", hTable);
-    printf("\n%s", a);
-    return 0;
-}
+// int main() {
+//     srand(1);
+//     TablaHash *hTable = crear_tabla_hash(1217);
+//     char stringArray[1200][100];
+//     for (int i = 0; i < 1200; i++) {
+//         sprintf(stringArray[i], "[%d, %d, %d, %d, %d, %d]", rand() % 100, rand() % 100, rand() % 100, rand() % 100,
+//                 rand() % 100, rand() % 100);
+//         insertar(stringArray[i], stringArray[i], hTable);
+//     }
+//
+//     imprimir_tabla_hash(hTable);
+//     char *a = buscar("[49, 18, 12, 34, 84, 30]", hTable);
+//     printf("\n%s", a);
+//     return 0;
+// }
