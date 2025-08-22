@@ -12,12 +12,15 @@
  * */
 
 // TO DO:
-// - parsear_apply
-// - parsear_search
-// - reemplazar con copiar_substring
+// - hacer apply
+// - hacer search
 // - agregar mensajes de error
 // - eliminar posActual como parametro de las funciones de parseo
 // - hacer enum con tipos de error
+typedef struct {
+        DList *fst;
+        DList *snd;
+} DListPair;
 
 typedef enum {
     TOKEN_EOF = 0,
@@ -57,12 +60,12 @@ typedef struct {
 } Token;
 
 char *copiar_substring(const char *str, int ini, int fin) {
-    if (ini < 0 || fin < ini) {
+    if (ini < 0 || fin < ini)
         return NULL;
-    }
 
     int largo = fin - ini;
     char *copia = malloc(largo + 1);
+
     if (!copia) {
         perror("Error reservando memoria en copiar_substring");
         exit(EXIT_FAILURE);
@@ -75,6 +78,7 @@ char *copiar_substring(const char *str, int ini, int fin) {
 }
 
 void actualizar_token(TokenType type, char *value, Token *token) {
+    free(token->value);
     token->type = type;
     token->value = value;
 }
@@ -156,33 +160,40 @@ void obtener_siguiente_token(char *input, int *posActual, int saltearEspacios, T
     // 5. Identificar operadores
     switch (input[*posActual]) {
     case '=':
-        (*posActual)++;
         actualizar_token(TOKEN_ASIGNACION, NULL, token);
+        (*posActual)++;
+        return;
     case '<':
-        (*posActual)++;
         actualizar_token(TOKEN_REPETICION_INI, NULL, token);
-    case '>':
         (*posActual)++;
+        return;
+    case '>':
         actualizar_token(TOKEN_REPETICION_FIN, NULL, token);
+        (*posActual)++;
+        return;
     case ' ':
         actualizar_token(TOKEN_COMPOSICION, NULL, token);
+        (*posActual)++;
         return;
     }
 
     // 6. Identificar puntuacion
     switch (input[*posActual]) {
     case '{':
-        (*posActual)++;
         actualizar_token(TOKEN_LBRACE, NULL, token);
+        (*posActual)++;
+        return;
     case '}':
-        (*posActual)++;
         actualizar_token(TOKEN_RBRACE, NULL, token);
+        (*posActual)++;
+        return;
     case ',':
-        (*posActual)++;
         actualizar_token(TOKEN_COMA, NULL, token);
-    case ';':
         (*posActual)++;
+        return;
+    case ';':
         actualizar_token(TOKEN_SEMICOLON, NULL, token);
+        (*posActual)++;
         return;
     }
 
@@ -230,7 +241,6 @@ DList *parsear_lista(char *lista) {
             switch (tok->type) {
             case TOKEN_NUM:
                 dlist_agregar_final(dlist, atoi(tok->value));
-                free(tok->value);
 
                 obtener_siguiente_token_lista(lista, &posActual, tok);
                 if (tok->type != TOKEN_COMA || tok->type != TOKEN_EOF)
@@ -249,7 +259,7 @@ DList *parsear_lista(char *lista) {
         }
     }
 
-    free(tok);
+    liberar_token(tok);
 
     if (!esValido) {
         dlist_destruir(dlist);
@@ -262,28 +272,24 @@ DList *parsear_lista(char *lista) {
 void parsear_defl(char *input, int *posActual, TablaHash *tablaHash) {
     Token *tok = malloc(sizeof(Token));
     obtener_siguiente_token(input, posActual, 1, tok);
+
     if (tok->type == TOKEN_IDENTIFICADOR) {
         char *identificador = tok->value;
         tok->value = NULL;
-        liberar_token(tok);
 
-        tok = obtener_siguiente_token(input, posActual, 1);
+        obtener_siguiente_token(input, posActual, 1, tok);
         if (tok->type == TOKEN_ASIGNACION) {
-            liberar_token(tok);
 
-            tok = obtener_siguiente_token(input, posActual, 1);
+            obtener_siguiente_token(input, posActual, 1, tok);
             if (tok->type == TOKEN_LIST_LITERAL) {
                 char *listaLiteral = tok->value;
                 tok->value = NULL;
-                liberar_token(tok);
 
-                tok = obtener_siguiente_token(input, posActual, 1);
+                obtener_siguiente_token(input, posActual, 1, tok);
                 if (tok->type == TOKEN_SEMICOLON) {
-                    liberar_token(tok);
 
-                    obtener_siguiente_token(input, posActual, 1);
+                    obtener_siguiente_token(input, posActual, 1, tok);
                     if (tok->type == TOKEN_EOF) {
-                        liberar_token(tok);
 
                         DList *dlist = parsear_lista(listaLiteral);
                         insertar(identificador, dlist, tablaHash);
@@ -294,25 +300,28 @@ void parsear_defl(char *input, int *posActual, TablaHash *tablaHash) {
             }
         }
     }
+    liberar_token(tok);
 }
 
 char *parsear_funcion(char *input, int *posActual, TablaHash *tablaHash) {
     saltear_espacios(input, posActual);
     int inicioFuncion = *posActual;
-    Token *tok = obtener_siguiente_token(input, posActual, 1);
-
+    Token *tok = malloc(sizeof(Token *));
     int esValido = 1;
-    if (tok->type != TOKEN_IDENTIFICADOR || tok->type != TOKEN_REPETICION_INI)
+
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type != TOKEN_IDENTIFICADOR || tok->type != TOKEN_REPETICION_INI) {
+        liberar_token(tok);
         return NULL;
+    }
+
     int cont = 0;
     while (esValido && tok->type != TOKEN_EOF) {
         switch (tok->type) {
 
         case TOKEN_IDENTIFICADOR:
             if (buscar(tok->value, tablaHash) != NULL) {
-                liberar_token(tok);
-
-                tok = obtener_siguiente_token(input, posActual, 0);
+                obtener_siguiente_token(input, posActual, 0, tok);
                 if (tok->type != TOKEN_COMPOSICION || tok->type != TOKEN_REPETICION_FIN)
                     esValido = 0;
             } else
@@ -321,34 +330,28 @@ char *parsear_funcion(char *input, int *posActual, TablaHash *tablaHash) {
 
         case TOKEN_REPETICION_INI:
             cont++;
-            liberar_token(tok);
 
-            tok = obtener_siguiente_token(input, posActual, 0);
+            obtener_siguiente_token(input, posActual, 0, tok);
             if (tok->type != TOKEN_IDENTIFICADOR)
                 esValido = 0;
             break;
 
         case TOKEN_REPETICION_FIN:
             cont--;
-            liberar_token(tok);
 
-            tok = obtener_siguiente_token(input, posActual, 0);
+            obtener_siguiente_token(input, posActual, 0, tok);
             if (cont < 0 || tok->type != TOKEN_COMPOSICION || tok->type != TOKEN_SEMICOLON)
                 esValido = 0;
             break;
 
         case TOKEN_COMPOSICION:
-            liberar_token(tok);
-
-            tok = obtener_siguiente_token(input, posActual, 0);
+            obtener_siguiente_token(input, posActual, 0, tok);
             if (tok->type != TOKEN_IDENTIFICADOR || tok->type != TOKEN_REPETICION_INI)
                 esValido = 0;
             break;
 
         case TOKEN_SEMICOLON:
-            liberar_token(tok);
-
-            tok = obtener_siguiente_token(input, posActual, 0);
+            obtener_siguiente_token(input, posActual, 0, tok);
             if (tok->type != TOKEN_EOF)
                 esValido = 0;
             break;
@@ -357,6 +360,7 @@ char *parsear_funcion(char *input, int *posActual, TablaHash *tablaHash) {
             esValido = 0;
         }
     }
+
     liberar_token(tok);
 
     int finalFuncion = (*posActual) - 1;
@@ -364,71 +368,151 @@ char *parsear_funcion(char *input, int *posActual, TablaHash *tablaHash) {
     return esValido ? copiar_substring(input, inicioFuncion, finalFuncion) : NULL;
 }
 
-void parsear_deff(char *input, int *posActual, TablaHash *tablaHash) {
+void parsear_deff(char *input, int *posActual, TablaHash *tablaHashFunciones) {
     char *funcion;
-    Token *tok = obtener_siguiente_token(input, posActual, 1);
     char *identificador;
+    Token *tok = malloc(sizeof(Token));
+
+    obtener_siguiente_token(input, posActual, 1, tok);
     if (tok->type == TOKEN_IDENTIFICADOR) {
         identificador = tok->value;
         tok->value = NULL;
-        liberar_token(tok);
 
-        tok = obtener_siguiente_token(input, posActual, 1);
+        obtener_siguiente_token(input, posActual, 1, tok);
         if (tok->type == TOKEN_ASIGNACION) {
-            liberar_token(tok);
 
-            funcion = parsear_funcion(input, posActual, tablaHash);
+            funcion = parsear_funcion(input, posActual, tablaHashFunciones);
             if (funcion != NULL) {
-                insertar(identificador, funcion, tablaHash);
+                insertar(identificador, funcion, tablaHashFunciones);
             }
         }
     }
-}
 
-void parsear_apply(char *input, int *posActual, TablaHash *tablaHashFunciones, TablaHash *tablaHashListas) {
-    Token *tok = obtener_siguiente_token(input, posActual, 1);
-
-    if (tok->type == TOKEN_IDENTIFICADOR) {
-        char *funcion = buscar(tok->value, tablaHashFunciones);
-        liberar_token(tok);
-
-        if (funcion) {
-            tok = obtener_siguiente_token(input, posActual, 1);
-
-            if (tok->type == TOKEN_IDENTIFICADOR) {
-                DList *lista = buscar(tok->value, tablaHashListas);
-                liberar_token(tok);
-
-                if (lista) {
-                    tok = obtener_siguiente_token(input, posActual, 1);
-
-                    if (tok->type == TOKEN_SEMICOLON)
-                }
-                liberar_token(tok);
-            }
-            liberar_token(tok);
-        }
-        liberar_token(tok);
-    }
     liberar_token(tok);
 }
 
-void parsear_expresion(char *input, TablaHash *tablaHash) {
-    int posActual = 0;
+void parsear_apply(char *input, int *posActual, TablaHash *tablaHashListas, TablaHash *tablaHashFunciones) {
+    Token *tok = malloc(sizeof(Token));
 
-    Token *tok = obtener_siguiente_token(input, &posActual, 1);
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type == TOKEN_IDENTIFICADOR) {
+
+        char *funcion = buscar(tok->value, tablaHashFunciones);
+        if (funcion) {
+
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type == TOKEN_IDENTIFICADOR) {
+
+                DList *lista = buscar(tok->value, tablaHashListas);
+                if (lista) {
+
+                    obtener_siguiente_token(input, posActual, 1, tok);
+                    if (tok->type == TOKEN_SEMICOLON)
+
+                        apply(funcion, lista);
+                }
+            }
+        }
+    }
+
+    liberar_token(tok);
+}
+
+void parsear_search(char *input, int *posActual, TablaHash *tablaHashListas) {
+    int esValido = 1;
+    int esPrimerIdentificador = 1;
+    int corcheteDerLeido = 0;
+    DListPair DLpair[1000];
+    int indiceDLPair = 0;
+
+    Token *tok = malloc(sizeof(Token));
+
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type != TOKEN_LBRACE) {
+        liberar_token(tok);
+        return;
+    }
+
+    while (tok != TOKEN_EOF && esValido) {
+        switch (tok->type) {
+
+        case TOKEN_LBRACE:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type != TOKEN_IDENTIFICADOR)
+                esValido = 0;
+            break;
+
+        case TOKEN_IDENTIFICADOR: {
+            DList *lista = buscar(tok->value, tablaHashListas);
+            if (lista) {
+                obtener_siguiente_token(input, posActual, 1, tok);
+                if (esPrimerIdentificador) {
+                    DLpair[indiceDLPair].fst = lista;
+                    if (tok->type != TOKEN_COMA)
+                        esValido = 0;
+                } else {
+                    DLpair[indiceDLPair].snd = lista;
+                    if (tok->type != TOKEN_SEMICOLON || tok->type != TOKEN_RBRACE)
+                        esValido = 0;
+                    indiceDLPair++;
+                }
+                esPrimerIdentificador = !esPrimerIdentificador;
+            } else
+                esValido = 0;
+            break;
+        }
+
+        case TOKEN_COMA:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type != TOKEN_IDENTIFICADOR)
+                esValido = 0;
+            break;
+
+        case TOKEN_SEMICOLON:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (corcheteDerLeido) {
+                if (tok->type != TOKEN_EOF)
+                    esValido = 0;
+            } else {
+                if (tok->type != TOKEN_IDENTIFICADOR)
+                    esValido = 0;
+            }
+            break;
+
+        case TOKEN_RBRACE:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type != TOKEN_SEMICOLON)
+                esValido = 0;
+            break;
+
+        default:
+            esValido = 0;
+        }
+    }
+
+    liberar_token(tok);
+
+    if (esValido)
+        search(DLpair);
+}
+
+void parsear_expresion(char *input, TablaHash *tablaHashListas, TablaHash *tablaHashFunciones) {
+    int posActual = 0;
+    Token *tok = malloc(sizeof(Token));
+
+    obtener_siguiente_token(input, &posActual, 1, tok);
     switch (tok->type) {
     case TOKEN_DEFL:
-        parsear_defl(input, &posActual, tablaHash);
+        parsear_defl(input, &posActual, tablaHashListas);
         break;
     case TOKEN_DEFF:
-        parsear_deff(input, &posActual);
+        parsear_deff(input, &posActual, tablaHashFunciones);
         break;
     case TOKEN_APPLY:
-        parsear_apply(input, &posActual);
+        parsear_apply(input, &posActual, tablaHashListas, tablaHashFunciones);
         break;
     case TOKEN_SEARCH:
-        parsear_search(input, &posActual);
+        parsear_search(input, &posActual, tablaHashListas);
         break;
     default:
         perror("Tipo de sentencia invalida");

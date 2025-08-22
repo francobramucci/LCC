@@ -8,7 +8,7 @@
 
 typedef struct _Entrada {
         char *key;
-        char *valor;
+        void *valor;
         int sig;
 } Entrada;
 
@@ -27,11 +27,11 @@ unsigned hash(char *key, int largoTabla);
 
 TablaHash *crear_tabla_hash(int capacidad);
 
-char *buscar(char *key, TablaHash *hashTable);
+void *buscar(char *key, TablaHash *hashTable);
 
-Entrada *crear_entrada(char *key, char *valor);
+Entrada *crear_entrada(char *key, void *valor);
 
-void insertar(char *key, char *value, TablaHash *hashTable);
+void insertar(char *key, void *value, TablaHash *hashTable);
 
 void rehash(TablaHash *hashTable);
 

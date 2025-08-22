@@ -57,7 +57,7 @@ TablaHash *crear_tabla_hash(int capacidad) {
     return tablaHash;
 }
 
-char *buscar(char *key, TablaHash *hashTable) {
+void *buscar(char *key, TablaHash *hashTable) {
     Entrada **tabla = hashTable->tabla;
     int index = hash(key, hashTable->tamRegionDirecciones);
     if (tabla[index] == NULL)
@@ -68,7 +68,7 @@ char *buscar(char *key, TablaHash *hashTable) {
     return index == -1 ? NULL : tabla[index]->valor;
 }
 
-Entrada *crear_entrada(char *key, char *valor) {
+Entrada *crear_entrada(char *key, void *valor) {
     Entrada *entrada = malloc(sizeof(Entrada));
     entrada->key = key;
     entrada->valor = valor;
@@ -77,7 +77,7 @@ Entrada *crear_entrada(char *key, char *valor) {
     return entrada;
 }
 
-void insertar(char *key, char *value, TablaHash *hashTable) {
+void insertar(char *key, void *value, TablaHash *hashTable) {
     Entrada **tabla = hashTable->tabla;
     int index = hash(key, hashTable->tamRegionDirecciones);
     int indiceAnterior;
