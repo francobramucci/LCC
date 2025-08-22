@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "dlist.h"
+#include "hash.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -146,11 +147,11 @@ int parsear_defl(char *parametros, char **idPointer, DList **dlistPointer) {
     return 0;
 }
 
-int validar_funcion(char *funcion) {
+int validar_funcion(char *funcion, TablaHash *tablaHash) {
     char *subFuncion = strtok(funcion, " ");
     int esValido = 1;
     while (subFuncion != NULL) {
-        if (!validar_identificador(subFuncion) || !find(subFuncion, tablaHash))
+        if (!validar_identificador(subFuncion) || !buscar(subFuncion, tablaHash))
             esValido = 0;
         subFuncion = strtok(NULL, " ");
     }
@@ -175,17 +176,24 @@ int validar_repeticiones(char *funcion) {
     return contadorRepeticion == 0 && esValido;
 }
 
-int validar_subfunciones(char *funcion) {
+int validar_subfunciones(char *funcion, TablaHash *hashTable) {
     char *subFuncion = funcion;
-    while (subFuncion != NULL) {
+    int esValido = 1;
+    while (subFuncion != NULL && esValido) {
         int inicioSubFuncion = strspn(subFuncion, "<> ");
         subFuncion += inicioSubFuncion;
         int finalSubFuncion = strcspn(subFuncion, "<> ");
         char temp = subFuncion[finalSubFuncion];
         subFuncion[finalSubFuncion] = '\0';
-        validar_identificador(subFuncion);
+        printf("%s", subFuncion);
+
+        esValido = validar_identificador(subFuncion) && buscar(subFuncion, hashTable);
+
+        subFuncion[finalSubFuncion] = temp;
         subFuncion += finalSubFuncion;
     }
+
+    return esValido && subFuncion != NULL;
 }
 
 int parsear_deff(char *parametros, char **idPointer, char **fcPointer) {
@@ -247,4 +255,24 @@ int main() {
     }
 
     return 0;
+}
+
+int validar_f(char *funcion, TablaHash *tablaHash) {
+    if (*funcion == '<') {
+        int cont = 1;
+        int largoSubFuncion = 0;
+        char *inicioSubFuncion = funcion + 1;
+        while (cont && *funcion != '\0') {
+            if (*funcion == '<')
+                cont++;
+            if (*funcion == '>')
+                cont--;
+            funcion++;
+            largoSubFuncion++;
+        }
+
+        if (!cont) {
+            *funcion = '\0';
+        }
+    }
 }

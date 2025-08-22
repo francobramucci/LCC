@@ -71,3 +71,15 @@ void dlist_eliminar_final(DList *lista) {
         }
     }
 }
+
+void dlist_destruir(DList *lista) {
+    if (lista != NULL) {
+        DNodo *nodoAEliminar;
+        while (lista->primero != NULL) {
+            nodoAEliminar = lista->primero;
+            lista->primero = lista->primero->sig;
+            free(nodoAEliminar);
+        }
+    }
+    free(lista);
+}
