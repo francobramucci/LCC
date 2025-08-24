@@ -282,9 +282,10 @@ void parsear_defl(char *input, int *posActual, THash *tablaHash) {
     int esValido = 0;
     char *identificador;
     char *listaLiteral;
+    DList *dlist;
     Token *tok = crear_token();
-    obtener_siguiente_token(input, posActual, 1, tok);
 
+    obtener_siguiente_token(input, posActual, 1, tok);
     if (tok->type == TOKEN_IDENTIFICADOR) {
         identificador = tok->value;
         tok->value = NULL;
@@ -303,8 +304,8 @@ void parsear_defl(char *input, int *posActual, THash *tablaHash) {
                     obtener_siguiente_token(input, posActual, 1, tok);
                     if (tok->type == TOKEN_EOF) {
 
-                        DList *dlist = parsear_lista(listaLiteral);
-                        if (dlist) {
+                        dlist = parsear_lista(listaLiteral);
+                        if (dlist && !thash_buscar(identificador, tablaHash)) {
                             thash_insertar(identificador, dlist, tablaHash);
                             esValido = 1;
                         }
@@ -314,8 +315,10 @@ void parsear_defl(char *input, int *posActual, THash *tablaHash) {
         }
     }
 
-    if (!esValido)
+    if (!esValido) {
         free(identificador);
+        dlist_destruir(dlist);
+    }
 
     free(listaLiteral);
     liberar_token(tok);
@@ -324,7 +327,7 @@ void parsear_defl(char *input, int *posActual, THash *tablaHash) {
 char *parsear_funcion(char *input, int *posActual, THash *tablaHash) {
     saltear_espacios(input, posActual);
     int inicioFuncion = *posActual;
-    Token *tok = malloc(sizeof(Token *));
+    Token *tok = crear_token();
     int esValido = 1;
 
     obtener_siguiente_token(input, posActual, 1, tok);
@@ -340,8 +343,10 @@ char *parsear_funcion(char *input, int *posActual, THash *tablaHash) {
         case TOKEN_IDENTIFICADOR:
             if (thash_buscar(tok->value, tablaHash)) {
                 obtener_siguiente_token(input, posActual, 0, tok);
-                if (tok->type != TOKEN_COMPOSICION && tok->type != TOKEN_REPETICION_FIN)
+                if (tok->type != TOKEN_COMPOSICION && tok->type != TOKEN_REPETICION_FIN &&
+                    tok->type != TOKEN_SEMICOLON) {
                     esValido = 0;
+                }
             } else
                 perror("La subfuncion no se encuentra definida");
             break;
@@ -552,18 +557,45 @@ void parsear_expresion(char *input, THash *tablaHashListas, THash *tablaHashFunc
     liberar_token(tok);
 }
 
-int main() {
-    char *l = "";
-    DList *lista = parsear_lista(l);
-    if (lista != NULL) {
-        printf("La lista es: ");
-        for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
-            printf("%d ", temp->dato);
-        }
-    }
+void string_destruir(char *str) {
+    free(str);
+}
 
-    //
-    // THash *tabla = crear_tabla_hash(100);
+int main() {
+    THash *tabla = thash_crear(100, (FuncionDestructora)string_destruir);
+    char *funcion = strdup("Dd Od Sd;");
+    int posActual = 0;
+    char *key1 = strdup("Dd");
+    char *value1 = strdup("Dd");
+    char *key2 = strdup("Od");
+    char *value2 = strdup("Od");
+    char *key3 = strdup("Sd");
+    char *value3 = strdup("Sd");
+
+    thash_insertar(key1, value1, tabla);
+    thash_insertar(key2, value2, tabla);
+    thash_insertar(key3, value3, tabla);
+
+    char *res = parsear_funcion(funcion, &posActual, tabla);
+    char *res1 = parsear_funcion(funcion, &posActual, tabla);
+    printf("La funcion es %s", res);
+
+    free(funcion);
+    free(res);
+
+    thash_destruir(tabla);
+
+    // char *l = "";
+    // DList *lista = parsear_lista(l);
+    // if (lista != NULL) {
+    //     printf("La lista es: ");
+    //     for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
+    //         printf("%d ", temp->dato);
+    //     }
+    // }
+    // dlist_destruir(lista);
+
+    // THash *tabla = thash_crear(100, (FuncionDestructora)dlist_destruir);
     // char *a = "L1 = [1];";
     // char *b = "L1 = [2];";
     // char *id = "L1";
@@ -573,29 +605,42 @@ int main() {
     // posActual = 0;
     // parsear_defl(b, &posActual, tabla);
     //
-    // DList *lista = buscar(id, tabla);
+    // DList *lista = thash_buscar(id, tabla);
     // if (lista != NULL) {
     //     printf("La lista es: ");
     //     for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
     //         printf("%d ", temp->dato);
     //     }
     // }
-
+    // thash_destruir(tabla);
+    // dlist_destruir(lista);
+    //
     // srand(1);
-    // THash *hTable = crear_tabla_hash(1217);
-    // char stringArray[1200][100];
-    // for (int i = 0; i < 1200; i++) {
+    // THash *hTable = thash_crear(1217, (FuncionDestructora)dlist_destruir);
+    // char **stringArray = malloc(1300 * sizeof(char *));
+    //
+    // for (int i = 0; i < 1300; i++) {
+    //     stringArray[i] = malloc(100 * sizeof(char));
+    // }
+    //
+    // for (int i = 0; i < 1300; i++) {
     //     sprintf(stringArray[i], "L%d = [%d, %d, %d, %d, %d, %d];", i, rand() % 100, rand() % 100, rand() % 100,
     //             rand() % 100, rand() % 100, rand() % 100);
     //     int posActual = 0;
     //     parsear_defl(stringArray[i], &posActual, hTable);
     // }
     // char *id = "L1190";
-    // DList *lista = buscar(id, hTable);
+    // DList *lista = thash_buscar(id, hTable);
     // if (lista != NULL) {
     //     printf("La lista es: ");
     //     for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
     //         printf("%d ", temp->dato);
     //     }
     // }
+    //
+    // thash_destruir(hTable);
+    // for (int i = 0; i < 1300; i++) {
+    //     free(stringArray[i]);
+    // }
+    // free(stringArray);
 }

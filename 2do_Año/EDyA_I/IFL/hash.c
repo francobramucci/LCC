@@ -116,7 +116,10 @@ void thash_rehash(THash *tablaHash) {
     tablaHash->tamRegionDirecciones = primo_mas_cercano(ceil(0.86 * (float)tablaHash->capacidad));
 
     for (int i = 0; i < tablaVieja.capacidad; i++) {
-        thash_insertar(tablaVieja.tabla[i]->key, tablaVieja.tabla[i]->valor, tablaHash);
+        if (tablaVieja.tabla[i] != NULL) {
+            thash_insertar(tablaVieja.tabla[i]->key, tablaVieja.tabla[i]->valor, tablaHash);
+            free(tablaVieja.tabla[i]);
+        }
     }
     free(tablaVieja.tabla);
 }
@@ -125,9 +128,13 @@ void thash_destruir(THash *tablaHash) {
     FuncionDestructora destr = tablaHash->destr;
     Entrada **tabla = tablaHash->tabla;
     for (int i = 0; i < tablaHash->capacidad; i++) {
-        destr(tabla[i]->valor);
-        free(tabla[i]);
+        if (tabla[i] != NULL) {
+            destr(tabla[i]->valor);
+            free(tabla[i]->key);
+            free(tabla[i]);
+        }
     }
+    free(tabla);
     free(tablaHash);
 }
 
