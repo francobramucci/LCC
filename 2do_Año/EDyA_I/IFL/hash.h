@@ -5,6 +5,7 @@
 #include <time.h>
 
 // TO DO: hacer tabla hash generalizada
+typedef void (*FuncionDestructora)(void *);
 
 typedef struct _Entrada {
         char *key;
@@ -17,22 +18,25 @@ typedef struct {
         int capacidad;
         int tamRegionDirecciones;
         int indiceRegionColisiones;
-} TablaHash;
+        FuncionDestructora destr;
+} THash;
 
 int es_primo(int n);
 
 int primo_mas_cercano(int n);
 
-unsigned hash(char *key, int largoTabla);
+unsigned thash_hash(char *key, int largoTabla);
 
-TablaHash *crear_tabla_hash(int capacidad);
+THash *thash_crear(int capacidad, FuncionDestructora destr);
 
-void *buscar(char *key, TablaHash *hashTable);
+void *thash_buscar(char *key, THash *hashTable);
 
-Entrada *crear_entrada(char *key, void *valor);
+Entrada *entrada_crear(char *key, void *valor);
 
-void insertar(char *key, void *value, TablaHash *hashTable);
+void thash_insertar(char *key, void *value, THash *hashTable);
 
-void rehash(TablaHash *hashTable);
+void thash_rehash(THash *hashTable);
 
-void imprimir_tabla_hash(TablaHash *tabla);
+void thash_destruir(THash *hashTable);
+
+void imprimir_tabla_hash(THash *tabla);

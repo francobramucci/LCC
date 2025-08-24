@@ -37,7 +37,7 @@ int primo_mas_cercano(int n) {
     return p;
 }
 
-unsigned hash(char *key, int largoTabla) {
+unsigned thash_hash(char *key, int largoTabla) {
     unsigned hashval;
 
     for (hashval = 0; *key != '\0'; key++) {
@@ -47,19 +47,20 @@ unsigned hash(char *key, int largoTabla) {
     return hashval % largoTabla;
 }
 
-TablaHash *crear_tabla_hash(int capacidad) {
-    TablaHash *tablaHash = malloc(sizeof(TablaHash));
+THash *thash_crear(int capacidad, FuncionDestructora destr) {
+    THash *tablaHash = malloc(sizeof(THash));
     tablaHash->capacidad = capacidad;
     tablaHash->tamRegionDirecciones = primo_mas_cercano(ceil(0.86 * (float)capacidad));
     tablaHash->tabla = calloc(capacidad, sizeof(Entrada *));
     tablaHash->indiceRegionColisiones = capacidad - 1;
+    tablaHash->destr = destr;
 
     return tablaHash;
 }
 
-void *buscar(char *key, TablaHash *hashTable) {
-    Entrada **tabla = hashTable->tabla;
-    int index = hash(key, hashTable->tamRegionDirecciones);
+void *thash_buscar(char *key, THash *tablaHash) {
+    Entrada **tabla = tablaHash->tabla;
+    int index = thash_hash(key, tablaHash->tamRegionDirecciones);
     if (tabla[index] == NULL)
         return NULL;
     while (index != -1 && strcmp(tabla[index]->key, key)) {
@@ -68,7 +69,7 @@ void *buscar(char *key, TablaHash *hashTable) {
     return index == -1 ? NULL : tabla[index]->valor;
 }
 
-Entrada *crear_entrada(char *key, void *valor) {
+Entrada *entrada_crear(char *key, void *valor) {
     Entrada *entrada = malloc(sizeof(Entrada));
     entrada->key = key;
     entrada->valor = valor;
@@ -77,13 +78,13 @@ Entrada *crear_entrada(char *key, void *valor) {
     return entrada;
 }
 
-void insertar(char *key, void *value, TablaHash *hashTable) {
-    Entrada **tabla = hashTable->tabla;
-    int index = hash(key, hashTable->tamRegionDirecciones);
+void thash_insertar(char *key, void *value, THash *tablaHash) {
+    Entrada **tabla = tablaHash->tabla;
+    int index = thash_hash(key, tablaHash->tamRegionDirecciones);
     int indiceAnterior;
 
     if (tabla[index] == NULL) {
-        tabla[index] = crear_entrada(key, value);
+        tabla[index] = entrada_crear(key, value);
         return;
     }
 
@@ -93,38 +94,48 @@ void insertar(char *key, void *value, TablaHash *hashTable) {
     }
 
     if (index == -1) {
-        int indiceRegionColisiones = hashTable->indiceRegionColisiones;
+        int indiceRegionColisiones = tablaHash->indiceRegionColisiones;
         while (indiceRegionColisiones >= 0 && tabla[indiceRegionColisiones] != NULL)
             indiceRegionColisiones--;
-        hashTable->indiceRegionColisiones = indiceRegionColisiones;
+        tablaHash->indiceRegionColisiones = indiceRegionColisiones;
         if (indiceRegionColisiones == -1) { // Overflow
-            rehash(hashTable);
-            insertar(key, value, hashTable);
+            thash_rehash(tablaHash);
+            thash_insertar(key, value, tablaHash);
             return;
         }
         tabla[indiceAnterior]->sig = indiceRegionColisiones;
-        tabla[indiceRegionColisiones] = crear_entrada(key, value);
+        tabla[indiceRegionColisiones] = entrada_crear(key, value);
     }
 }
 
-void rehash(TablaHash *hashTable) {
-    TablaHash tablaVieja = *hashTable;
-    hashTable->capacidad = hashTable->capacidad * 2;
-    hashTable->indiceRegionColisiones = hashTable->capacidad - 1;
-    hashTable->tabla = calloc(hashTable->capacidad, sizeof(Entrada *));
-    hashTable->tamRegionDirecciones = primo_mas_cercano(ceil(0.86 * (float)hashTable->capacidad));
+void thash_rehash(THash *tablaHash) {
+    THash tablaVieja = *tablaHash;
+    tablaHash->capacidad = tablaHash->capacidad * 2;
+    tablaHash->indiceRegionColisiones = tablaHash->capacidad - 1;
+    tablaHash->tabla = calloc(tablaHash->capacidad, sizeof(Entrada *));
+    tablaHash->tamRegionDirecciones = primo_mas_cercano(ceil(0.86 * (float)tablaHash->capacidad));
 
     for (int i = 0; i < tablaVieja.capacidad; i++) {
-        insertar(tablaVieja.tabla[i]->key, tablaVieja.tabla[i]->valor, hashTable);
+        thash_insertar(tablaVieja.tabla[i]->key, tablaVieja.tabla[i]->valor, tablaHash);
     }
     free(tablaVieja.tabla);
 }
 
-void imprimir_tabla_hash(TablaHash *tabla) {
+void thash_destruir(THash *tablaHash) {
+    FuncionDestructora destr = tablaHash->destr;
+    Entrada **tabla = tablaHash->tabla;
+    for (int i = 0; i < tablaHash->capacidad; i++) {
+        destr(tabla[i]->valor);
+        free(tabla[i]);
+    }
+    free(tablaHash);
+}
+
+void imprimir_tabla_hash(THash *tabla) {
     printf("%-10s | %-15s | %s\n", "Posicion", "Valor", "Siguiente");
     printf("-------------------------------------------\n");
     for (int i = 0; i < tabla->capacidad; i++) {
-        char *valor = tabla->tabla[i] == NULL ? "NULL" : tabla->tabla[i]->valor;
+        char *valor = tabla->tabla[i] == NULL ? "NULL" : tabla->tabla[i]->key;
         int sig = tabla->tabla[i] == NULL ? -1 : tabla->tabla[i]->sig;
         printf("%-10d | %-15s | %d\n", i, valor, sig);
     }
@@ -132,7 +143,7 @@ void imprimir_tabla_hash(TablaHash *tabla) {
 
 // int main() {
 //     srand(1);
-//     TablaHash *hTable = crear_tabla_hash(1217);
+//     THash *hTable = crear_tabla_hash(1217);
 //     char stringArray[1200][100];
 //     for (int i = 0; i < 1200; i++) {
 //         sprintf(stringArray[i], "[%d, %d, %d, %d, %d, %d]", rand() % 100, rand() % 100, rand() % 100, rand() % 100,
