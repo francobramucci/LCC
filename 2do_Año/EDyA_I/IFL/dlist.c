@@ -83,3 +83,13 @@ void dlist_destruir(DList *lista) {
     }
     free(lista);
 }
+
+DList *dlist_copiar(DList *lista) {
+    DList *nuevaLista = dlist_crear();
+    if (lista) {
+        for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig)
+            dlist_agregar_final(nuevaLista, temp->dato);
+    }
+
+    return nuevaLista;
+}

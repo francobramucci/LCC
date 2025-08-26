@@ -26,4 +26,6 @@ void dlist_eliminar_final(DList *lista);
 
 void dlist_destruir(DList *lista);
 
+DList *dlist_copiar(DList *lista);
+
 #endif /* __DLIST_H__ */

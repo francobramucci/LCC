@@ -1,3 +1,4 @@
+#include "dlist.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +7,11 @@
 
 // TO DO: hacer tabla hash generalizada
 typedef void (*FuncionDestructora)(void *);
+
+typedef struct {
+        char **def;
+        int largo;
+} FLista;
 
 typedef struct _Entrada {
         char *key;
@@ -40,3 +46,9 @@ void thash_rehash(THash *hashTable);
 void thash_destruir(THash *hashTable);
 
 void imprimir_tabla_hash(THash *tabla);
+
+void aplicacion_singular(char *funcion, DList *lista, THash *tablaHashFunciones);
+
+void apply(FLista *funcion, DList *lista, THash *tablaHashFunciones);
+
+void parsear_apply(char *input, int *posActual, THash *tablaHashListas, THash *tablaHashFunciones);
