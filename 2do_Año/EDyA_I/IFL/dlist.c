@@ -93,3 +93,15 @@ DList *dlist_copiar(DList *lista) {
 
     return nuevaLista;
 }
+
+void dlist_imprimir(DList *lista) {
+    if (lista != NULL) {
+        printf("[");
+        for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
+            printf("%d", temp->dato);
+            if (temp->sig != NULL)
+                printf(",");
+        }
+        printf("]");
+    }
+}

@@ -6,36 +6,6 @@
  * Doble hash: mayor costo computacional al
  *
  * */
-int es_primo(int n) {
-    if (n <= 1)
-        return 0;
-    if (n <= 3)
-        return 1;
-    if (n % 2 == 0 || n % 3 == 0)
-        return 0;
-
-    int esPrimo = 1;
-
-    for (int i = 5; i * i <= n && esPrimo; i = i + 6) {
-        if (n % i == 0 || n % (i + 2) == 0)
-            esPrimo = 0;
-    }
-
-    return esPrimo;
-}
-
-int primo_mas_cercano(int n) {
-    int p = 0;
-
-    for (int i = 0; p == 0; i++) {
-        if (es_primo(n - i))
-            p = n - i;
-        else if (es_primo(n + i))
-            p = n + i;
-    }
-
-    return p;
-}
 
 unsigned thash_hash(char *key, int largoTabla) {
     unsigned hashval;
@@ -138,15 +108,15 @@ void thash_destruir(THash *tablaHash) {
     free(tablaHash);
 }
 
-void imprimir_tabla_hash(THash *tabla) {
-    printf("%-10s | %-15s | %s\n", "Posicion", "Valor", "Siguiente");
-    printf("-------------------------------------------\n");
-    for (int i = 0; i < tabla->capacidad; i++) {
-        char *valor = tabla->tabla[i] == NULL ? "NULL" : tabla->tabla[i]->key;
-        int sig = tabla->tabla[i] == NULL ? -1 : tabla->tabla[i]->sig;
-        printf("%-10d | %-15s | %d\n", i, valor, sig);
-    }
-}
+// void imprimir_tabla_hash(THash *tabla) {
+//     printf("%-10s | %-15s | %s\n", "Posicion", "Valor", "Siguiente");
+//     printf("-------------------------------------------\n");
+//     for (int i = 0; i < tabla->capacidad; i++) {
+//         char *valor = tabla->tabla[i] == NULL ? "NULL" : tabla->tabla[i]->key;
+//         int sig = tabla->tabla[i] == NULL ? -1 : tabla->tabla[i]->sig;
+//         printf("%-10d | %-15s | %d\n", i, valor, sig);
+//     }
+// }
 
 // int main() {
 //     srand(1);

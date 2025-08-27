@@ -28,4 +28,6 @@ void dlist_destruir(DList *lista);
 
 DList *dlist_copiar(DList *lista);
 
+void dlist_imprimir(DList *lista);
+
 #endif /* __DLIST_H__ */

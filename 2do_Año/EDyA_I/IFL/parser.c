@@ -1,278 +1,629 @@
 #include "parser.h"
-#include "dlist.h"
-#include "hash.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <string.h>
+#include "token.h"
+/*
+ * Aclaraciones:
+ *  - Los identificadores deberán comenzar con una letra.
+ *
+ * */
 
-int caracter_valido(char c) {
-    return isalnum(c) || c == '_';
-}
+// TO DO:
+// - hacer apply
+// - hacer search
+// - agregar mensajes de error
+// - eliminar posActual como parametro de las funciones de parseo
+// - hacer enum con tipos de error
 
-char *strip(char *cadena) {
-    int i = 0, ultimoEspacio = -1, actualizarPos = 1;
-    while (isspace(*cadena))
-        cadena += 1;
-    while (cadena[i] != '\0') {
-        if (isspace(cadena[i]) && actualizarPos == 1) {
-            ultimoEspacio = i;
-            actualizarPos = 0;
-        }
-        if (!isspace(cadena[i])) {
-            ultimoEspacio = -1;
-            actualizarPos = 1;
-        }
-        i++;
+void saltear_espacios(char *input, int *posActual) {
+    while (input[*posActual] != '\0' && isspace(input[*posActual])) {
+        (*posActual)++;
     }
-    if (ultimoEspacio != -1)
-        cadena[ultimoEspacio] = '\0';
-    return cadena;
 }
 
-int validar_identificador(char *identificador) {
-    while (*identificador != '\0' && caracter_valido(*identificador)) {
-        identificador++;
+void obtener_siguiente_token(char *input, int *posActual, int saltearEspacios, Token *token) {
+    // 1. Saltar espacios en blanco
+    if (saltearEspacios) {
+        saltear_espacios(input, posActual);
     }
-    return (*identificador == '\0');
-}
 
-typedef enum {
-    EST_INICIO,
-    EST_ANTES_NUMERO,
-    EST_NUMERO,
-    EST_ESPACIO_POST_NUMERO,
-    EST_DESPUES_COMA,
-    EST_FIN,
-    EST_ERROR
-} Estado;
+    // 2. Chequear si se llego al final de la entrada
+    if (input[*posActual] == '\0') {
+        actualizar_token(TOKEN_EOF, NULL, token);
+        return;
+    }
 
-int validar_lista(const char *lista) {
-    Estado estado = EST_INICIO;
-
-    for (int i = 0; lista[i] != '\0' && estado != EST_ERROR; i++) {
-        char c = lista[i];
-
-        switch (estado) {
-        case EST_INICIO:
-            if (isspace(c))
-                continue;
-            estado = (c == '[') ? EST_ANTES_NUMERO : EST_ERROR;
-            break;
-
-        case EST_ANTES_NUMERO:
-            if (isspace(c))
-                continue;
-            if (c == ']')
-                estado = EST_FIN;
-            else
-                estado = isdigit(c) ? EST_NUMERO : EST_ERROR;
-            break;
-
-        case EST_NUMERO:
-            if (isdigit(c)) {
-            } else if (isspace(c)) {
-                estado = EST_ESPACIO_POST_NUMERO;
-            } else if (c == ',') {
-                estado = EST_DESPUES_COMA;
-            } else if (c == ']') {
-                estado = EST_FIN;
-            } else {
-                estado = EST_ERROR;
-            }
-            break;
-
-        case EST_ESPACIO_POST_NUMERO:
-            if (isspace(c)) {
-            } else if (c == ',') {
-                estado = EST_DESPUES_COMA;
-            } else if (c == ']') {
-                estado = EST_FIN;
-            } else {
-                estado = EST_ERROR;
-            }
-            break;
-
-        case EST_DESPUES_COMA:
-            if (isspace(c))
-                continue;
-            estado = isdigit(c) ? EST_NUMERO : EST_ERROR;
-            break;
-
-        case EST_FIN:
-            estado = EST_ERROR;
-            break;
-
-        case EST_ERROR:
-            break;
+    // 3. Identificar palabras clave o identificadores
+    if (isalpha(input[*posActual])) {
+        int inicio = *posActual;
+        while (isalnum(input[*posActual]) || input[*posActual] == '_') {
+            (*posActual)++;
         }
+        int fin = *posActual;
+        char *identificador = copiar_substring(input, inicio, fin);
+
+        // Chequear si es una keyword
+        if (strcmp(identificador, "defl") == 0) {
+            free(identificador);
+            actualizar_token(TOKEN_DEFL, NULL, token);
+        } else if (strcmp(identificador, "deff") == 0) {
+            free(identificador);
+            actualizar_token(TOKEN_DEFF, NULL, token);
+        } else if (strcmp(identificador, "apply") == 0) {
+            free(identificador);
+            actualizar_token(TOKEN_APPLY, NULL, token);
+        } else if (strcmp(identificador, "search") == 0) {
+            free(identificador);
+            actualizar_token(TOKEN_SEARCH, NULL, token);
+        } else {
+            // Es un identificador
+            actualizar_token(TOKEN_IDENTIFICADOR, identificador, token);
+        }
+        return;
     }
-    return estado == EST_FIN;
+
+    // 4. Identificar listas en formato string
+    if (input[*posActual] == '[') {
+        (*posActual)++;
+        int inicio = *posActual;
+
+        while (input[*posActual] != ']' && input[*posActual] != '\0') {
+            (*posActual)++;
+        }
+        if (input[*posActual] == ']') {
+            int fin = *posActual;
+            (*posActual)++;
+
+            actualizar_token(TOKEN_LIST_LITERAL, copiar_substring(input, inicio, fin), token);
+        } else {
+            // Error: Lista abierta por derecha
+            actualizar_token(TOKEN_ERROR, NULL, token);
+        }
+        return;
+    }
+
+    // 5. Identificar operadores
+    switch (input[*posActual]) {
+    case '=':
+        actualizar_token(TOKEN_ASIGNACION, NULL, token);
+        (*posActual)++;
+        return;
+    case '<':
+        actualizar_token(TOKEN_REPETICION_INI, NULL, token);
+        (*posActual)++;
+        return;
+    case '>':
+        actualizar_token(TOKEN_REPETICION_FIN, NULL, token);
+        (*posActual)++;
+        return;
+    case ' ':
+        actualizar_token(TOKEN_COMPOSICION, NULL, token);
+        (*posActual)++;
+        return;
+    }
+
+    // 6. Identificar puntuacion
+    switch (input[*posActual]) {
+    case '{':
+        actualizar_token(TOKEN_LBRACE, NULL, token);
+        (*posActual)++;
+        return;
+    case '}':
+        actualizar_token(TOKEN_RBRACE, NULL, token);
+        (*posActual)++;
+        return;
+    case ',':
+        actualizar_token(TOKEN_COMA, NULL, token);
+        (*posActual)++;
+        return;
+    case ';':
+        actualizar_token(TOKEN_SEMICOLON, NULL, token);
+        (*posActual)++;
+        return;
+    }
+
+    // 7. Si no hay coindidencias es un error
+    actualizar_token(TOKEN_ERROR, NULL, token);
 }
 
-DList *lista_to_intdlist(char *lista) {
+void obtener_siguiente_token_lista(char *lista, int *posActual, Token *token) {
+    saltear_espacios(lista, posActual);
+
+    if (lista[*posActual] == '\0') {
+        actualizar_token(TOKEN_EOF, NULL, token);
+    }
+
+    else if (isdigit(lista[*posActual])) {
+        int inicio = *posActual;
+        while (isdigit(lista[*posActual]))
+            (*posActual)++;
+        int fin = *posActual;
+
+        char *num = copiar_substring(lista, inicio, fin);
+
+        actualizar_token(TOKEN_NUM, num, token);
+    }
+
+    else if (lista[*posActual] == ',') {
+        (*posActual)++;
+        actualizar_token(TOKEN_COMA, NULL, token);
+    }
+
+    else
+        actualizar_token(TOKEN_ERROR, NULL, token);
+}
+
+DList *parsear_lista(char *lista) {
+    int posActual = 0;
+    int esValido = 1;
     DList *dlist = dlist_crear();
-    char *num = strtok(lista, "[], ");
-    while (num != NULL) {
-        dlist_agregar_final(dlist, atoi(num));
-        num = strtok(NULL, "[], ");
+    Token *tok = crear_token();
+
+    obtener_siguiente_token_lista(lista, &posActual, tok);
+    if (tok->type == TOKEN_NUM || tok->type == TOKEN_EOF) {
+
+        while (tok->type != TOKEN_EOF && esValido) {
+            switch (tok->type) {
+            case TOKEN_NUM:
+                dlist_agregar_final(dlist, atoi(tok->value));
+
+                obtener_siguiente_token_lista(lista, &posActual, tok);
+                if (tok->type != TOKEN_COMA && tok->type != TOKEN_EOF)
+                    esValido = 0;
+                break;
+
+            case TOKEN_COMA:
+                obtener_siguiente_token_lista(lista, &posActual, tok);
+                if (tok->type != TOKEN_NUM)
+                    esValido = 0;
+                break;
+
+            default:
+                esValido = 0;
+            }
+        }
+    }
+
+    liberar_token(tok);
+
+    if (!esValido) {
+        dlist_destruir(dlist);
+        return NULL;
     }
 
     return dlist;
 }
 
-int parsear_defl(char *parametros, char **idPointer, DList **dlistPointer) {
-    char *id = strip(strtok(parametros, "="));
-    char *lista = strtok(NULL, ";");
+void parsear_defl(char *input, int *posActual, THash *tablaHash) {
+    int esValido = 0;
+    char *identificador = NULL;
+    char *listaLiteral = NULL;
+    DList *dlist = NULL;
+    Token *tok = crear_token();
 
-    if (lista == NULL) {
-        printf("Entrada invalida. Debe incluirse el operador '='.");
-        return 1;
-    } else
-        lista = strip(lista);
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type == TOKEN_IDENTIFICADOR) {
+        identificador = tok->value;
+        tok->value = NULL;
 
-    if (!validar_identificador(id)) {
-        printf("Entrada invalida. El identificador debe ser una sola cadena y contener solo alfanumericos o el "
-               "caracter '_'.");
-        return 1;
+        obtener_siguiente_token(input, posActual, 1, tok);
+        if (tok->type == TOKEN_ASIGNACION) {
+
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type == TOKEN_LIST_LITERAL) {
+                listaLiteral = tok->value;
+                tok->value = NULL;
+
+                obtener_siguiente_token(input, posActual, 1, tok);
+                if (tok->type == TOKEN_SEMICOLON) {
+
+                    obtener_siguiente_token(input, posActual, 1, tok);
+                    if (tok->type == TOKEN_EOF) {
+
+                        dlist = parsear_lista(listaLiteral);
+                        if (dlist && !thash_buscar(identificador, tablaHash)) {
+                            thash_insertar(identificador, dlist, tablaHash);
+                            esValido = 1;
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    if (!validar_lista(lista)) {
-        printf("Entrada invalida. Sintaxis de lista incorrecta.");
-        return 1;
+    if (!esValido) {
+        free(identificador);
+        dlist_destruir(dlist);
     }
 
-    *idPointer = id;
-    *dlistPointer = lista_to_intdlist(lista);
-
-    return 0;
+    free(listaLiteral);
+    liberar_token(tok);
 }
 
-int validar_funcion(char *funcion, TablaHash *tablaHash) {
-    char *subFuncion = strtok(funcion, " ");
+FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash) {
+    FLista *funcion = flista_crear(1000);
     int esValido = 1;
-    while (subFuncion != NULL) {
-        if (!validar_identificador(subFuncion) || !buscar(subFuncion, tablaHash))
-            esValido = 0;
-        subFuncion = strtok(NULL, " ");
-    }
-    return esValido;
-}
+    int cont = 0;
 
-int validar_repeticiones(char *funcion) {
-    int contadorRepeticion = 0;
-    int esValido = 1;
-    while (*funcion != '\0' && contadorRepeticion >= 0 && esValido) {
-        char c = *funcion;
-        if (c == '<') {
-            if (*(funcion + 1) == '>')
+    Token *tok = crear_token();
+
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type != TOKEN_IDENTIFICADOR && tok->type != TOKEN_REPETICION_INI) {
+        flista_destruir(funcion);
+        liberar_token(tok);
+        return NULL;
+    }
+
+    while (esValido && tok->type != TOKEN_EOF) {
+        switch (tok->type) {
+
+        case TOKEN_IDENTIFICADOR:
+            if (thash_buscar(tok->value, tablaHash)) {
+                funcion->def[funcion->largo] = tok->value;
+                funcion->largo++;
+                tok->value = NULL;
+                obtener_siguiente_token(input, posActual, 0, tok);
+                if (tok->type != TOKEN_COMPOSICION && tok->type != TOKEN_REPETICION_FIN &&
+                    tok->type != TOKEN_SEMICOLON) {
+                    esValido = 0;
+                }
+            } else {
                 esValido = 0;
-            contadorRepeticion++;
+                perror("La subfuncion no se encuentra definida");
+            }
+            break;
+
+        case TOKEN_REPETICION_INI:
+            funcion->def[funcion->largo] = strdup("<");
+            funcion->largo++;
+            cont++;
+
+            obtener_siguiente_token(input, posActual, 0, tok);
+            if (tok->type != TOKEN_IDENTIFICADOR && tok->type != TOKEN_REPETICION_INI)
+                esValido = 0;
+            break;
+
+        case TOKEN_REPETICION_FIN:
+            funcion->def[funcion->largo] = strdup(">");
+            funcion->largo++;
+            cont--;
+
+            obtener_siguiente_token(input, posActual, 0, tok);
+            if (cont < 0 ||
+                tok->type != TOKEN_COMPOSICION && tok->type != TOKEN_SEMICOLON && tok->type != TOKEN_REPETICION_FIN)
+                esValido = 0;
+            break;
+
+        case TOKEN_COMPOSICION:
+            obtener_siguiente_token(input, posActual, 0, tok);
+            if (tok->type != TOKEN_IDENTIFICADOR && tok->type != TOKEN_REPETICION_INI)
+                esValido = 0;
+            break;
+
+        case TOKEN_SEMICOLON:
+            obtener_siguiente_token(input, posActual, 0, tok);
+            if (tok->type != TOKEN_EOF)
+                esValido = 0;
+            break;
+
+        default:
+            esValido = 0;
         }
-        if (c == '>')
-            contadorRepeticion--;
-        funcion++;
     }
 
-    return contadorRepeticion == 0 && esValido;
+    liberar_token(tok);
+
+    if (!esValido) {
+        flista_destruir(funcion);
+        return NULL;
+    }
+
+    return funcion;
 }
 
-int validar_subfunciones(char *funcion, TablaHash *hashTable) {
-    char *subFuncion = funcion;
+void parsear_deff(char *input, int *posActual, THash *tablaHashFunciones) {
+    int esValido = 0;
+    FLista *funcion = NULL;
+    char *identificador = NULL;
+    Token *tok = crear_token();
+
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type == TOKEN_IDENTIFICADOR) {
+        identificador = tok->value;
+        tok->value = NULL;
+
+        obtener_siguiente_token(input, posActual, 1, tok);
+        if (tok->type == TOKEN_ASIGNACION) {
+
+            funcion = parsear_funcion(input, posActual, tablaHashFunciones);
+            if (funcion != NULL) {
+                thash_insertar(identificador, funcion, tablaHashFunciones);
+                esValido = 1;
+            }
+        }
+    }
+
+    if (!esValido) {
+        free(identificador);
+        free(funcion);
+    }
+    liberar_token(tok);
+}
+
+void parsear_apply(char *input, int *posActual, THash *tablaHashListas, THash *tablaHashFunciones) {
+    Token *tok = crear_token();
+
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type == TOKEN_IDENTIFICADOR) {
+
+        FLista *funcion = thash_buscar(tok->value, tablaHashFunciones);
+        if (funcion) {
+
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type == TOKEN_IDENTIFICADOR) {
+
+                DList *lista = thash_buscar(tok->value, tablaHashListas);
+                if (lista) {
+
+                    obtener_siguiente_token(input, posActual, 1, tok);
+                    if (tok->type == TOKEN_SEMICOLON) {
+
+                        obtener_siguiente_token(input, posActual, 1, tok);
+                        if (tok->type == TOKEN_EOF) {
+                            DList *copia = dlist_copiar(lista);
+                            apply(funcion, copia, tablaHashFunciones);
+                            dlist_destruir(copia);
+                        }
+                    }
+                }
+            }
+
+            if (tok->type == TOKEN_LIST_LITERAL) {
+                DList *lista = parsear_lista(tok->value);
+
+                obtener_siguiente_token(input, posActual, 1, tok);
+                if (tok->type == TOKEN_SEMICOLON) {
+
+                    obtener_siguiente_token(input, posActual, 1, tok);
+                    if (tok->type == TOKEN_EOF) {
+                        apply(funcion, lista, tablaHashFunciones);
+                    }
+                }
+                dlist_destruir(lista);
+            }
+        }
+    }
+
+    liberar_token(tok);
+}
+
+void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
     int esValido = 1;
-    while (subFuncion != NULL && esValido) {
-        int inicioSubFuncion = strspn(subFuncion, "<> ");
-        subFuncion += inicioSubFuncion;
-        int finalSubFuncion = strcspn(subFuncion, "<> ");
-        char temp = subFuncion[finalSubFuncion];
-        subFuncion[finalSubFuncion] = '\0';
-        printf("%s", subFuncion);
+    int esPrimerIdentificador = 1;
+    int corcheteDerLeido = 0;
+    DLPair DLpair[1000];
+    int indiceDLPair = 0;
 
-        esValido = validar_identificador(subFuncion) && buscar(subFuncion, hashTable);
+    Token *tok = crear_token();
 
-        subFuncion[finalSubFuncion] = temp;
-        subFuncion += finalSubFuncion;
+    obtener_siguiente_token(input, posActual, 1, tok);
+    if (tok->type != TOKEN_LBRACE) {
+        liberar_token(tok);
+        return;
     }
 
-    return esValido && subFuncion != NULL;
-}
+    while (tok != TOKEN_EOF && esValido) {
+        switch (tok->type) {
 
-int parsear_deff(char *parametros, char **idPointer, char **fcPointer) {
-    char *id = strip(strtok(parametros, "="));
-    char *funcion = strtok(NULL, ";");
+        case TOKEN_LBRACE:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type != TOKEN_IDENTIFICADOR)
+                esValido = 0;
+            break;
 
-    if (funcion == NULL) {
-        printf("Entrada invalida. Debe incluirse el operador '='.");
-        return 1;
-    } else
-        funcion = strip(funcion);
+        case TOKEN_IDENTIFICADOR: {
+            DList *lista = thash_buscar(tok->value, tablaHashListas);
+            if (lista) {
+                obtener_siguiente_token(input, posActual, 1, tok);
+                if (esPrimerIdentificador) {
+                    DLpair[indiceDLPair].fst = lista;
+                    if (tok->type != TOKEN_COMA)
+                        esValido = 0;
+                } else {
+                    DLpair[indiceDLPair].snd = lista;
+                    if (tok->type != TOKEN_SEMICOLON && tok->type != TOKEN_RBRACE)
+                        esValido = 0;
+                    indiceDLPair++;
+                }
+                esPrimerIdentificador = !esPrimerIdentificador;
+            } else
+                esValido = 0;
+            break;
+        }
 
-    if (!validar_identificador(id)) {
-        printf("Entrada invalida. El identificador debe ser una sola cadena y contener solo alfanumericos o el "
-               "caracter '_'.");
-        return 1;
-    }
+        case TOKEN_COMA:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type != TOKEN_IDENTIFICADOR)
+                esValido = 0;
+            break;
 
-    if (!validar_funcion(funcion)) {
-        printf("Entrada invalida. Sintaxis de funcion incorrecta");
-        return 1;
-    }
-}
-
-int main() {
-    while (1) {
-        printf("\n> ");
-
-        char buffer[256];
-        scanf(" %[^\n]", buffer);
-
-        if (!strchr(buffer, ';'))
-            printf("Entrada invalida. Las sentencias deben terminar con ';'.");
-        else {
-            char *tipoDeSentencia = strtok(buffer, " \t\n");
-            char *parametros = strtok(NULL, "");
-
-            if (!strcmp(tipoDeSentencia, "defl")) {
-                char *identificador;
-                DList *dlist;
-                parsear_defl(parametros, &identificador, &dlist);
+        case TOKEN_SEMICOLON:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (corcheteDerLeido) {
+                if (tok->type != TOKEN_EOF)
+                    esValido = 0;
+            } else {
+                if (tok->type != TOKEN_IDENTIFICADOR)
+                    esValido = 0;
             }
+            break;
 
-            if (!strcmp(tipoDeSentencia, "deff")) {
-                char *identificador;
-                char *funcion;
-                parsear_deff(parametros, &identificador, &funcion);
-            }
+        case TOKEN_RBRACE:
+            obtener_siguiente_token(input, posActual, 1, tok);
+            if (tok->type != TOKEN_SEMICOLON)
+                esValido = 0;
+            break;
 
-            if (!strcmp(tipoDeSentencia, "apply")) {
-            }
-
-            if (!strcmp(tipoDeSentencia, "search")) {
-            }
-
-            if (!strcmp(tipoDeSentencia, "exit"))
-                return 0;
+        default:
+            esValido = 0;
         }
     }
 
-    return 0;
+    liberar_token(tok);
+
+    // if (esValido)
+    //     search(DLpair);
 }
 
-int validar_f(char *funcion, TablaHash *tablaHash) {
-    if (*funcion == '<') {
-        int cont = 1;
-        int largoSubFuncion = 0;
-        char *inicioSubFuncion = funcion + 1;
-        while (cont && *funcion != '\0') {
-            if (*funcion == '<')
-                cont++;
-            if (*funcion == '>')
-                cont--;
-            funcion++;
-            largoSubFuncion++;
-        }
+void parsear_expresion(char *input, THash *tablaHashListas, THash *tablaHashFunciones) {
+    int posActual = 0;
+    Token *tok = crear_token();
 
-        if (!cont) {
-            *funcion = '\0';
-        }
+    obtener_siguiente_token(input, &posActual, 1, tok);
+    switch (tok->type) {
+    case TOKEN_DEFL:
+        parsear_defl(input, &posActual, tablaHashListas);
+        break;
+    case TOKEN_DEFF:
+        parsear_deff(input, &posActual, tablaHashFunciones);
+        break;
+    case TOKEN_APPLY:
+        parsear_apply(input, &posActual, tablaHashListas, tablaHashFunciones);
+        break;
+    case TOKEN_SEARCH:
+        parsear_search(input, &posActual, tablaHashListas);
+        break;
+    default:
+        perror("Tipo de sentencia invalida");
+        break;
     }
+
+    liberar_token(tok);
 }
+
+// int main() {
+//     // THash *tabla = thash_crear(100, (FuncionDestructora)flista_destruir);
+//     // char *id = "F";
+//     // char *input = strdup("F = <Dd> Od Sd");
+//     // int posActual = 0;
+//     // char *key1 = strdup("Dd");
+//     // FLista *value1 = flista_crear(10);
+//     // char *key2 = strdup("Od");
+//     // FLista *value2 = flista_crear(10);
+//     // char *key3 = strdup("Sd");
+//     // FLista *value3 = flista_crear(10);
+//     //
+//     // thash_insertar(key1, value1, tabla);
+//     // thash_insertar(key2, value2, tabla);
+//     // thash_insertar(key3, value3, tabla);
+//     //
+//     // parsear_deff(input, &posActual, tabla);
+//     // FLista *res = thash_buscar(id, tabla);
+//     //
+//     // if (res != NULL) {
+//     //     for (int i = 0; i < res->largo; i++) {
+//     //         printf("%s ", res->def[i]);
+//     //     }
+//     // }
+//     //
+//     // free(input);
+//     //
+//     // thash_destruir(tabla);
+//
+//     // char *l = "";
+//     // DList *lista = parsear_lista(l);
+//     // if (lista != NULL) {
+//     //     printf("La lista es: ");
+//     //     for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
+//     //         printf("%d ", temp->dato);
+//     //     }
+//     // }
+//     // dlist_destruir(lista);
+//
+//     // THash *tabla = thash_crear(100, (FuncionDestructora)dlist_destruir);
+//     // char *a = "L1 = [1];";
+//     // char *b = "L1 = [2];";
+//     // char *id = "L1";
+//     // int posActual = 0;
+//     //
+//     // parsear_defl(a, &posActual, tabla);
+//     // posActual = 0;
+//     // parsear_defl(b, &posActual, tabla);
+//     //
+//     // DList *lista = thash_buscar(id, tabla);
+//     // if (lista != NULL) {
+//     //     printf("La lista es: ");
+//     //     for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
+//     //         printf("%d ", temp->dato);
+//     //     }
+//     // }
+//     // thash_destruir(tabla);
+//     // dlist_destruir(lista);
+//     //
+//     // srand(1);
+//     // THash *hTable = thash_crear(1217, (FuncionDestructora)dlist_destruir);
+//     // char **stringArray = malloc(1300 * sizeof(char *));
+//     //
+//     // for (int i = 0; i < 1300; i++) {
+//     //     stringArray[i] = malloc(100 * sizeof(char));
+//     // }
+//     //
+//     // for (int i = 0; i < 1300; i++) {
+//     //     sprintf(stringArray[i], "L%d = [%d, %d, %d, %d, %d, %d];", i, rand() % 100, rand() % 100, rand() % 100,
+//     //             rand() % 100, rand() % 100, rand() % 100);
+//     //     int posActual = 0;
+//     //     parsear_defl(stringArray[i], &posActual, hTable);
+//     // }
+//     // char *id = "L1190";
+//     // DList *lista = thash_buscar(id, hTable);
+//     // if (lista != NULL) {
+//     //     printf("La lista es: ");
+//     //     for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
+//     //         printf("%d ", temp->dato);
+//     //     }
+//     // }
+//     //
+//     // thash_destruir(hTable);
+//     // for (int i = 0; i < 1300; i++) {
+//     //     free(stringArray[i]);
+//     // }
+//     // free(stringArray);
+//     //
+//
+//     THash *tablaF = thash_crear(100, (FuncionDestructora)flista_destruir);
+//     THash *tablaL = thash_crear(100, (FuncionDestructora)dlist_destruir);
+//
+//     char *input1 = "defl L1 = [10,2,3];";
+//     char *input2 = "deff Mi = Oi <Si> Dd;";
+//     char *input3 = "deff Md = Od <Sd> Di;";
+//     char *input4 = "deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di;";
+//     char *input5 = "apply S L1;";
+//
+//     char *key1 = strdup("Oi");
+//     FLista *value1 = flista_crear(10);
+//     char *key2 = strdup("Od");
+//     FLista *value2 = flista_crear(10);
+//     char *key3 = strdup("Si");
+//     FLista *value3 = flista_crear(10);
+//     char *key4 = strdup("Sd");
+//     FLista *value4 = flista_crear(10);
+//     char *key5 = strdup("Di");
+//     FLista *value5 = flista_crear(10);
+//     char *key6 = strdup("Dd");
+//     FLista *value6 = flista_crear(10);
+//
+//     thash_insertar(key1, value1, tablaF);
+//     thash_insertar(key2, value2, tablaF);
+//     thash_insertar(key3, value3, tablaF);
+//     thash_insertar(key4, value4, tablaF);
+//     thash_insertar(key5, value5, tablaF);
+//     thash_insertar(key6, value6, tablaF);
+//
+//     parsear_expresion(input1, tablaL, tablaF);
+//     parsear_expresion(input2, tablaL, tablaF);
+//     parsear_expresion(input3, tablaL, tablaF);
+//     parsear_expresion(input4, tablaL, tablaF);
+//     parsear_expresion(input5, tablaL, tablaF);
+//
+//     thash_destruir(tablaL);
+//     thash_destruir(tablaF);
+//     return 0;
+// }
