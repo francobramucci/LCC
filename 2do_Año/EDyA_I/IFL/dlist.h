@@ -3,8 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef void *(*FuncionCopiadora)(void *);
+typedef void (*FuncionDestructora)(void *);
+typedef int (*FuncionComparadora)(void *, void *);
+typedef void (*FuncionVisitante)(void *);
+
 typedef struct _DNodo {
-        int dato;
+        void *dato;
         struct _DNodo *sig;
         struct _DNodo *ant;
 } DNodo;
@@ -12,13 +17,15 @@ typedef struct _DNodo {
 typedef struct {
         DNodo *primero;
         DNodo *ultimo;
+        FuncionCopiadora copiar;
+        FuncionDestructora destruir;
 } DList;
 
-DList *dlist_crear();
+DList *dlist_crear(FuncionCopiadora copiar, FuncionDestructora destruir);
 
-void dlist_agregar_inicio(DList *lista, int dato);
+void dlist_agregar_inicio(DList *lista, void *dato);
 
-void dlist_agregar_final(DList *lista, int dato);
+void dlist_agregar_final(DList *lista, void *dato);
 
 void dlist_eliminar_inicio(DList *lista);
 
@@ -28,6 +35,8 @@ void dlist_destruir(DList *lista);
 
 DList *dlist_copiar(DList *lista);
 
-void dlist_imprimir(DList *lista);
+int dlist_comparar(DList *l1, DList *l2, FuncionComparadora comparar);
+
+void dlist_imprimir(DList *lista, FuncionVisitante visitar);
 
 #endif /* __DLIST_H__ */

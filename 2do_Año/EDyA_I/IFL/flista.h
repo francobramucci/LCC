@@ -5,10 +5,15 @@
 
 typedef struct {
         char **def;
-        int largo;
+        int ultimo;
+        int capacidad;
 } FLista;
 
-FLista *flista_crear(int tamBuffer);
+FLista *flista_crear(int capacidad);
+
+void flista_insertar(FLista *funcion, char *subFuncion);
+
+void flista_redimensionar(FLista *funcion);
 
 void flista_destruir(FLista *funcion);
 

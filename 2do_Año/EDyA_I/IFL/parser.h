@@ -5,11 +5,6 @@
 #include "utils.h"
 #include <ctype.h>
 
-typedef struct {
-        DList *fst;
-        DList *snd;
-} DLPair;
-
 void saltear_espacios(char *input, int *posActual);
 
 void obtener_siguiente_token(char *input, int *posActual, int saltearEspacios, Token *token);

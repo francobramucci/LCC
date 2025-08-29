@@ -48,3 +48,26 @@ int primo_mas_cercano(int n) {
 
     return p;
 }
+
+int *copiar_puntero_entero(int *i) {
+    int *j = malloc(sizeof(int));
+    *j = *i;
+
+    return j;
+}
+
+void destruir_puntero_entero(int *i) {
+    free(i);
+}
+
+int comparar_referencia_puntero_entero(int *i, int *j) {
+    if (*i > *j)
+        return 1;
+    if (*i < *j)
+        return -1;
+    return 0;
+}
+
+void imprimir_puntero_entero(int *i) {
+    printf("%d", *i);
+}

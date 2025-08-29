@@ -8,7 +8,7 @@ void insertar_funciones_primitivas(THash *tablaFunciones) {
         char *key = strdup(funciones_primitivas[i]);
         FLista *value = flista_crear(1);
         value->def[0] = strdup(funciones_primitivas[i]);
-        value->largo = 1;
+        value->ultimo = 1;
 
         thash_insertar(key, value, tablaFunciones);
     }

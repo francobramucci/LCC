@@ -1,10 +1,11 @@
 #include "pila.h"
+#include "dlist.h"
 
-Pila pila_crear() {
-    return dlist_crear();
+Pila pila_crear(FuncionCopiadora copiar, FuncionDestructora destruir) {
+    return dlist_crear(copiar, destruir);
 }
 
-void pila_push(int dato, Pila p) {
+void pila_push(void *dato, Pila p) {
     dlist_agregar_inicio(p, dato);
 }
 
@@ -12,8 +13,10 @@ void pila_pop(Pila p) {
     dlist_eliminar_inicio(p);
 }
 
-int pila_top(Pila p) {
-    return p->primero->dato;
+void *pila_top(Pila p) {
+    if (!p->primero)
+        return p->primero->dato;
+    return NULL;
 }
 
 void pila_destruir(Pila p) {

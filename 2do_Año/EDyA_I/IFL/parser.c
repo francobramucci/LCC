@@ -1,5 +1,12 @@
 #include "parser.h"
+#include "dlist.h"
+#include "flista.h"
 #include "token.h"
+typedef struct {
+        DList *fst;
+        DList *snd;
+} DLPair;
+
 /*
  * Aclaraciones:
  *  - Los identificadores deberán comenzar con una letra.
@@ -154,7 +161,7 @@ void obtener_siguiente_token_lista(char *lista, int *posActual, Token *token) {
 DList *parsear_lista(char *lista) {
     int posActual = 0;
     int esValido = 1;
-    DList *dlist = dlist_crear();
+    DList *dlist = dlist_crear((FuncionCopiadora)copiar_puntero_entero, (FuncionDestructora)destruir_puntero_entero);
     Token *tok = crear_token();
 
     obtener_siguiente_token_lista(lista, &posActual, tok);
@@ -162,14 +169,16 @@ DList *parsear_lista(char *lista) {
 
         while (tok->type != TOKEN_EOF && esValido) {
             switch (tok->type) {
-            case TOKEN_NUM:
-                dlist_agregar_final(dlist, atoi(tok->value));
+
+            case TOKEN_NUM: {
+                int num = atoi(tok->value);
+                dlist_agregar_final(dlist, &num);
 
                 obtener_siguiente_token_lista(lista, &posActual, tok);
                 if (tok->type != TOKEN_COMA && tok->type != TOKEN_EOF)
                     esValido = 0;
                 break;
-
+            }
             case TOKEN_COMA:
                 obtener_siguiente_token_lista(lista, &posActual, tok);
                 if (tok->type != TOKEN_NUM)
@@ -239,7 +248,7 @@ void parsear_defl(char *input, int *posActual, THash *tablaHash) {
 }
 
 FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash) {
-    FLista *funcion = flista_crear(1000);
+    FLista *funcion = flista_crear(50);
     int esValido = 1;
     int cont = 0;
 
@@ -257,8 +266,7 @@ FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash) {
 
         case TOKEN_IDENTIFICADOR:
             if (thash_buscar(tok->value, tablaHash)) {
-                funcion->def[funcion->largo] = tok->value;
-                funcion->largo++;
+                flista_insertar(funcion, tok->value);
                 tok->value = NULL;
                 obtener_siguiente_token(input, posActual, 0, tok);
                 if (tok->type != TOKEN_COMPOSICION && tok->type != TOKEN_REPETICION_FIN &&
@@ -272,8 +280,7 @@ FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash) {
             break;
 
         case TOKEN_REPETICION_INI:
-            funcion->def[funcion->largo] = strdup("<");
-            funcion->largo++;
+            flista_insertar(funcion, strdup("<"));
             cont++;
 
             obtener_siguiente_token(input, posActual, 0, tok);
@@ -282,8 +289,7 @@ FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash) {
             break;
 
         case TOKEN_REPETICION_FIN:
-            funcion->def[funcion->largo] = strdup(">");
-            funcion->largo++;
+            flista_insertar(funcion, strdup(">"));
             cont--;
 
             obtener_siguiente_token(input, posActual, 0, tok);
@@ -343,7 +349,7 @@ void parsear_deff(char *input, int *posActual, THash *tablaHashFunciones) {
 
     if (!esValido) {
         free(identificador);
-        free(funcion);
+        flista_destruir(funcion);
     }
     liberar_token(tok);
 }

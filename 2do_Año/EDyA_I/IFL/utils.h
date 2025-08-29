@@ -10,4 +10,12 @@ int es_primo(int n);
 
 int primo_mas_cercano(int n);
 
+int *copiar_puntero_entero(int *i);
+
+void destruir_puntero_entero(int *i);
+
+int comparar_referencia_puntero_entero(int *i, int *j);
+
+void imprimir_puntero_entero(int *i);
+
 #endif // !__UTILS_H__
