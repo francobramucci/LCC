@@ -112,9 +112,9 @@ int dlist_comparar(DList *l1, DList *l2, FuncionComparadora comparar) {
     int sonIguales = 1;
 
     while (temp1 && temp2 && sonIguales) {
-        if (comparar(temp1->dato, temp2->dato)) {
+        if (comparar(temp1->dato, temp2->dato))
             sonIguales = 0;
-        }
+
         temp1 = temp1->sig;
         temp2 = temp2->sig;
     }

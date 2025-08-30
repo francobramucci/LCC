@@ -71,3 +71,7 @@ int comparar_referencia_puntero_entero(int *i, int *j) {
 void imprimir_puntero_entero(int *i) {
     printf("%d", *i);
 }
+
+void *retornar_puntero(void *a) {
+    return a;
+}

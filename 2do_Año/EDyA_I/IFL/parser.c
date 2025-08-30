@@ -2,6 +2,7 @@
 #include "dlist.h"
 #include "flista.h"
 #include "token.h"
+#include "utils.h"
 typedef struct {
         DList *fst;
         DList *snd;
@@ -228,9 +229,13 @@ void parsear_defl(char *input, int *posActual, THash *tablaHash) {
                     if (tok->type == TOKEN_EOF) {
 
                         dlist = parsear_lista(listaLiteral);
+
                         if (dlist && !thash_buscar(identificador, tablaHash)) {
                             thash_insertar(identificador, dlist, tablaHash);
                             esValido = 1;
+
+                            printf("%s <-- ", identificador);
+                            dlist_imprimir(dlist, (FuncionVisitante)imprimir_puntero_entero);
                         }
                     }
                 }
@@ -405,8 +410,7 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
     int esValido = 1;
     int esPrimerIdentificador = 1;
     int corcheteDerLeido = 0;
-    DLPair DLpair[1000];
-    int indiceDLPair = 0;
+    DList *dlpairs = dlist_crear(retornar_puntero, (FuncionDestructora)dlist_destruir);
 
     Token *tok = crear_token();
 
@@ -430,16 +434,14 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
             if (lista) {
                 obtener_siguiente_token(input, posActual, 1, tok);
                 if (esPrimerIdentificador) {
-                    DLpair[indiceDLPair].fst = lista;
                     if (tok->type != TOKEN_COMA)
                         esValido = 0;
                 } else {
-                    DLpair[indiceDLPair].snd = lista;
                     if (tok->type != TOKEN_SEMICOLON && tok->type != TOKEN_RBRACE)
                         esValido = 0;
-                    indiceDLPair++;
                 }
                 esPrimerIdentificador = !esPrimerIdentificador;
+                dlist_agregar_final(dlpairs, lista);
             } else
                 esValido = 0;
             break;
@@ -472,6 +474,9 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
             esValido = 0;
         }
     }
+
+    if (!esValido)
+        dlist_destruir(dlpairs);
 
     liberar_token(tok);
 

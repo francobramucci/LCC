@@ -18,4 +18,6 @@ int comparar_referencia_puntero_entero(int *i, int *j);
 
 void imprimir_puntero_entero(int *i);
 
+void *retornar_puntero(void *a);
+
 #endif // !__UTILS_H__

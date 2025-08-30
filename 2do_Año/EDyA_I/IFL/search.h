@@ -2,14 +2,10 @@
 #define __SEARCH_H__
 
 #include "apply.h"
-#include "dlist.h"
+#include "cola.h"
 #include "flista.h"
+#include "utils.h"
 
-typedef struct {
-        DList *fst;
-        DList *snd;
-} DLPair;
-
-void search(DLPair *listas, THash *tablaFunciones);
+void search(DList *listas, THash *tablaFunciones);
 
 #endif // !__SEARCH_H__

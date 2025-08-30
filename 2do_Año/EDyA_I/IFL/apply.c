@@ -68,7 +68,6 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
             errorCode = 2;
 
         if (funcion->def[i][0] == '<') {
-            perror("4");
             if (comparar_referencia_puntero_entero(lista->primero->dato, lista->ultimo->dato)) {
                 pila_push(&i, p);
             } else {

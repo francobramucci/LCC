@@ -1,16 +1,16 @@
 #include "flista.h"
 #include "parser.h"
+#include <string.h>
 
 void insertar_funciones_primitivas(THash *tablaFunciones) {
-    const char *funciones_primitivas[] = {"Oi", "Od", "Si", "Sd", "Di", "Dd"};
+    char *funciones_primitivas[] = {"Oi", "Od", "Si", "Sd", "Di", "Dd"};
 
     for (int i = 0; i < 6; i++) {
         char *key = strdup(funciones_primitivas[i]);
-        FLista *value = flista_crear(1);
-        value->def[0] = strdup(funciones_primitivas[i]);
-        value->ultimo = 1;
+        FLista *funcion = flista_crear(1);
+        flista_insertar(funcion, strdup(funciones_primitivas[i]));
 
-        thash_insertar(key, value, tablaFunciones);
+        thash_insertar(key, funcion, tablaFunciones);
     }
 }
 
@@ -19,13 +19,20 @@ int main() {
     THash *tablaFunciones = thash_crear(1000, (FuncionDestructora)flista_destruir);
     insertar_funciones_primitivas(tablaFunciones);
 
-    while (1) {
+    int exit = 0;
+
+    while (!exit) {
         char buffer[1000];
         printf("\n> ");
         scanf(" %[^\n]", buffer);
+        if (!strcmp(buffer, "exit"))
+            exit = 1;
 
         parsear_expresion(buffer, tablaListas, tablaFunciones);
     }
+
+    thash_destruir(tablaListas);
+    thash_destruir(tablaFunciones);
 
     return 0;
 }

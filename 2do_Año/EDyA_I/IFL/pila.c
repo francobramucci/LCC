@@ -15,8 +15,9 @@ void pila_pop(Pila p) {
 
 void *pila_top(Pila p) {
     if (!p->primero)
-        return p->primero->dato;
-    return NULL;
+        return NULL;
+
+    return p->primero->dato;
 }
 
 void pila_destruir(Pila p) {
