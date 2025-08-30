@@ -35,7 +35,7 @@ void dlist_destruir(DList *lista);
 
 DList *dlist_copiar(DList *lista);
 
-int dlist_comparar(DList *l1, DList *l2, FuncionComparadora comparar);
+int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar);
 
 void dlist_imprimir(DList *lista, FuncionVisitante visitar);
 

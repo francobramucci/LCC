@@ -21,7 +21,7 @@ void parsear_deff(char *input, int *posActual, THash *tablaHashFunciones);
 
 void parsear_apply(char *input, int *posActual, THash *tablaHashListas, THash *tablaHashFunciones);
 
-void parsear_search(char *input, int *posActual, THash *tablaHashListas);
+void parsear_search(char *input, int *posActual, THash *tablaHashListas, THash *tablaFunciones);
 
 void parsear_expresion(char *input, THash *tablaHashListas, THash *tablaHashFunciones);
 

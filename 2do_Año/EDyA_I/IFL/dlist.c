@@ -101,7 +101,7 @@ DList *dlist_copiar(DList *lista) {
     return nuevaLista;
 }
 
-int dlist_comparar(DList *l1, DList *l2, FuncionComparadora comparar) {
+int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar) {
     if (l1 && !l2 || !l1 && l2)
         return 0;
     if (!l1 && !l2)

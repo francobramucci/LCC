@@ -1,80 +1,139 @@
 #include "search.h"
 #include "apply.h"
-#include "cola.h"
 #include "dlist.h"
 #include "flista.h"
 #include "utils.h"
 
+#define PROFUNDIDAD_MAX 8
+
 // Implementar colas
 // Funcion que agrega primitivas y funciones definidas
 
-int probar_funcion_con_resto_de_pares(DList *listas, FLista *funcion, THash *tablaFunciones) {
-    DNodo *nodoInput = NULL;
-    DNodo *nodoOutput = NULL;
-    int sonIguales = 1;
-    int finDeLista = 0;
-    if (!listas->primero->sig->sig)
+// int probar_funcion_con_resto_de_pares(DList *listas, FLista *funcion, THash *tablaFunciones) {
+//     DNodo *nodoInput = NULL;
+//     DNodo *nodoOutput = NULL;
+//     int sonIguales = 1;
+//     int finDeLista = 0;
+//     if (!listas->primero->sig->sig)
+//         return 1;
+//
+//     // Asignamos como input el primer elemento del segundo par de listas
+//     // y el segundo del segundo par como el output
+//     nodoInput = listas->primero->sig->sig;
+//     nodoOutput = nodoInput->sig;
+//
+//     while (!finDeLista && sonIguales) {
+//         DList *input = dlist_copiar(nodoInput->dato);
+//         DList *output = nodoOutput->dato;
+//
+//         apply(funcion, input, tablaFunciones);
+//
+//         sonIguales = dlist_comparar(input, output, (FuncionComparadora)dlist_comparar);
+//
+//         if (nodoOutput->sig == NULL)
+//             finDeLista = 1;
+//         else {
+//             nodoInput = nodoOutput->sig;
+//             nodoOutput = nodoOutput->sig->sig;
+//         }
+//     }
+//
+//     return sonIguales;
+// }
+//
+// void expandir_nivel(Cola q, FLista *funcion, THash tablaFunciones) {
+// }
+//
+// void search_primera_lista(DList *listas, THash *tablaFunciones) {
+//     DList *listaInput = listas->primero->dato;
+//     DList *listaOutput = listas->primero->sig->dato;
+//
+//     Cola q = cola_crear((FuncionCopiadora)retornar_puntero, (FuncionDestructora)flista_destruir);
+//
+//     cola_encolar(q, thash_buscar("Oi", tablaFunciones));
+//     cola_encolar(q, thash_buscar("Od", tablaFunciones));
+//     cola_encolar(q, thash_buscar("Si", tablaFunciones));
+//     cola_encolar(q, thash_buscar("Sd", tablaFunciones));
+//     cola_encolar(q, thash_buscar("Di", tablaFunciones));
+//     cola_encolar(q, thash_buscar("Dd", tablaFunciones));
+//
+//     int profundidad = 1;
+//
+//     while (profundidad < 8) {
+//         int largo = 0;
+//         while (largo <= profundidad) {
+//             FLista *funcion = cola_desencolar(q);
+//             DList *copia = dlist_copiar(listaInput);
+//             apply(funcion, copia, tablaFunciones);
+//             int sonIguales =
+//                 dlist_comparar(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero);
+//
+//             if (sonIguales)
+//                 probar_funcion_con_resto_de_pares(listas, funcion, tablaFunciones);
+//             else {
+//                 expandir(q, funcion, tablaFunciones);
+//             }
+//             FLista *proximaFuncion = cola_top(q);
+//             largo = proximaFuncion->ultimo + 1;
+//         }
+//         profundidad++;
+//     }
+// }
+
+int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
+    if (!listas)
         return 1;
 
-    // Asignamos como input el primer elemento del segundo par de listas
-    // y el segundo del segundo par como el output
-    nodoInput = listas->primero->sig->sig;
-    nodoOutput = nodoInput->sig;
+    DNodo *nodoInput = listas;
+    DNodo *nodoOutput = nodoInput->sig;
 
-    while (!finDeLista && sonIguales) {
-        DList *input = dlist_copiar(nodoInput->dato);
-        DList *output = nodoOutput->dato;
+    DList *listaInput = dlist_copiar(nodoInput->dato);
+    DList *listaOutput = nodoOutput->dato;
 
-        apply(funcion, input, tablaFunciones);
+    apply(funcion, listaInput, tablaFunciones);
 
-        sonIguales = dlist_comparar(input, output, (FuncionComparadora)dlist_comparar);
+    if (dlist_igual(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero)) {
+        free(listaInput);
+        return probar_funcion(funcion, nodoOutput->sig, tablaFunciones);
+    }
 
-        if (nodoOutput->sig == NULL)
-            finDeLista = 1;
-        else {
-            nodoInput = nodoOutput->sig;
-            nodoOutput = nodoOutput->sig->sig;
+    free(listaInput);
+    return 0;
+}
+
+FLista *generate(int length, int pos, int indices[], THash *tablaFunciones, DList *listas) {
+    if (pos == length) {
+        FLista *funcion = flista_crear(8);
+        for (int i = 0; i < length; i++)
+            flista_insertar(funcion, tablaFunciones->tabla[indices[i]]->key);
+        if (probar_funcion(funcion, listas->primero, tablaFunciones))
+            return funcion;
+        // flista_destruir(funcion);
+        return NULL;
+    }
+    FLista *funcion = NULL;
+    for (int i = 0; i < tablaFunciones->capacidad && !funcion; i++) {
+        if (tablaFunciones->tabla[i] != NULL) {
+            indices[pos] = i;
+            funcion = generate(length, pos + 1, indices, tablaFunciones, listas);
         }
     }
 
-    return sonIguales;
+    return funcion;
 }
 
-void expandir_nivel(Cola q, FLista *funcion, THash tablaFunciones) {
-}
-
-void search_primera_lista(DList *listas, THash *tablaFunciones) {
-    DList *listaInput = listas->primero->dato;
-    DList *listaOutput = listas->primero->sig->dato;
-
-    Cola q = cola_crear((FuncionCopiadora)retornar_puntero, (FuncionDestructora)flista_destruir);
-
-    cola_encolar(q, thash_buscar("Oi", tablaFunciones));
-    cola_encolar(q, thash_buscar("Od", tablaFunciones));
-    cola_encolar(q, thash_buscar("Si", tablaFunciones));
-    cola_encolar(q, thash_buscar("Sd", tablaFunciones));
-    cola_encolar(q, thash_buscar("Di", tablaFunciones));
-    cola_encolar(q, thash_buscar("Dd", tablaFunciones));
-
-    int profundidad = 1;
-
-    while (profundidad < 8) {
-        int largo = 0;
-        while (largo <= profundidad) {
-            FLista *funcion = cola_desencolar(q);
-            DList *copia = dlist_copiar(listaInput);
-            apply(funcion, copia, tablaFunciones);
-            int sonIguales =
-                dlist_comparar(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero);
-
-            if (sonIguales)
-                probar_funcion_con_resto_de_pares(listas, funcion, tablaFunciones);
-            else {
-                expandir(q, funcion, tablaFunciones);
-            }
-            FLista *proximaFuncion = cola_top(q);
-            largo = proximaFuncion->ultimo + 1;
-        }
-        profundidad++;
+void search(DList *listas, THash *tablaFunciones) {
+    int indices[8];
+    FLista *funcionBuscada = NULL;
+    for (int i = 1; i < 2 && !funcionBuscada; i++) {
+        funcionBuscada = generate(i, 0, indices, tablaFunciones, listas);
     }
+    if (funcionBuscada) {
+        printf("La funcion buscada es: ");
+        for (int i = 0; i <= funcionBuscada->ultimo; i++) {
+            printf("%s ", funcionBuscada->def[i]);
+        }
+    }
+
+    // flista_destruir();
 }

@@ -1,12 +1,10 @@
 #include "parser.h"
 #include "dlist.h"
 #include "flista.h"
+#include "search.h"
 #include "token.h"
 #include "utils.h"
-typedef struct {
-        DList *fst;
-        DList *snd;
-} DLPair;
+#include <stdio.h>
 
 /*
  * Aclaraciones:
@@ -406,7 +404,7 @@ void parsear_apply(char *input, int *posActual, THash *tablaHashListas, THash *t
     liberar_token(tok);
 }
 
-void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
+void parsear_search(char *input, int *posActual, THash *tablaHashListas, THash *tablaFunciones) {
     int esValido = 1;
     int esPrimerIdentificador = 1;
     int corcheteDerLeido = 0;
@@ -420,7 +418,7 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
         return;
     }
 
-    while (tok != TOKEN_EOF && esValido) {
+    while (tok->type != TOKEN_EOF && esValido) {
         switch (tok->type) {
 
         case TOKEN_LBRACE:
@@ -465,6 +463,7 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
             break;
 
         case TOKEN_RBRACE:
+            corcheteDerLeido = 1;
             obtener_siguiente_token(input, posActual, 1, tok);
             if (tok->type != TOKEN_SEMICOLON)
                 esValido = 0;
@@ -480,8 +479,9 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas) {
 
     liberar_token(tok);
 
-    // if (esValido)
-    //     search(DLpair);
+    if (esValido) {
+        search(dlpairs, tablaFunciones);
+    }
 }
 
 void parsear_expresion(char *input, THash *tablaHashListas, THash *tablaHashFunciones) {
@@ -500,7 +500,7 @@ void parsear_expresion(char *input, THash *tablaHashListas, THash *tablaHashFunc
         parsear_apply(input, &posActual, tablaHashListas, tablaHashFunciones);
         break;
     case TOKEN_SEARCH:
-        parsear_search(input, &posActual, tablaHashListas);
+        parsear_search(input, &posActual, tablaHashListas, tablaHashFunciones);
         break;
     default:
         perror("Tipo de sentencia invalida");
