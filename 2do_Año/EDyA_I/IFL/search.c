@@ -11,37 +11,39 @@
 // Implementar colas
 // Funcion que agrega primitivas y funciones definidas
 
-// int probar_funcion_con_resto_de_pares(DList *listas, FLista *funcion, THash *tablaFunciones) {
-//     DNodo *nodoInput = NULL;
-//     DNodo *nodoOutput = NULL;
-//     int sonIguales = 1;
-//     int finDeLista = 0;
-//     if (!listas->primero->sig->sig)
-//         return 1;
-//
-//     // Asignamos como input el primer elemento del segundo par de listas
-//     // y el segundo del segundo par como el output
-//     nodoInput = listas->primero->sig->sig;
-//     nodoOutput = nodoInput->sig;
-//
-//     while (!finDeLista && sonIguales) {
-//         DList *input = dlist_copiar(nodoInput->dato);
-//         DList *output = nodoOutput->dato;
-//
-//         apply(funcion, input, tablaFunciones);
-//
-//         sonIguales = dlist_comparar(input, output, (FuncionComparadora)dlist_comparar);
-//
-//         if (nodoOutput->sig == NULL)
-//             finDeLista = 1;
-//         else {
-//             nodoInput = nodoOutput->sig;
-//             nodoOutput = nodoOutput->sig->sig;
-//         }
-//     }
-//
-//     return sonIguales;
-// }
+int probar_funcion_con_resto_de_pares(FLista *funcion, DList *listas, THash *tablaFunciones) {
+    DNodo *nodoInput = NULL;
+    DNodo *nodoOutput = NULL;
+    int sonIguales = 1;
+    int finDeLista = 0;
+    if (!listas->primero->sig->sig)
+        return 1;
+
+    // Asignamos como input el primer elemento del segundo par de listas
+    // y el segundo del segundo par como el output
+    nodoInput = listas->primero->sig->sig;
+    nodoOutput = nodoInput->sig;
+
+    while (!finDeLista && sonIguales) {
+        DList *listaInput = dlist_copiar(nodoInput->dato);
+        DList *listaOutput = nodoOutput->dato;
+
+        int resultadoApply = apply(funcion, listaInput, tablaFunciones, 0);
+        if (resultadoApply == SUCCESS)
+            sonIguales = dlist_igual(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero);
+        else
+            sonIguales = 0;
+
+        if (nodoOutput->sig == NULL)
+            finDeLista = 1;
+        else {
+            nodoInput = nodoOutput->sig;
+            nodoOutput = nodoOutput->sig->sig;
+        }
+    }
+
+    return sonIguales;
+}
 //
 // void expandir_nivel(Cola q, FLista *funcion, THash tablaFunciones) {
 // }
@@ -125,25 +127,9 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
 //     return funcion;
 // }
 //
-void search(DList *listas, THash *tablaFunciones) {
-    FLista *funcion = flista_crear(PROFUNDIDAD_MAX);
-    int funcionEncontrada = buscar_funcion(PROFUNDIDAD_MAX, 0, tablaFunciones, listas, funcion);
-    if (funcionEncontrada == SUCCESS) {
-        for (int i = 0; i <= funcion->ultimo; i++) {
-            printf("%s ", funcion->def[i]);
-        }
-    }
-
-    free(funcion->def);
-    free(funcion);
-}
-
 // void search(DList *listas, THash *tablaFunciones) {
 //     FLista *funcion = flista_crear(PROFUNDIDAD_MAX);
-//
-//     int funcionEncontrada = buscar_funcion2(funcion, listas->primero->dato, listas->primero->sig->dato,
-//     tablaFunciones);
-//
+//     int funcionEncontrada = buscar_funcion(PROFUNDIDAD_MAX, 0, tablaFunciones, listas, funcion);
 //     if (funcionEncontrada == SUCCESS) {
 //         for (int i = 0; i <= funcion->ultimo; i++) {
 //             printf("%s ", funcion->def[i]);
@@ -153,6 +139,22 @@ void search(DList *listas, THash *tablaFunciones) {
 //     free(funcion->def);
 //     free(funcion);
 // }
+
+void search(DList *listaDePares, THash *tablaFunciones) {
+    FLista *funcion = flista_crear(PROFUNDIDAD_MAX);
+
+    int funcionEncontrada = buscar_funcion2(funcion, listaDePares->primero->dato, listaDePares->primero->sig->dato,
+                                            tablaFunciones, listaDePares);
+
+    if (funcionEncontrada == SUCCESS) {
+        for (int i = 0; i <= funcion->ultimo; i++) {
+            printf("%s ", funcion->def[i]);
+        }
+    }
+
+    free(funcion->def);
+    free(funcion);
+}
 
 int podar(FLista *funcion, char *subfuncion) {
     if (!flista_es_vacia(funcion)) {
@@ -198,7 +200,8 @@ int buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FL
     return resultado;
 }
 
-int buscar_funcion2(FLista *funcion, DList *listaInput, DList *listaOutput, THash *tablaFunciones) {
+int buscar_funcion2(FLista *funcion, DList *listaInput, DList *listaOutput, THash *tablaFunciones,
+                    DList *listaDePares) {
     if (funcion->ultimo + 1 >= PROFUNDIDAD_MAX)
         return FAIL;
 
@@ -213,10 +216,11 @@ int buscar_funcion2(FLista *funcion, DList *listaInput, DList *listaOutput, THas
 
             if (resultado != ERROR_DOMINIO && resultado != ERROR_CANT_EJECUCIONES) {
                 flista_insertar(funcion, subFuncion);
-                if (dlist_igual(copia, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero)) {
+                if (dlist_igual(copia, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero) &&
+                    probar_funcion_con_resto_de_pares(funcion, listaDePares, tablaFunciones)) {
                     resultado = SUCCESS;
                 } else {
-                    resultado = buscar_funcion2(funcion, copia, listaOutput, tablaFunciones);
+                    resultado = buscar_funcion2(funcion, copia, listaOutput, tablaFunciones, listaDePares);
                     if (resultado != SUCCESS)
                         funcion->ultimo--;
                 }
