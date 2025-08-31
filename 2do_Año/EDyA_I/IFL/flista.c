@@ -31,3 +31,7 @@ void flista_destruir(FLista *funcion) {
         free(funcion);
     }
 }
+
+int flista_es_vacia(FLista *funcion) {
+    return funcion->ultimo == -1;
+}

@@ -104,27 +104,27 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
     return 0;
 }
 
-FLista *generate(int length, int pos, int indices[], THash *tablaFunciones, DList *listas) {
-    if (pos == length) {
-        FLista *funcion = flista_crear(8);
-        for (int i = 0; i < length; i++)
-            flista_insertar(funcion, tablaFunciones->tabla[indices[i]]->key);
-        if (probar_funcion(funcion, listas->primero, tablaFunciones))
-            return funcion;
-        // flista_destruir(funcion);
-        return NULL;
-    }
-    FLista *funcion = NULL;
-    for (int i = 0; i < tablaFunciones->capacidad && !funcion; i++) {
-        if (tablaFunciones->tabla[i] != NULL) {
-            indices[pos] = i;
-            funcion = generate(length, pos + 1, indices, tablaFunciones, listas);
-        }
-    }
-
-    return funcion;
-}
-
+// FLista *generate(int length, int pos, int indices[], THash *tablaFunciones, DList *listas) {
+//     if (pos == length) {
+//         FLista *funcion = flista_crear(8);
+//         for (int i = 0; i < length; i++)
+//             flista_insertar(funcion, tablaFunciones->tabla[indices[i]]->key);
+//         if (probar_funcion(funcion, listas->primero, tablaFunciones))
+//             return funcion;
+//         // flista_destruir(funcion);
+//         return NULL;
+//     }
+//     FLista *funcion = NULL;
+//     for (int i = 0; i < tablaFunciones->capacidad && !funcion; i++) {
+//         if (tablaFunciones->tabla[i] != NULL) {
+//             indices[pos] = i;
+//             funcion = generate(length, pos + 1, indices, tablaFunciones, listas);
+//         }
+//     }
+//
+//     return funcion;
+// }
+//
 void search(DList *listas, THash *tablaFunciones) {
     FLista *f = flista_crear(PROFUNDIDAD_MAX);
     FLista *funcionBuscada = NULL;
@@ -141,13 +141,24 @@ void search(DList *listas, THash *tablaFunciones) {
     // flista_destruir();
 }
 
+int podar(FLista *funcion, char *subfuncion) {
+    if (!flista_es_vacia(funcion)) {
+        char *ultimo_str = funcion->def[funcion->ultimo];
+        return (strcmp(ultimo_str, "Oi") == 0 && strcmp(subfuncion, "Di") == 0) ||
+               (strcmp(ultimo_str, "Od") == 0 && strcmp(subfuncion, "Dd") == 0) ||
+               (strcmp(ultimo_str, "Si") == 0 && strcmp(subfuncion, "Di") == 0) ||
+               (strcmp(ultimo_str, "Sd") == 0 && strcmp(subfuncion, "Dd") == 0);
+    }
+    return 0;
+}
+
 FLista *buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FLista *f) {
     if (pos == length)
         return NULL;
 
     int estado = 0;
     for (int i = 0; i < tablaFunciones->capacidad && estado != 1; i++) {
-        if (tablaFunciones->tabla[i]) {
+        if (tablaFunciones->tabla[i] && !podar(f, tablaFunciones->tabla[i]->key)) {
             // fprintf(stderr, "%s", tablaFunciones->tabla[i]->key);
             flista_insertar(f, tablaFunciones->tabla[i]->key);
             // for (int j = 0; j <= f->ultimo; j++) {

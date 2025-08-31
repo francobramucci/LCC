@@ -17,4 +17,6 @@ void flista_redimensionar(FLista *funcion);
 
 void flista_destruir(FLista *funcion);
 
+int flista_es_vacia(FLista *funcion);
+
 #endif // !__FLISTA_H__
