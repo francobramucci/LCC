@@ -136,3 +136,7 @@ void dlist_imprimir(DList *lista, FuncionVisitante visitar) {
         printf("]");
     }
 }
+
+int dlist_largo_mayor_a_uno(DList *lista) {
+    return lista->primero && lista->primero->sig != NULL;
+}

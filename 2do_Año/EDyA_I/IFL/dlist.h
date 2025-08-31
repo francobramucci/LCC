@@ -39,4 +39,6 @@ int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar);
 
 void dlist_imprimir(DList *lista, FuncionVisitante visitar);
 
+int dlist_largo_mayor_a_uno(DList *lista);
+
 #endif /* __DLIST_H__ */

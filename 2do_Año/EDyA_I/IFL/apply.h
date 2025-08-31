@@ -7,6 +7,19 @@
 
 #define MAX_EJECUCIONES_APPLY 1000000
 
+typedef enum {
+    NO_ERROR = 0,
+    // Error
+    ERROR_DESIGUALDAD,
+
+    // Error
+    ERROR_DOMINIO,
+
+    // Error
+    ERROR_CANT_EJECUCIONES
+
+} ErrorCode;
+
 int Od(DList *lista);
 
 int Oi(DList *lista);

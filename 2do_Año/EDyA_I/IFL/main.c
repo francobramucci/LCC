@@ -18,7 +18,12 @@ int main() {
     THash *tablaListas = thash_crear(1000, (FuncionDestructora)dlist_destruir);
     THash *tablaFunciones = thash_crear(1000, (FuncionDestructora)flista_destruir);
     insertar_funciones_primitivas(tablaFunciones);
-
+    parsear_expresion("defl L1 = [0,0,0];", tablaListas, tablaFunciones);
+    parsear_expresion("defl L2 = [9,0,0];", tablaListas, tablaFunciones);
+    parsear_expresion("defl L3 = [1,2,1];", tablaListas, tablaFunciones);
+    parsear_expresion("defl L4 = [10,2,1];", tablaListas, tablaFunciones);
+    parsear_expresion("deff Md = Od <Sd> Di;", tablaListas, tablaFunciones);
+    parsear_expresion("search{L1,L2;L3,L4};", tablaListas, tablaFunciones);
     int exit = 0;
 
     while (!exit) {

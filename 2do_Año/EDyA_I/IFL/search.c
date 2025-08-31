@@ -3,6 +3,7 @@
 #include "dlist.h"
 #include "flista.h"
 #include "utils.h"
+#include <stdio.h>
 
 #define PROFUNDIDAD_MAX 8
 
@@ -90,14 +91,16 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
     DList *listaInput = dlist_copiar(nodoInput->dato);
     DList *listaOutput = nodoOutput->dato;
 
-    apply(funcion, listaInput, tablaFunciones);
+    int error = apply(funcion, listaInput, tablaFunciones);
+    if (error)
+        return error;
 
     if (dlist_igual(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero)) {
-        free(listaInput);
+        dlist_destruir(listaInput);
         return probar_funcion(funcion, nodoOutput->sig, tablaFunciones);
     }
 
-    free(listaInput);
+    dlist_destruir(listaInput);
     return 0;
 }
 
@@ -123,11 +126,11 @@ FLista *generate(int length, int pos, int indices[], THash *tablaFunciones, DLis
 }
 
 void search(DList *listas, THash *tablaFunciones) {
-    int indices[8];
+    FLista *f = flista_crear(PROFUNDIDAD_MAX);
     FLista *funcionBuscada = NULL;
-    for (int i = 1; i < 2 && !funcionBuscada; i++) {
-        funcionBuscada = generate(i, 0, indices, tablaFunciones, listas);
-    }
+    // for (int i = 1; i < 3 && !funcionBuscada; i++) {
+    // }
+    funcionBuscada = buscar_funcion(PROFUNDIDAD_MAX, 0, tablaFunciones, listas, f);
     if (funcionBuscada) {
         printf("La funcion buscada es: ");
         for (int i = 0; i <= funcionBuscada->ultimo; i++) {
@@ -136,4 +139,37 @@ void search(DList *listas, THash *tablaFunciones) {
     }
 
     // flista_destruir();
+}
+
+FLista *buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FLista *f) {
+    if (pos == length)
+        return NULL;
+
+    int estado = 0;
+    for (int i = 0; i < tablaFunciones->capacidad && estado != 1; i++) {
+        if (tablaFunciones->tabla[i]) {
+            // fprintf(stderr, "%s", tablaFunciones->tabla[i]->key);
+            flista_insertar(f, tablaFunciones->tabla[i]->key);
+            // for (int j = 0; j <= f->ultimo; j++) {
+            //     fprintf(stderr, "%s ", f->def[j]);
+            // }
+            // printf("\n");
+            estado = probar_funcion(f, listas->primero, tablaFunciones);
+            if (estado == ERROR_CANT_EJECUCIONES || estado == ERROR_DOMINIO) {
+                // fprintf(stderr, " ERROR:%d\n", estado);
+                f->ultimo--;
+            }
+
+            if (estado == 0) {
+                if (buscar_funcion(length, pos + 1, tablaFunciones, listas, f))
+                    estado = 1;
+                else
+                    f->ultimo--;
+            }
+        }
+    }
+
+    if (estado == 1)
+        return f;
+    return NULL;
 }

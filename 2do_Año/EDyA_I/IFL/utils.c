@@ -61,6 +61,8 @@ void destruir_puntero_entero(int *i) {
 }
 
 int comparar_referencia_puntero_entero(int *i, int *j) {
+    if (!i || !j)
+        return 0;
     if (*i > *j)
         return 1;
     if (*i < *j)
