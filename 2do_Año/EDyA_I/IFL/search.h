@@ -14,4 +14,6 @@ void search(DList *listas, THash *tablaFunciones);
 
 int buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FLista *f);
 
+int buscar_funcion2(FLista *funcion, DList *listaInput, DList *listaOutput, THash *tablaFunciones);
+
 #endif // !__SEARCH_H__

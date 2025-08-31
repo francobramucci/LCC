@@ -138,6 +138,22 @@ void search(DList *listas, THash *tablaFunciones) {
     free(funcion);
 }
 
+// void search(DList *listas, THash *tablaFunciones) {
+//     FLista *funcion = flista_crear(PROFUNDIDAD_MAX);
+//
+//     int funcionEncontrada = buscar_funcion2(funcion, listas->primero->dato, listas->primero->sig->dato,
+//     tablaFunciones);
+//
+//     if (funcionEncontrada == SUCCESS) {
+//         for (int i = 0; i <= funcion->ultimo; i++) {
+//             printf("%s ", funcion->def[i]);
+//         }
+//     }
+//
+//     free(funcion->def);
+//     free(funcion);
+// }
+
 int podar(FLista *funcion, char *subfuncion) {
     if (!flista_es_vacia(funcion)) {
         char *ultimo_str = funcion->def[funcion->ultimo];
@@ -176,6 +192,36 @@ int buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FL
                 if (resultado != SUCCESS)
                     f->ultimo--;
             }
+        }
+    }
+
+    return resultado;
+}
+
+int buscar_funcion2(FLista *funcion, DList *listaInput, DList *listaOutput, THash *tablaFunciones) {
+    if (funcion->ultimo + 1 >= PROFUNDIDAD_MAX)
+        return FAIL;
+
+    int resultado = FAIL;
+    for (int i = 0; i < tablaFunciones->capacidad && resultado != SUCCESS; i++) {
+        if (tablaFunciones->tabla[i] && !podar(funcion, tablaFunciones->tabla[i]->key)) {
+            char *subFuncion = tablaFunciones->tabla[i]->key;
+            DList *copia = dlist_copiar(listaInput);
+
+            int cantMaxEjecuciones = MAX_EJECUCIONES_APPLY;
+            resultado = aplicacion_singular(subFuncion, copia, tablaFunciones, &cantMaxEjecuciones);
+
+            if (resultado != ERROR_DOMINIO && resultado != ERROR_CANT_EJECUCIONES) {
+                flista_insertar(funcion, subFuncion);
+                if (dlist_igual(copia, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero)) {
+                    resultado = SUCCESS;
+                } else {
+                    resultado = buscar_funcion2(funcion, copia, listaOutput, tablaFunciones);
+                    if (resultado != SUCCESS)
+                        funcion->ultimo--;
+                }
+            }
+            dlist_destruir(copia);
         }
     }
 
