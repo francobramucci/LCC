@@ -92,7 +92,7 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
     DList *listaInput = dlist_copiar(nodoInput->dato);
     DList *listaOutput = nodoOutput->dato;
 
-    if (apply(funcion, listaInput, tablaFunciones, 1) == ERROR_APPLY)
+    if (apply(funcion, listaInput, tablaFunciones, 0) == ERROR_APPLY)
         return ERROR_APPLY;
 
     if (dlist_igual(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero)) {
@@ -128,7 +128,6 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
 void search(DList *listas, THash *tablaFunciones) {
     FLista *funcion = flista_crear(PROFUNDIDAD_MAX);
     int funcionEncontrada = buscar_funcion(PROFUNDIDAD_MAX, 0, tablaFunciones, listas, funcion);
-    // printf("La funcion: ");
     if (funcionEncontrada == SUCCESS) {
         for (int i = 0; i <= funcion->ultimo; i++) {
             printf("%s ", funcion->def[i]);
@@ -161,20 +160,21 @@ int buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FL
 
             flista_insertar(f, tablaFunciones->tabla[i]->key);
 
-            for (int j = 0; j <= f->ultimo; j++) {
-                fprintf(stderr, "%s ", f->def[j]);
-            }
-            printf("\n");
+            // for (int j = 0; j <= f->ultimo; j++) {
+            //     fprintf(stderr, "%s ", f->def[j]);
+            // }
+            // printf("\n");
 
             resultado = probar_funcion(f, listas->primero, tablaFunciones);
             if (resultado == ERROR_APPLY) {
-                fprintf(stderr, " ERROR:%d\n", resultado);
+                // fprintf(stderr, " ERROR:%d\n", resultado);
                 f->ultimo--;
             }
 
             if (resultado == FAIL) {
                 resultado = buscar_funcion(length, pos + 1, tablaFunciones, listas, f);
-                f->ultimo--;
+                if (resultado != SUCCESS)
+                    f->ultimo--;
             }
         }
     }

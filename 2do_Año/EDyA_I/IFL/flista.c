@@ -19,7 +19,7 @@ void flista_insertar(FLista *funcion, char *subFuncion) {
 
 void flista_redimensionar(FLista *funcion) {
     funcion->capacidad *= 2;
-    funcion->def = realloc(funcion->def, funcion->capacidad);
+    funcion->def = realloc(funcion->def, funcion->capacidad * sizeof(char *));
 }
 
 void flista_destruir(FLista *funcion) {
