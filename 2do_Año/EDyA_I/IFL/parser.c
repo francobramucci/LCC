@@ -378,7 +378,7 @@ void parsear_apply(char *input, int *posActual, THash *tablaHashListas, THash *t
                         obtener_siguiente_token(input, posActual, 1, tok);
                         if (tok->type == TOKEN_EOF) {
                             DList *copia = dlist_copiar(lista);
-                            apply(funcion, copia, tablaHashFunciones);
+                            apply(funcion, copia, tablaHashFunciones, 1);
                             dlist_destruir(copia);
                         }
                     }
@@ -393,7 +393,7 @@ void parsear_apply(char *input, int *posActual, THash *tablaHashListas, THash *t
 
                     obtener_siguiente_token(input, posActual, 1, tok);
                     if (tok->type == TOKEN_EOF) {
-                        apply(funcion, lista, tablaHashFunciones);
+                        apply(funcion, lista, tablaHashFunciones, 1);
                     }
                 }
                 dlist_destruir(lista);

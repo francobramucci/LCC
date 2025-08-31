@@ -7,18 +7,17 @@
 
 #define MAX_EJECUCIONES_APPLY 1000000
 
-typedef enum {
-    NO_ERROR = 0,
-    // Error
-    ERROR_DESIGUALDAD,
+enum {
+    SUCCESS = 0,
 
-    // Error
     ERROR_DOMINIO,
 
-    // Error
-    ERROR_CANT_EJECUCIONES
+    ERROR_CANT_EJECUCIONES,
 
-} ErrorCode;
+    ERROR_APPLY,
+
+    FAIL
+};
 
 int Od(DList *lista);
 
@@ -32,7 +31,7 @@ int Dd(DList *lista);
 
 int Di(DList *lista);
 
-int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones);
+int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir);
 
 int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *cantMaxEjecuciones);
 

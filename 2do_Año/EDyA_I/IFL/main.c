@@ -19,25 +19,25 @@ int main() {
     THash *tablaFunciones = thash_crear(1000, (FuncionDestructora)flista_destruir);
     insertar_funciones_primitivas(tablaFunciones);
     parsear_expresion("defl L1 = [2,0,4];", tablaListas, tablaFunciones);
-    parsear_expresion("defl L2 = [4,0,8];", tablaListas, tablaFunciones);
-    parsear_expresion("defl L3 = [1,2,1];", tablaListas, tablaFunciones);
-    parsear_expresion("defl L4 = [9,2,1];", tablaListas, tablaFunciones);
+    parsear_expresion("defl L2 = [4,0,2];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl L3 = [1,2,1];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl L4 = [9,2,1];", tablaListas, tablaFunciones);
     parsear_expresion("deff Md = Od <Sd> Di;", tablaListas, tablaFunciones);
     parsear_expresion("deff Mi = Oi <Si> Dd;", tablaListas, tablaFunciones);
     parsear_expresion("deff Ddi = Od <Sd> Mi;", tablaListas, tablaFunciones);
-    parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di;", tablaListas, tablaFunciones);
+    parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di Md;", tablaListas, tablaFunciones);
     parsear_expresion("search{L1,L2};", tablaListas, tablaFunciones);
     int exit = 0;
 
-    // while (!exit) {
-    //     char buffer[1000];
-    //     printf("\n> ");
-    //     scanf(" %[^\n]", buffer);
-    //     if (!strcmp(buffer, "exit"))
-    //         exit = 1;
-    //
-    //     parsear_expresion(buffer, tablaListas, tablaFunciones);
-    // }
+    while (!exit) {
+        char buffer[1000];
+        printf("\n> ");
+        scanf(" %[^\n]", buffer);
+        if (!strcmp(buffer, "exit"))
+            exit = 1;
+
+        parsear_expresion(buffer, tablaListas, tablaFunciones);
+    }
 
     thash_destruir(tablaListas);
     thash_destruir(tablaFunciones);

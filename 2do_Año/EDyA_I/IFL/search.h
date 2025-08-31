@@ -12,6 +12,6 @@ FLista *generate(int length, int pos, int indices[], THash *tablaFunciones, DLis
 
 void search(DList *listas, THash *tablaFunciones);
 
-FLista *buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FLista *f);
+int buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FLista *f);
 
 #endif // !__SEARCH_H__

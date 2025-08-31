@@ -5,19 +5,19 @@
 int Od(DList *lista) {
     int i = 0;
     dlist_agregar_final(lista, &i);
-    return NO_ERROR;
+    return SUCCESS;
 }
 
 int Oi(DList *lista) {
     int i = 0;
     dlist_agregar_inicio(lista, &i);
-    return NO_ERROR;
+    return SUCCESS;
 }
 
 int Sd(DList *lista) {
     if (lista->primero != NULL) {
         (*(int *)(lista->ultimo->dato))++;
-        return NO_ERROR;
+        return SUCCESS;
     }
     return ERROR_DOMINIO;
 }
@@ -25,7 +25,7 @@ int Sd(DList *lista) {
 int Si(DList *lista) {
     if (lista->primero != NULL) {
         (*(int *)lista->primero->dato)++;
-        return NO_ERROR;
+        return SUCCESS;
     }
     return ERROR_DOMINIO;
 }
@@ -33,7 +33,7 @@ int Si(DList *lista) {
 int Dd(DList *lista) {
     if (lista->primero != NULL) {
         dlist_eliminar_final(lista);
-        return NO_ERROR;
+        return SUCCESS;
     }
     return ERROR_DOMINIO;
 }
@@ -41,25 +41,27 @@ int Dd(DList *lista) {
 int Di(DList *lista) {
     if (lista->primero != NULL) {
         dlist_eliminar_inicio(lista);
-        return NO_ERROR;
+        return SUCCESS;
     }
     return ERROR_DOMINIO;
 }
 
-int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones) {
+int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir) {
     int cantMaxEjecuciones = MAX_EJECUCIONES_APPLY;
 
     int errorCode = apply_flista(funcion, lista, tablaHashFunciones, &cantMaxEjecuciones);
 
-    // if (errorCode == NO_ERROR) {
-    //     dlist_imprimir(lista, (FuncionVisitante)imprimir_puntero_entero);
-    // }
+    if (errorCode == SUCCESS) {
+        if (imprimir)
+            dlist_imprimir(lista, (FuncionVisitante)imprimir_puntero_entero);
+        return SUCCESS;
+    }
 
-    return errorCode;
+    return ERROR_APPLY;
 }
 
 int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *cantMaxEjecuciones) {
-    int errorCode = NO_ERROR;
+    int errorCode = SUCCESS;
     Pila p = pila_crear((FuncionCopiadora)copiar_puntero_entero, (FuncionDestructora)destruir_puntero_entero);
 
     for (int i = 0; i <= funcion->ultimo && !errorCode; i++) {
@@ -102,7 +104,6 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
 }
 
 int aplicacion_singular(char *funcion, DList *lista, THash *tablaHashFunciones, int *cantMaxEjecuciones) {
-    int error = NO_ERROR;
     if (!strcmp(funcion, "Oi"))
         return Oi(lista);
     if (!strcmp(funcion, "Od"))

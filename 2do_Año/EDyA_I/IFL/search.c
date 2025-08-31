@@ -7,6 +7,7 @@
 
 #define PROFUNDIDAD_MAX 8
 
+// Agregar bandera para imprimir de apply
 // Implementar colas
 // Funcion que agrega primitivas y funciones definidas
 
@@ -83,7 +84,7 @@
 
 int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
     if (!listas)
-        return 1;
+        return SUCCESS;
 
     DNodo *nodoInput = listas;
     DNodo *nodoOutput = nodoInput->sig;
@@ -91,9 +92,8 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
     DList *listaInput = dlist_copiar(nodoInput->dato);
     DList *listaOutput = nodoOutput->dato;
 
-    int error = apply(funcion, listaInput, tablaFunciones);
-    if (error)
-        return error;
+    if (apply(funcion, listaInput, tablaFunciones, 1) == ERROR_APPLY)
+        return ERROR_APPLY;
 
     if (dlist_igual(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero)) {
         dlist_destruir(listaInput);
@@ -101,7 +101,7 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
     }
 
     dlist_destruir(listaInput);
-    return 0;
+    return FAIL;
 }
 
 // FLista *generate(int length, int pos, int indices[], THash *tablaFunciones, DList *listas) {
@@ -126,19 +126,17 @@ int probar_funcion(FLista *funcion, DNodo *listas, THash *tablaFunciones) {
 // }
 //
 void search(DList *listas, THash *tablaFunciones) {
-    FLista *f = flista_crear(PROFUNDIDAD_MAX);
-    FLista *funcionBuscada = NULL;
-    // for (int i = 1; i < 3 && !funcionBuscada; i++) {
-    // }
-    funcionBuscada = buscar_funcion(PROFUNDIDAD_MAX, 0, tablaFunciones, listas, f);
-    if (funcionBuscada) {
-        printf("La funcion buscada es: ");
-        for (int i = 0; i <= funcionBuscada->ultimo; i++) {
-            printf("%s ", funcionBuscada->def[i]);
+    FLista *funcion = flista_crear(PROFUNDIDAD_MAX);
+    int funcionEncontrada = buscar_funcion(PROFUNDIDAD_MAX, 0, tablaFunciones, listas, funcion);
+    // printf("La funcion: ");
+    if (funcionEncontrada == SUCCESS) {
+        for (int i = 0; i <= funcion->ultimo; i++) {
+            printf("%s ", funcion->def[i]);
         }
     }
 
-    // flista_destruir();
+    free(funcion->def);
+    free(funcion);
 }
 
 int podar(FLista *funcion, char *subfuncion) {
@@ -152,35 +150,34 @@ int podar(FLista *funcion, char *subfuncion) {
     return 0;
 }
 
-FLista *buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FLista *f) {
+int buscar_funcion(int length, int pos, THash *tablaFunciones, DList *listas, FLista *f) {
     if (pos == length)
-        return NULL;
+        return FAIL;
 
-    int estado = 0;
-    for (int i = 0; i < tablaFunciones->capacidad && estado != 1; i++) {
+    int resultado = FAIL;
+    for (int i = 0; i < tablaFunciones->capacidad && resultado != SUCCESS; i++) {
         if (tablaFunciones->tabla[i] && !podar(f, tablaFunciones->tabla[i]->key)) {
             // fprintf(stderr, "%s", tablaFunciones->tabla[i]->key);
+
             flista_insertar(f, tablaFunciones->tabla[i]->key);
-            // for (int j = 0; j <= f->ultimo; j++) {
-            //     fprintf(stderr, "%s ", f->def[j]);
-            // }
-            // printf("\n");
-            estado = probar_funcion(f, listas->primero, tablaFunciones);
-            if (estado == ERROR_CANT_EJECUCIONES || estado == ERROR_DOMINIO) {
-                // fprintf(stderr, " ERROR:%d\n", estado);
+
+            for (int j = 0; j <= f->ultimo; j++) {
+                fprintf(stderr, "%s ", f->def[j]);
+            }
+            printf("\n");
+
+            resultado = probar_funcion(f, listas->primero, tablaFunciones);
+            if (resultado == ERROR_APPLY) {
+                fprintf(stderr, " ERROR:%d\n", resultado);
                 f->ultimo--;
             }
 
-            if (estado == 0) {
-                if (buscar_funcion(length, pos + 1, tablaFunciones, listas, f))
-                    estado = 1;
-                else
-                    f->ultimo--;
+            if (resultado == FAIL) {
+                resultado = buscar_funcion(length, pos + 1, tablaFunciones, listas, f);
+                f->ultimo--;
             }
         }
     }
 
-    if (estado == 1)
-        return f;
-    return NULL;
+    return resultado;
 }
