@@ -5,7 +5,7 @@
 
 typedef void *(*FuncionCopiadora)(void *);
 typedef void (*FuncionDestructora)(void *);
-typedef int (*FuncionComparadora)(void *, void *);
+typedef int (*FuncionComparadora)(void *a, void *b); // 1 si a > b, 0 si a == b y -1 si a < b
 typedef void (*FuncionVisitante)(void *);
 
 typedef struct _DNodo {
@@ -41,4 +41,5 @@ void dlist_imprimir(DList *lista, FuncionVisitante visitar);
 
 int dlist_largo_mayor_a_uno(DList *lista);
 
+void dlist_transformar_int(DList *lista, DList *listaParametro);
 #endif /* __DLIST_H__ */

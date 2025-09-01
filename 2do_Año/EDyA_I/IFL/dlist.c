@@ -16,12 +16,9 @@ void dlist_agregar_inicio(DList *lista, void *dato) {
     nuevoNodo->sig = lista->primero;
     nuevoNodo->ant = NULL;
 
-    if (lista->primero == NULL) {
-        lista->primero = nuevoNodo;
-    } else {
+    if (lista->primero != NULL)
         lista->primero->ant = nuevoNodo;
-        lista->primero = nuevoNodo;
-    }
+    lista->primero = nuevoNodo;
 
     if (lista->ultimo == NULL)
         lista->ultimo = nuevoNodo;
@@ -33,12 +30,9 @@ void dlist_agregar_final(DList *lista, void *dato) {
     nuevoNodo->ant = lista->ultimo;
     nuevoNodo->sig = NULL;
 
-    if (lista->ultimo == NULL) {
-        lista->ultimo = nuevoNodo;
-    } else {
+    if (lista->ultimo != NULL)
         lista->ultimo->sig = nuevoNodo;
-        lista->ultimo = nuevoNodo;
-    }
+    lista->ultimo = nuevoNodo;
 
     if (lista->primero == NULL)
         lista->primero = nuevoNodo;
@@ -139,4 +133,33 @@ void dlist_imprimir(DList *lista, FuncionVisitante visitar) {
 
 int dlist_largo_mayor_a_uno(DList *lista) {
     return lista->primero && lista->primero->sig != NULL;
+}
+
+void dlist_transformar_int(DList *lista, DList *listaParametro) {
+    DNodo *temp1 = lista->primero;
+    DNodo *temp2 = listaParametro->primero;
+
+    while (temp1 != NULL && temp2 != NULL) {
+        *(int *)temp1->dato = *(int *)temp2->dato;
+        temp1 = temp1->sig;
+        temp2 = temp2->sig;
+    }
+
+    if (!temp1 && !temp2)
+        return;
+
+    if (temp1 && !temp2) {
+        while (temp1->sig != NULL) {
+            dlist_eliminar_final(lista);
+        }
+        dlist_eliminar_final(lista);
+        return;
+    }
+
+    if (!temp1 && temp2) {
+        while (temp2 != NULL) {
+            dlist_agregar_final(lista, temp2->dato);
+            temp2 = temp2->sig;
+        }
+    }
 }

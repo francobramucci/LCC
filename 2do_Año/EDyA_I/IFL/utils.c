@@ -77,3 +77,11 @@ void imprimir_puntero_entero(int *i) {
 void *retornar_puntero(void *a) {
     return a;
 }
+
+void liberar_puntero(void *a) {
+    free(a);
+}
+
+void funcion_vacia(void *a) {
+    return;
+}

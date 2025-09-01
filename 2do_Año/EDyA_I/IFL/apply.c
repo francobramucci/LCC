@@ -1,5 +1,6 @@
 #include "apply.h"
 #include "dlist.h"
+#include "flista.h"
 #include "utils.h"
 
 int Od(DList *lista) {
@@ -57,6 +58,12 @@ int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir
         return SUCCESS;
     }
 
+    if (errorCode == ERROR_DOMINIO)
+        printf("La lista no pertenece al dominio de la funcion");
+
+    if (errorCode == ERROR_CANT_EJECUCIONES)
+        printf("Se ha superado la cantidad maxima de ejecuciones");
+
     return ERROR_APPLY;
 }
 
@@ -69,7 +76,7 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
         if (!(*cantMaxEjecuciones))
             errorCode = ERROR_CANT_EJECUCIONES;
 
-        if (funcion->def[i][0] == '<') {
+        if (flista_acceder(funcion, i)[0] == '<') {
             if (dlist_largo_mayor_a_uno(lista)) {
                 if (comparar_referencia_puntero_entero(lista->primero->dato, lista->ultimo->dato)) {
                     pila_push(&i, p);
@@ -77,15 +84,15 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
                     int cont = 1;
                     while (cont != 0) {
                         i++;
-                        if (funcion->def[i][0] == '<')
+                        if (flista_acceder(funcion, i)[0] == '<')
                             cont++;
-                        if (funcion->def[i][0] == '>')
+                        if (flista_acceder(funcion, i)[0] == '>')
                             cont--;
                     }
                 }
             } else
                 errorCode = ERROR_DOMINIO;
-        } else if (funcion->def[i][0] == '>') {
+        } else if (flista_acceder(funcion, i)[0] == '>') {
             if (dlist_largo_mayor_a_uno(lista)) {
                 if (comparar_referencia_puntero_entero(lista->primero->dato, lista->ultimo->dato))
                     i = *(int *)pila_top(p);
@@ -94,7 +101,7 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
             } else
                 errorCode = ERROR_DOMINIO;
         } else {
-            errorCode = aplicacion_singular(funcion->def[i], lista, tablaHashFunciones, cantMaxEjecuciones);
+            errorCode = aplicacion_singular(flista_acceder(funcion, i), lista, tablaHashFunciones, cantMaxEjecuciones);
             (*cantMaxEjecuciones)--;
         }
     }

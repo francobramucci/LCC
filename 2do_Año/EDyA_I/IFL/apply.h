@@ -5,7 +5,7 @@
 #include "hash.h"
 #include "pila.h"
 
-#define MAX_EJECUCIONES_APPLY 1000000
+#define MAX_EJECUCIONES_APPLY 100000
 
 enum {
     SUCCESS = 0,

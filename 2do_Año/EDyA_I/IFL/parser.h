@@ -15,7 +15,7 @@ DList *parsear_lista(char *lista);
 
 void parsear_defl(char *input, int *posActual, THash *tablaHash);
 
-FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash);
+FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash, int *errorCode);
 
 void parsear_deff(char *input, int *posActual, THash *tablaHashFunciones);
 

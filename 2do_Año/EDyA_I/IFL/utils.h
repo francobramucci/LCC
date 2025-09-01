@@ -20,4 +20,8 @@ void imprimir_puntero_entero(int *i);
 
 void *retornar_puntero(void *a);
 
+void liberar_puntero(void *a);
+
+void funcion_vacia(void *a);
+
 #endif // !__UTILS_H__

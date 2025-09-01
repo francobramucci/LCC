@@ -1,37 +1,27 @@
 #include "flista.h"
+#include "dlist.h"
 
-FLista *flista_crear(int capacidad) {
-    FLista *funcion = malloc(sizeof(FLista));
-    funcion->def = malloc(sizeof(char *) * capacidad);
-    funcion->capacidad = capacidad;
-    funcion->ultimo = -1;
-
+FLista *flista_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir) {
+    FLista *funcion = vector_crear(capacidad, copiar, destruir);
     return funcion;
 }
 
 void flista_insertar(FLista *funcion, char *subFuncion) {
-    int ultimo = funcion->ultimo;
-    if (ultimo + 1 == funcion->capacidad)
-        flista_redimensionar(funcion);
-    funcion->def[ultimo + 1] = subFuncion;
-    funcion->ultimo++;
+    vector_insertar(funcion, subFuncion);
 }
 
 void flista_redimensionar(FLista *funcion) {
-    funcion->capacidad *= 2;
-    funcion->def = realloc(funcion->def, funcion->capacidad * sizeof(char *));
+    vector_redimensionar(funcion);
 }
 
 void flista_destruir(FLista *funcion) {
-    if (funcion) {
-        for (int i = 0; i <= funcion->ultimo; i++) {
-            free(funcion->def[i]);
-        }
-        free(funcion->def);
-        free(funcion);
-    }
+    vector_destruir(funcion);
 }
 
 int flista_es_vacia(FLista *funcion) {
     return funcion->ultimo == -1;
+}
+
+char *flista_acceder(FLista *funcion, int indice) {
+    return (char *)funcion->arr[indice];
 }
