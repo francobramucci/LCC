@@ -1,7 +1,7 @@
 #ifndef __FLISTA_H__
 #define __FLISTA_H__
+
 #include "vector.h"
-#include <stdlib.h>
 
 typedef Vector FLista;
 

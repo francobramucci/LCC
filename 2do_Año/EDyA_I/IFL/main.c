@@ -1,5 +1,6 @@
 #include "flista.h"
 #include "parser.h"
+#include "utils.h"
 #include <string.h>
 
 void insertar_funciones_primitivas(THash *tablaFunciones) {
@@ -7,7 +8,7 @@ void insertar_funciones_primitivas(THash *tablaFunciones) {
 
     for (int i = 0; i < 6; i++) {
         char *key = strdup(funciones_primitivas[i]);
-        FLista *funcion = flista_crear(1);
+        FLista *funcion = flista_crear(1, retornar_puntero, liberar_puntero);
         flista_insertar(funcion, strdup(funciones_primitivas[i]));
 
         thash_insertar(key, funcion, tablaFunciones);
@@ -26,13 +27,15 @@ int main() {
     parsear_expresion("defl L3 = [0,0,0];", tablaListas, tablaFunciones);
     parsear_expresion("defl L4 = [1,1,1];", tablaListas, tablaFunciones);
     parsear_expresion("defl A = [0];", tablaListas, tablaFunciones);
-    parsear_expresion("defl B = [5];", tablaListas, tablaFunciones);
-    parsear_expresion("deff Md = Od <Sd> Di;", tablaListas, tablaFunciones);
-    parsear_expresion("deff Mi = Oi <Si> Dd;", tablaListas, tablaFunciones);
-    parsear_expresion("deff Ddi = Od <Sd> Mi;", tablaListas, tablaFunciones);
-    parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di Md;", tablaListas, tablaFunciones);
-    parsear_expresion("search{L1,L2; L3,L4};", tablaListas, tablaFunciones);
-    parsear_expresion("search{A,B};", tablaListas, tablaFunciones);
+    parsear_expresion("defl B = [8];", tablaListas, tablaFunciones);
+    parsear_expresion("defl C = [3];", tablaListas, tablaFunciones);
+    parsear_expresion("defl D = [11];", tablaListas, tablaFunciones);
+    // parsear_expresion("deff Md = Od <Sd> Di;", tablaListas, tablaFunciones);
+    // parsear_expresion("deff Mi = Oi <Si> Dd;", tablaListas, tablaFunciones);
+    // parsear_expresion("deff Ddi = Od <Sd> Mi;", tablaListas, tablaFunciones);
+    // parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di Md;", tablaListas, tablaFunciones);
+    // parsear_expresion("search{L1,L2; L3,L4};", tablaListas, tablaFunciones);
+    parsear_expresion("search{A,B;C,D};", tablaListas, tablaFunciones);
 
     // while (!exit) {
     //     char buffer[1000];

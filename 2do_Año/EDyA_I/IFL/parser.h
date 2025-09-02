@@ -1,9 +1,27 @@
 #ifndef __PARSER_H__
 #define __PARSER_H__
-#include "apply.h"
+#include "search.h"
 #include "token.h"
 #include "utils.h"
 #include <ctype.h>
+
+enum {
+    ERROR_SINTAXIS_SENTENCIA,
+
+    ERROR_SINTAXIS_LISTA,
+
+    ERROR_LISTA_NO_DEFINIDA,
+
+    ERROR_LISTA_YA_DEFINIDA,
+
+    ERROR_SUBFUNCION_NO_DEFINIDA,
+
+    ERROR_SINTAXIS_FUNCION,
+
+    ERROR_FUNCION_NO_DEFINIDA,
+
+    ERROR_FUNCION_YA_DEFINIDA
+};
 
 void saltear_espacios(char *input, int *posActual);
 

@@ -1,7 +1,4 @@
 #include "apply.h"
-#include "dlist.h"
-#include "flista.h"
-#include "utils.h"
 
 int Od(DList *lista) {
     int i = 0;
@@ -58,13 +55,13 @@ int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir
         return SUCCESS;
     }
 
-    if (errorCode == ERROR_DOMINIO)
+    if (errorCode == ERROR_DOMINIO && imprimir)
         printf("La lista no pertenece al dominio de la funcion");
 
-    if (errorCode == ERROR_CANT_EJECUCIONES)
+    if (errorCode == ERROR_CANT_EJECUCIONES && imprimir)
         printf("Se ha superado la cantidad maxima de ejecuciones");
 
-    return ERROR_APPLY;
+    return errorCode;
 }
 
 int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *cantMaxEjecuciones) {

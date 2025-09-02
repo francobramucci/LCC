@@ -34,6 +34,13 @@ void vector_destruir(Vector *vec) {
     }
 }
 
-int vector_es_vacia(Vector *vec) {
+void vector_eliminar_ultimo(Vector *vec) {
+    if (!vector_es_vacio(vec)) {
+        vec->destruir(vec->arr[vec->ultimo]);
+        vec->ultimo--;
+    }
+}
+
+int vector_es_vacio(Vector *vec) {
     return vec->ultimo == -1;
 }

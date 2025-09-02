@@ -4,6 +4,7 @@
 #include "flista.h"
 #include "hash.h"
 #include "pila.h"
+#include "utils.h"
 
 #define MAX_EJECUCIONES_APPLY 100000
 
@@ -13,8 +14,6 @@ enum {
     ERROR_DOMINIO,
 
     ERROR_CANT_EJECUCIONES,
-
-    ERROR_APPLY,
 
     FAIL
 };

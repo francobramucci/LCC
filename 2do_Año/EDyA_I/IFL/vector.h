@@ -22,6 +22,8 @@ void vector_redimensionar(Vector *vec);
 
 void vector_destruir(Vector *vec);
 
+void vector_eliminar_ultimo(Vector *vec);
+
 int vector_es_vacio(Vector *vec);
 
 #endif // !__VECTOR_H__

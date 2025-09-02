@@ -1,28 +1,4 @@
 #include "parser.h"
-#include "dlist.h"
-#include "flista.h"
-#include "search.h"
-#include "token.h"
-#include "utils.h"
-#include <stdio.h>
-
-enum {
-    ERROR_SINTAXIS_SENTENCIA,
-
-    ERROR_SINTAXIS_LISTA,
-
-    ERROR_LISTA_NO_DEFINIDA,
-
-    ERROR_LISTA_YA_DEFINIDA,
-
-    ERROR_SUBFUNCION_NO_DEFINIDA,
-
-    ERROR_SINTAXIS_FUNCION,
-
-    ERROR_FUNCION_NO_DEFINIDA,
-
-    ERROR_FUNCION_YA_DEFINIDA
-};
 
 void imprimir_errores(int errorCode) {
     switch (errorCode) {
@@ -471,7 +447,8 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas, THash *
     int esValido = 1;
     int esPrimerIdentificador = 1;
     int corcheteDerLeido = 0;
-    DList *listaDePares = dlist_crear(retornar_puntero, funcion_vacia);
+    // DList *listaDePares = dlist_crear(retornar_puntero, funcion_vacia);
+    Vector *paresDeListas = vector_crear(50, retornar_puntero, funcion_vacia);
 
     Token *tok = crear_token();
 
@@ -502,7 +479,8 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas, THash *
                         esValido = 0;
                 }
                 esPrimerIdentificador = !esPrimerIdentificador;
-                dlist_agregar_final(listaDePares, lista);
+                // dlist_agregar_final(listaDePares, lista);
+                vector_insertar(paresDeListas, lista);
             } else {
                 esValido = 0;
                 errorCode = ERROR_LISTA_NO_DEFINIDA;
@@ -541,13 +519,14 @@ void parsear_search(char *input, int *posActual, THash *tablaHashListas, THash *
 
     liberar_token(tok);
 
-    if (esValido) {
-        search(listaDePares, tablaFunciones);
-    } else {
+    if (esValido)
+        // search(listaDePares, tablaFunciones);
+        search(paresDeListas, tablaFunciones);
+    else
         imprimir_errores(errorCode);
-    }
 
-    dlist_destruir(listaDePares);
+    vector_destruir(paresDeListas);
+    // dlist_destruir(listaDePares);
 }
 
 void parsear_expresion(char *input, THash *tablaHashListas, THash *tablaHashFunciones) {
