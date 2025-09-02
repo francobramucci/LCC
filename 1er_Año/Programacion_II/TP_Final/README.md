@@ -18,7 +18,7 @@ objetivo
 (o1,o2)  
 
 En caso de no respetar el formato el programa no funcionará y devolverá error.
-Si no se quieren incluír obstaculos fijos los mismos pueden ser obviados.
+Si no se quieren incluír obstaculos fijos los mismos pueden ser omitidos.
 
 En caso de que el laberinto generado no admita solución, python ejecutará
 nuevamente al código en c. Eventualmente la disposición aleatoria de los
