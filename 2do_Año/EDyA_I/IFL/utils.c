@@ -1,4 +1,15 @@
 #include "utils.h"
+#include <string.h>
+
+char *copiar_string(char *str) {
+    if (str == NULL)
+        return NULL;
+
+    char *copia = malloc(strlen(str) + 1);
+    strcpy(copia, str);
+
+    return copia;
+}
 
 char *copiar_substring(const char *str, int ini, int fin) {
     if (ini < 0 || fin < ini)
@@ -83,5 +94,6 @@ void liberar_puntero(void *a) {
 }
 
 void funcion_vacia(void *a) {
+    // (void)a;
     return;
 }

@@ -5,13 +5,13 @@
 
 typedef DList *Pila;
 
-Pila pila_crear(FuncionCopiadora copiar, FuncionDestructora destruir);
+Pila pila_crear();
 
-void pila_push(void *dato, Pila p);
+void pila_push(Pila p, int dato);
 
 void pila_pop(Pila p);
 
-void *pila_top(Pila p);
+int pila_top(Pila p);
 
 void pila_destruir(Pila p);
 

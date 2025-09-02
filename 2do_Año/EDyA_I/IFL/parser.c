@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "dlist.h"
 
 void imprimir_errores(int errorCode) {
     switch (errorCode) {
@@ -180,7 +181,8 @@ void obtener_siguiente_token_lista(char *lista, int *posActual, Token *token) {
 DList *parsear_lista(char *lista) {
     int posActual = 0;
     int esValido = 1;
-    DList *dlist = dlist_crear((FuncionCopiadora)copiar_puntero_entero, (FuncionDestructora)destruir_puntero_entero);
+    // DList *dlist = dlist_crear((FuncionCopiadora)copiar_puntero_entero, (FuncionDestructora)destruir_puntero_entero);
+    DList *dlist = dlist_crear();
     Token *tok = crear_token();
 
     obtener_siguiente_token_lista(lista, &posActual, tok);
@@ -191,7 +193,8 @@ DList *parsear_lista(char *lista) {
 
             case TOKEN_NUM: {
                 int num = atoi(tok->value);
-                dlist_agregar_final(dlist, &num);
+                // dlist_agregar_final(dlist, &num);
+                dlist_agregar_final(dlist, num);
 
                 obtener_siguiente_token_lista(lista, &posActual, tok);
                 if (tok->type != TOKEN_COMA && tok->type != TOKEN_EOF)
@@ -254,7 +257,8 @@ void parsear_defl(char *input, int *posActual, THash *tablaHash) {
                             esValido = 1;
 
                             printf("%s <-- ", identificador);
-                            dlist_imprimir(dlist, (FuncionVisitante)imprimir_puntero_entero);
+                            // dlist_imprimir(dlist, (FuncionVisitante)imprimir_puntero_entero);
+                            dlist_imprimir(dlist);
                         } else {
                             if (!dlist)
                                 errorCode = ERROR_SINTAXIS_LISTA;
@@ -308,7 +312,7 @@ FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash, int *erro
             break;
 
         case TOKEN_REPETICION_INI:
-            flista_insertar(funcion, strdup("<"));
+            flista_insertar(funcion, copiar_string("<"));
             cont++;
 
             obtener_siguiente_token(input, posActual, 0, tok);
@@ -317,12 +321,12 @@ FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash, int *erro
             break;
 
         case TOKEN_REPETICION_FIN:
-            flista_insertar(funcion, strdup(">"));
+            flista_insertar(funcion, copiar_string(">"));
             cont--;
 
             obtener_siguiente_token(input, posActual, 0, tok);
             if (cont < 0 ||
-                tok->type != TOKEN_COMPOSICION && tok->type != TOKEN_SEMICOLON && tok->type != TOKEN_REPETICION_FIN)
+                (tok->type != TOKEN_COMPOSICION && tok->type != TOKEN_SEMICOLON && tok->type != TOKEN_REPETICION_FIN))
                 esValido = 0;
             break;
 

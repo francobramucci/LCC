@@ -1,20 +1,18 @@
 #include "apply.h"
 
 int Od(DList *lista) {
-    int i = 0;
-    dlist_agregar_final(lista, &i);
+    dlist_agregar_final(lista, 0);
     return SUCCESS;
 }
 
 int Oi(DList *lista) {
-    int i = 0;
-    dlist_agregar_inicio(lista, &i);
+    dlist_agregar_inicio(lista, 0);
     return SUCCESS;
 }
 
 int Sd(DList *lista) {
     if (lista->primero != NULL) {
-        (*(int *)(lista->ultimo->dato))++;
+        lista->ultimo->dato++;
         return SUCCESS;
     }
     return ERROR_DOMINIO;
@@ -22,7 +20,7 @@ int Sd(DList *lista) {
 
 int Si(DList *lista) {
     if (lista->primero != NULL) {
-        (*(int *)lista->primero->dato)++;
+        lista->primero->dato++;
         return SUCCESS;
     }
     return ERROR_DOMINIO;
@@ -51,7 +49,7 @@ int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir
 
     if (errorCode == SUCCESS) {
         if (imprimir)
-            dlist_imprimir(lista, (FuncionVisitante)imprimir_puntero_entero);
+            dlist_imprimir(lista);
         return SUCCESS;
     }
 
@@ -66,7 +64,7 @@ int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir
 
 int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *cantMaxEjecuciones) {
     int errorCode = SUCCESS;
-    Pila p = pila_crear((FuncionCopiadora)copiar_puntero_entero, (FuncionDestructora)destruir_puntero_entero);
+    Pila p = pila_crear();
 
     for (int i = 0; i <= funcion->ultimo && !errorCode; i++) {
 
@@ -75,8 +73,8 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
 
         if (flista_acceder(funcion, i)[0] == '<') {
             if (dlist_largo_mayor_a_uno(lista)) {
-                if (comparar_referencia_puntero_entero(lista->primero->dato, lista->ultimo->dato)) {
-                    pila_push(&i, p);
+                if (lista->primero->dato != lista->ultimo->dato) {
+                    pila_push(p, i);
                 } else {
                     int cont = 1;
                     while (cont != 0) {
@@ -91,8 +89,8 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
                 errorCode = ERROR_DOMINIO;
         } else if (flista_acceder(funcion, i)[0] == '>') {
             if (dlist_largo_mayor_a_uno(lista)) {
-                if (comparar_referencia_puntero_entero(lista->primero->dato, lista->ultimo->dato))
-                    i = *(int *)pila_top(p);
+                if (lista->primero->dato != lista->ultimo->dato)
+                    i = pila_top(p);
                 else
                     pila_pop(p);
             } else

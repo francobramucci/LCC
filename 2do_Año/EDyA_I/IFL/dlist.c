@@ -1,18 +1,16 @@
 #include "dlist.h"
 
-DList *dlist_crear(FuncionCopiadora copiar, FuncionDestructora destruir) {
+DList *dlist_crear() {
     DList *lista = malloc(sizeof(DList));
     lista->primero = NULL;
     lista->ultimo = NULL;
-    lista->copiar = copiar;
-    lista->destruir = destruir;
 
     return lista;
 }
 
-void dlist_agregar_inicio(DList *lista, void *dato) {
+void dlist_agregar_inicio(DList *lista, int dato) {
     DNodo *nuevoNodo = malloc(sizeof(DNodo));
-    nuevoNodo->dato = lista->copiar(dato);
+    nuevoNodo->dato = dato;
     nuevoNodo->sig = lista->primero;
     nuevoNodo->ant = NULL;
 
@@ -24,9 +22,9 @@ void dlist_agregar_inicio(DList *lista, void *dato) {
         lista->ultimo = nuevoNodo;
 }
 
-void dlist_agregar_final(DList *lista, void *dato) {
+void dlist_agregar_final(DList *lista, int dato) {
     DNodo *nuevoNodo = malloc(sizeof(DNodo));
-    nuevoNodo->dato = lista->copiar(dato);
+    nuevoNodo->dato = dato;
     nuevoNodo->ant = lista->ultimo;
     nuevoNodo->sig = NULL;
 
@@ -41,14 +39,12 @@ void dlist_agregar_final(DList *lista, void *dato) {
 void dlist_eliminar_inicio(DList *lista) {
     if (lista->primero != NULL) {
         if (lista->primero->sig == NULL) {
-            lista->destruir(lista->primero->dato);
             free(lista->primero);
             lista->primero = NULL;
             lista->ultimo = NULL;
         } else {
             DNodo *segundo = lista->primero->sig;
             segundo->ant = NULL;
-            lista->destruir(lista->primero->dato);
             free(lista->primero);
             lista->primero = segundo;
         }
@@ -58,14 +54,12 @@ void dlist_eliminar_inicio(DList *lista) {
 void dlist_eliminar_final(DList *lista) {
     if (lista->ultimo != NULL) {
         if (lista->ultimo->ant == NULL) {
-            lista->destruir(lista->ultimo->dato);
             free(lista->ultimo);
             lista->ultimo = NULL;
             lista->primero = NULL;
         } else {
             DNodo *penultimo = lista->ultimo->ant;
             penultimo->sig = NULL;
-            lista->destruir(lista->ultimo->dato);
             free(lista->ultimo);
             lista->ultimo = penultimo;
         }
@@ -78,7 +72,6 @@ void dlist_destruir(DList *lista) {
         while (lista->primero != NULL) {
             nodoAEliminar = lista->primero;
             lista->primero = lista->primero->sig;
-            lista->destruir(nodoAEliminar->dato);
             free(nodoAEliminar);
         }
     }
@@ -86,7 +79,7 @@ void dlist_destruir(DList *lista) {
 }
 
 DList *dlist_copiar(DList *lista) {
-    DList *nuevaLista = dlist_crear(lista->copiar, lista->destruir);
+    DList *nuevaLista = dlist_crear();
     if (lista) {
         for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig)
             dlist_agregar_final(nuevaLista, temp->dato);
@@ -95,8 +88,8 @@ DList *dlist_copiar(DList *lista) {
     return nuevaLista;
 }
 
-int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar) {
-    if (l1 && !l2 || !l1 && l2)
+int dlist_igual(DList *l1, DList *l2) {
+    if ((l1 && !l2) || (!l1 && l2))
         return 0;
     if (!l1 && !l2)
         return 1;
@@ -106,7 +99,7 @@ int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar) {
     int sonIguales = 1;
 
     while (temp1 && temp2 && sonIguales) {
-        if (comparar(temp1->dato, temp2->dato))
+        if (temp1->dato != temp2->dato)
             sonIguales = 0;
 
         temp1 = temp1->sig;
@@ -119,11 +112,11 @@ int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar) {
     return sonIguales;
 }
 
-void dlist_imprimir(DList *lista, FuncionVisitante visitar) {
+void dlist_imprimir(DList *lista) {
     if (lista != NULL) {
         printf("[");
         for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
-            visitar(temp->dato);
+            printf("%d", temp->dato);
             if (temp->sig != NULL)
                 printf(",");
         }
@@ -132,7 +125,7 @@ void dlist_imprimir(DList *lista, FuncionVisitante visitar) {
 }
 
 int dlist_largo_mayor_a_uno(DList *lista) {
-    return lista->primero && lista->primero->sig != NULL;
+    return lista->primero && lista->primero->sig;
 }
 
 void dlist_transformar_int(DList *lista, DList *listaParametro) {
@@ -140,7 +133,7 @@ void dlist_transformar_int(DList *lista, DList *listaParametro) {
     DNodo *temp2 = listaParametro->primero;
 
     while (temp1 != NULL && temp2 != NULL) {
-        *(int *)temp1->dato = *(int *)temp2->dato;
+        temp1->dato = temp2->dato;
         temp1 = temp1->sig;
         temp2 = temp2->sig;
     }

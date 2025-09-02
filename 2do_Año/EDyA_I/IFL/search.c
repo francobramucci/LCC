@@ -61,7 +61,7 @@ int probar_funcion_con_resto_de_pares(FLista *funcion, Vector *listas, THash *ta
 
         resultadoApply = apply(funcion, listaInput, tablaFunciones, 0);
         if (resultadoApply == SUCCESS)
-            sonIguales = dlist_igual(listaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero);
+            sonIguales = dlist_igual(listaInput, listaOutput);
 
         dlist_destruir(listaInput);
     }
@@ -172,7 +172,7 @@ int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput, THash
                 // }
                 // fprintf(stderr, "\n");
 
-                if (dlist_igual(copiaInput, listaOutput, (FuncionComparadora)comparar_referencia_puntero_entero)) {
+                if (dlist_igual(copiaInput, listaOutput)) {
                     int resultadoResto = probar_funcion_con_resto_de_pares(funcion, paresDeListas, tablaFunciones);
                     // fprintf(stderr, "%d", resultadoResto);
                     if (resultadoResto == SUCCESS) {

@@ -9,7 +9,7 @@ typedef int (*FuncionComparadora)(void *a, void *b); // 1 si a > b, 0 si a == b 
 typedef void (*FuncionVisitante)(void *);
 
 typedef struct _DNodo {
-        void *dato;
+        int dato;
         struct _DNodo *sig;
         struct _DNodo *ant;
 } DNodo;
@@ -17,15 +17,13 @@ typedef struct _DNodo {
 typedef struct {
         DNodo *primero;
         DNodo *ultimo;
-        FuncionCopiadora copiar;
-        FuncionDestructora destruir;
 } DList;
 
-DList *dlist_crear(FuncionCopiadora copiar, FuncionDestructora destruir);
+DList *dlist_crear();
 
-void dlist_agregar_inicio(DList *lista, void *dato);
+void dlist_agregar_inicio(DList *lista, int dato);
 
-void dlist_agregar_final(DList *lista, void *dato);
+void dlist_agregar_final(DList *lista, int dato);
 
 void dlist_eliminar_inicio(DList *lista);
 
@@ -35,9 +33,9 @@ void dlist_destruir(DList *lista);
 
 DList *dlist_copiar(DList *lista);
 
-int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar);
+int dlist_igual(DList *l1, DList *l2);
 
-void dlist_imprimir(DList *lista, FuncionVisitante visitar);
+void dlist_imprimir(DList *lista);
 
 int dlist_largo_mayor_a_uno(DList *lista);
 

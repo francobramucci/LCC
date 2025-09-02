@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+char *copiar_string(char *str);
+
 char *copiar_substring(const char *str, int ini, int fin);
 
 int es_primo(int n);
