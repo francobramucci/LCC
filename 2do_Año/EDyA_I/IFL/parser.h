@@ -2,9 +2,8 @@
 #define __PARSER_H__
 #include "search.h"
 #include "token.h"
-#include "utils.h"
-#include <ctype.h>
 
+// Codigos de error
 enum {
     ERROR_SINTAXIS_SENTENCIA,
 
@@ -23,24 +22,16 @@ enum {
     ERROR_FUNCION_YA_DEFINIDA
 };
 
-void saltear_espacios(char *input, int *posActual);
-
-void obtener_siguiente_token(char *input, int *posActual, int saltearEspacios, Token *token);
-
-void obtener_siguiente_token_lista(char *lista, int *posActual, Token *token);
-
-DList *parsear_lista(char *lista);
-
-void parsear_defl(char *input, int *posActual, THash *tablaHash);
-
-FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash, int *errorCode);
-
-void parsear_deff(char *input, int *posActual, THash *tablaHashFunciones);
-
-void parsear_apply(char *input, int *posActual, THash *tablaHashListas, THash *tablaHashFunciones);
-
-void parsear_search(char *input, int *posActual, THash *tablaHashListas, THash *tablaFunciones);
-
+/*
+ * Parsea una expresión completa desde el input.
+ * Según el contenido, delega el análisis a las funciones correspondientes:
+ *   - Definición de lista
+ *   - Definición de función
+ *   - Aplicación de función
+ *   - Búsqueda sobre pares de listas
+ * Los resultados se almacenan en las tablas hash de listas o funciones, según corresponda.
+ * En caso de error, imprime el mensaje correspondiente.
+ */
 void parsear_expresion(char *input, THash *tablaHashListas, THash *tablaHashFunciones);
 
 #endif // __PARSER_H__

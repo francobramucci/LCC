@@ -1,5 +1,4 @@
 #include "pila.h"
-#include "dlist.h"
 
 Pila pila_crear() {
     return dlist_crear();

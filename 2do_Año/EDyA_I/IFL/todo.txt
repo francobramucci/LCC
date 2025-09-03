@@ -1,5 +1,4 @@
-Mostrar mensaje cuando se define una funcion correctamente.
-Crear funciones estáticas y organizar cada archivo por importancia de funciones.
 Crear make file con opciones de compilacion
+Agregar comentarios sobre cada funcion
 Crear algunos tests
 Hacer informe

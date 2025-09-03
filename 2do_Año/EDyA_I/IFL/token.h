@@ -1,5 +1,6 @@
 #ifndef __TOKEN_H__
 #define __TOKEN_H__
+#include <ctype.h>
 #include <stdlib.h>
 
 typedef enum {
@@ -41,8 +42,10 @@ typedef struct {
 
 Token *crear_token();
 
-void actualizar_token(TokenType type, char *value, Token *token);
-
 void liberar_token(Token *token);
+
+void obtener_siguiente_token(char *input, int *posActual, int saltearEspacios, Token *token);
+
+void obtener_siguiente_token_lista(char *lista, int *posActual, Token *token);
 
 #endif // !__TOKEN_H__

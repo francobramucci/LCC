@@ -1,8 +1,15 @@
 #include "vector.h"
+#include <assert.h>
+#include <stdlib.h>
+
+// Dado un vector lo redimensiona al doble de la capacidad original
+static void vector_redimensionar(Vector *vec);
 
 Vector *vector_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir) {
     Vector *vec = malloc(sizeof(Vector));
+    assert(vec);
     vec->arr = malloc(sizeof(void *) * capacidad);
+    assert(vec->arr);
     vec->capacidad = capacidad;
     vec->ultimo = -1;
     vec->copiar = copiar;
@@ -17,11 +24,6 @@ void vector_insertar(Vector *vec, void *dato) {
         vector_redimensionar(vec);
     vec->arr[ultimo + 1] = vec->copiar(dato);
     vec->ultimo++;
-}
-
-void vector_redimensionar(Vector *vec) {
-    vec->capacidad *= 2;
-    vec->arr = realloc(vec->arr, vec->capacidad * sizeof(void *));
 }
 
 void vector_destruir(Vector *vec) {
@@ -43,4 +45,9 @@ void vector_eliminar_ultimo(Vector *vec) {
 
 int vector_es_vacio(Vector *vec) {
     return vec->ultimo == -1;
+}
+
+static void vector_redimensionar(Vector *vec) {
+    vec->capacidad *= 2;
+    vec->arr = realloc(vec->arr, vec->capacidad * sizeof(void *));
 }

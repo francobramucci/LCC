@@ -1,7 +1,11 @@
 #include "dlist.h"
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 DList *dlist_crear() {
     DList *lista = malloc(sizeof(DList));
+    assert(lista);
     lista->primero = NULL;
     lista->ultimo = NULL;
 
@@ -10,6 +14,7 @@ DList *dlist_crear() {
 
 void dlist_agregar_inicio(DList *lista, int dato) {
     DNodo *nuevoNodo = malloc(sizeof(DNodo));
+    assert(nuevoNodo);
     nuevoNodo->dato = dato;
     nuevoNodo->sig = lista->primero;
     nuevoNodo->ant = NULL;
@@ -24,6 +29,7 @@ void dlist_agregar_inicio(DList *lista, int dato) {
 
 void dlist_agregar_final(DList *lista, int dato) {
     DNodo *nuevoNodo = malloc(sizeof(DNodo));
+    assert(nuevoNodo);
     nuevoNodo->dato = dato;
     nuevoNodo->ant = lista->ultimo;
     nuevoNodo->sig = NULL;

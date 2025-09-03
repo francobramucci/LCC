@@ -6,12 +6,6 @@
 
 char *copiar_string(char *str);
 
-char *copiar_substring(const char *str, int ini, int fin);
-
-int es_primo(int n);
-
-int primo_mas_cercano(int n);
-
 int *copiar_puntero_entero(int *i);
 
 void destruir_puntero_entero(int *i);

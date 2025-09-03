@@ -1,51 +1,44 @@
 #include "apply.h"
+#include "pila.h"
+#include <stdio.h>
+#include <string.h>
 
-int Od(DList *lista) {
-    dlist_agregar_final(lista, 0);
-    return SUCCESS;
-}
+/*
+ * Toma la definicion de una funcion de lista y la aplica a la lista.
+ * Modifica la lista provista.
+ * Retorna SUCCESS si la aplicacion fue exitosa, ERROR_DOMINIO si la lista no se encuentra en el dominio de la
+ * funcion y ERROR_CANT_EJECUCIONES en caso de que se supere MAX_EJECUCIONES_APPLY.
+ */
+static int apply_flista(FLista *funcion, DList *lista, THash *tablaFunciones, int *cantMaxEjecuciones);
 
-int Oi(DList *lista) {
-    dlist_agregar_inicio(lista, 0);
-    return SUCCESS;
-}
+/*
+ * Dada una funcion de lista y una posicion donde se encuentra el comienzo de una repeticion, se devuelve el final de
+ * dicha repeticion en la funcion.
+ */
+static int avanzar_hasta_repeticion_fin(FLista *funcion, int i);
 
-int Sd(DList *lista) {
-    if (lista->primero != NULL) {
-        lista->ultimo->dato++;
-        return SUCCESS;
-    }
-    return ERROR_DOMINIO;
-}
+// Aplica la funcion de lista Oi que agrega un 0 a la izquierda
+static int Oi(DList *lista);
 
-int Si(DList *lista) {
-    if (lista->primero != NULL) {
-        lista->primero->dato++;
-        return SUCCESS;
-    }
-    return ERROR_DOMINIO;
-}
+// Aplica la funcion de lista Od que agrega un 0 a la derecha
+static int Od(DList *lista);
 
-int Dd(DList *lista) {
-    if (lista->primero != NULL) {
-        dlist_eliminar_final(lista);
-        return SUCCESS;
-    }
-    return ERROR_DOMINIO;
-}
+// Aplica la funcion de lista Si que suma 1 al elemento izquierdo
+static int Si(DList *lista);
 
-int Di(DList *lista) {
-    if (lista->primero != NULL) {
-        dlist_eliminar_inicio(lista);
-        return SUCCESS;
-    }
-    return ERROR_DOMINIO;
-}
+// Aplica la funcion de lista Sd que suma 1 al elemento derecho
+static int Sd(DList *lista);
 
-int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir) {
+// Aplica la funcion de lista Di que elimina el elemento izquierdo
+static int Di(DList *lista);
+
+// Aplica la funcion de lista Dd que elimina el elemento derecho
+static int Dd(DList *lista);
+
+int apply(FLista *funcion, DList *lista, THash *tablaFunciones, int imprimir) {
     int cantMaxEjecuciones = MAX_EJECUCIONES_APPLY;
 
-    int errorCode = apply_flista(funcion, lista, tablaHashFunciones, &cantMaxEjecuciones);
+    int errorCode = apply_flista(funcion, lista, tablaFunciones, &cantMaxEjecuciones);
 
     if (errorCode == SUCCESS) {
         if (imprimir)
@@ -54,40 +47,34 @@ int apply(FLista *funcion, DList *lista, THash *tablaHashFunciones, int imprimir
     }
 
     if (errorCode == ERROR_DOMINIO && imprimir)
-        printf("La lista no pertenece al dominio de la funcion");
+        printf("Error: La lista no pertenece al dominio de la funcion.");
 
     if (errorCode == ERROR_CANT_EJECUCIONES && imprimir)
-        printf("Se ha superado la cantidad maxima de ejecuciones");
+        printf("Error: Se ha superado la cantidad maxima de ejecuciones.");
 
     return errorCode;
 }
 
-int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *cantMaxEjecuciones) {
+static int apply_flista(FLista *funcion, DList *lista, THash *tablaFunciones, int *cantMaxEjecuciones) {
     int errorCode = SUCCESS;
     Pila p = pila_crear();
 
-    for (int i = 0; i <= funcion->ultimo && !errorCode; i++) {
+    for (int i = 0; i <= funcion->ultimo && errorCode == SUCCESS; i++) {
 
         if (!(*cantMaxEjecuciones))
             errorCode = ERROR_CANT_EJECUCIONES;
 
         if (flista_acceder(funcion, i)[0] == '<') {
             if (dlist_largo_mayor_a_uno(lista)) {
-                if (lista->primero->dato != lista->ultimo->dato) {
+                if (lista->primero->dato != lista->ultimo->dato)
                     pila_push(p, i);
-                } else {
-                    int cont = 1;
-                    while (cont != 0) {
-                        i++;
-                        if (flista_acceder(funcion, i)[0] == '<')
-                            cont++;
-                        if (flista_acceder(funcion, i)[0] == '>')
-                            cont--;
-                    }
-                }
+                else
+                    i = avanzar_hasta_repeticion_fin(funcion, i);
             } else
                 errorCode = ERROR_DOMINIO;
-        } else if (flista_acceder(funcion, i)[0] == '>') {
+        }
+
+        else if (flista_acceder(funcion, i)[0] == '>') {
             if (dlist_largo_mayor_a_uno(lista)) {
                 if (lista->primero->dato != lista->ultimo->dato)
                     i = pila_top(p);
@@ -95,29 +82,87 @@ int apply_flista(FLista *funcion, DList *lista, THash *tablaHashFunciones, int *
                     pila_pop(p);
             } else
                 errorCode = ERROR_DOMINIO;
-        } else {
-            errorCode = aplicacion_singular(flista_acceder(funcion, i), lista, tablaHashFunciones, cantMaxEjecuciones);
+        }
+
+        else {
+            errorCode = aplicacion_singular(flista_acceder(funcion, i), lista, tablaFunciones, cantMaxEjecuciones);
             (*cantMaxEjecuciones)--;
         }
     }
+
     pila_destruir(p);
 
     return errorCode;
 }
 
-int aplicacion_singular(char *funcion, DList *lista, THash *tablaHashFunciones, int *cantMaxEjecuciones) {
-    if (!strcmp(funcion, "Oi"))
+static int avanzar_hasta_repeticion_fin(FLista *funcion, int i) {
+    int cont = 1;
+    while (cont != 0) {
+        i++;
+        if (flista_acceder(funcion, i)[0] == '<')
+            cont++;
+        if (flista_acceder(funcion, i)[0] == '>')
+            cont--;
+    }
+
+    return i;
+}
+
+int aplicacion_singular(char *id, DList *lista, THash *tablaFunciones, int *cantMaxEjecuciones) {
+    if (!strcmp(id, "Oi"))
         return Oi(lista);
-    if (!strcmp(funcion, "Od"))
+    if (!strcmp(id, "Od"))
         return Od(lista);
-    if (!strcmp(funcion, "Si"))
+    if (!strcmp(id, "Si"))
         return Si(lista);
-    if (!strcmp(funcion, "Sd"))
+    if (!strcmp(id, "Sd"))
         return Sd(lista);
-    if (!strcmp(funcion, "Di"))
+    if (!strcmp(id, "Di"))
         return Di(lista);
-    if (!strcmp(funcion, "Dd"))
+    if (!strcmp(id, "Dd"))
         return Dd(lista);
 
-    return apply_flista(thash_buscar(funcion, tablaHashFunciones), lista, tablaHashFunciones, cantMaxEjecuciones);
+    return apply_flista(thash_buscar(id, tablaFunciones), lista, tablaFunciones, cantMaxEjecuciones);
+}
+
+static int Oi(DList *lista) {
+    dlist_agregar_inicio(lista, 0);
+    return SUCCESS;
+}
+
+static int Od(DList *lista) {
+    dlist_agregar_final(lista, 0);
+    return SUCCESS;
+}
+
+static int Si(DList *lista) {
+    if (lista->primero != NULL) {
+        lista->primero->dato++;
+        return SUCCESS;
+    }
+    return ERROR_DOMINIO;
+}
+
+static int Sd(DList *lista) {
+    if (lista->primero != NULL) {
+        lista->ultimo->dato++;
+        return SUCCESS;
+    }
+    return ERROR_DOMINIO;
+}
+
+static int Di(DList *lista) {
+    if (lista->primero != NULL) {
+        dlist_eliminar_inicio(lista);
+        return SUCCESS;
+    }
+    return ERROR_DOMINIO;
+}
+
+static int Dd(DList *lista) {
+    if (lista->primero != NULL) {
+        dlist_eliminar_final(lista);
+        return SUCCESS;
+    }
+    return ERROR_DOMINIO;
 }

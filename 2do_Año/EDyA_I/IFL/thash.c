@@ -1,4 +1,14 @@
-#include "hash.h"
+#include "thash.h"
+#include <assert.h>
+#include <math.h>
+#include <string.h>
+
+static unsigned thash_hash(char *key, int largoTabla);
+static void thash_rehash(THash *tablaHash);
+static Entrada *entrada_crear(char *key, void *valor);
+static int es_primo(int n);
+static int primo_mas_cercano(int n);
+
 /*
  * Encadenamiento: requiere memoria adicional.
  * Listas mezcladas: eliminación costosa. No afecta en este caso.
@@ -7,18 +17,9 @@
  *
  * */
 
-unsigned thash_hash(char *key, int largoTabla) {
-    unsigned hashval;
-
-    for (hashval = 0; *key != '\0'; key++) {
-        hashval = *key + 67 * hashval;
-    }
-
-    return hashval % largoTabla;
-}
-
 THash *thash_crear(int capacidad, FuncionDestructora destr) {
     THash *tablaHash = malloc(sizeof(THash));
+    assert(tablaHash);
     tablaHash->capacidad = capacidad;
     tablaHash->tamRegionDirecciones = primo_mas_cercano(ceil(0.86 * (float)capacidad));
     tablaHash->tabla = calloc(capacidad, sizeof(Entrada *));
@@ -37,15 +38,6 @@ void *thash_buscar(char *key, THash *tablaHash) {
         index = tabla[index]->sig;
     }
     return index == -1 ? NULL : tabla[index]->valor;
-}
-
-Entrada *entrada_crear(char *key, void *valor) {
-    Entrada *entrada = malloc(sizeof(Entrada));
-    entrada->key = key;
-    entrada->valor = valor;
-    entrada->sig = -1;
-
-    return entrada;
 }
 
 void thash_insertar(char *key, void *value, THash *tablaHash) {
@@ -78,7 +70,31 @@ void thash_insertar(char *key, void *value, THash *tablaHash) {
     }
 }
 
-void thash_rehash(THash *tablaHash) {
+void thash_destruir(THash *tablaHash) {
+    FuncionDestructora destr = tablaHash->destr;
+    Entrada **tabla = tablaHash->tabla;
+    for (int i = 0; i < tablaHash->capacidad; i++) {
+        if (tabla[i] != NULL) {
+            destr(tabla[i]->valor);
+            free(tabla[i]->key);
+            free(tabla[i]);
+        }
+    }
+    free(tabla);
+    free(tablaHash);
+}
+
+static unsigned thash_hash(char *key, int largoTabla) {
+    unsigned hashval;
+
+    for (hashval = 0; *key != '\0'; key++) {
+        hashval = *key + 67 * hashval;
+    }
+
+    return hashval % largoTabla;
+}
+
+static void thash_rehash(THash *tablaHash) {
     THash tablaVieja = *tablaHash;
     tablaHash->capacidad = tablaHash->capacidad * 2;
     tablaHash->indiceRegionColisiones = tablaHash->capacidad - 1;
@@ -94,42 +110,43 @@ void thash_rehash(THash *tablaHash) {
     free(tablaVieja.tabla);
 }
 
-void thash_destruir(THash *tablaHash) {
-    FuncionDestructora destr = tablaHash->destr;
-    Entrada **tabla = tablaHash->tabla;
-    for (int i = 0; i < tablaHash->capacidad; i++) {
-        if (tabla[i] != NULL) {
-            destr(tabla[i]->valor);
-            free(tabla[i]->key);
-            free(tabla[i]);
-        }
-    }
-    free(tabla);
-    free(tablaHash);
+static Entrada *entrada_crear(char *key, void *valor) {
+    Entrada *entrada = malloc(sizeof(Entrada));
+    assert(entrada);
+    entrada->key = key;
+    entrada->valor = valor;
+    entrada->sig = -1;
+
+    return entrada;
 }
 
-// void imprimir_tabla_hash(THash *tabla) {
-//     printf("%-10s | %-15s | %s\n", "Posicion", "Valor", "Siguiente");
-//     printf("-------------------------------------------\n");
-//     for (int i = 0; i < tabla->capacidad; i++) {
-//         char *valor = tabla->tabla[i] == NULL ? "NULL" : tabla->tabla[i]->key;
-//         int sig = tabla->tabla[i] == NULL ? -1 : tabla->tabla[i]->sig;
-//         printf("%-10d | %-15s | %d\n", i, valor, sig);
-//     }
-// }
+static int es_primo(int n) {
+    if (n <= 1)
+        return 0;
+    if (n <= 3)
+        return 1;
+    if (n % 2 == 0 || n % 3 == 0)
+        return 0;
 
-// int main() {
-//     srand(1);
-//     THash *hTable = crear_tabla_hash(1217);
-//     char stringArray[1200][100];
-//     for (int i = 0; i < 1200; i++) {
-//         sprintf(stringArray[i], "[%d, %d, %d, %d, %d, %d]", rand() % 100, rand() % 100, rand() % 100, rand() % 100,
-//                 rand() % 100, rand() % 100);
-//         insertar(stringArray[i], stringArray[i], hTable);
-//     }
-//
-//     imprimir_tabla_hash(hTable);
-//     char *a = buscar("[49, 18, 12, 34, 84, 30]", hTable);
-//     printf("\n%s", a);
-//     return 0;
-// }
+    int esPrimo = 1;
+
+    for (int i = 5; i * i <= n && esPrimo; i = i + 6) {
+        if (n % i == 0 || n % (i + 2) == 0)
+            esPrimo = 0;
+    }
+
+    return esPrimo;
+}
+
+static int primo_mas_cercano(int n) {
+    int p = 0;
+
+    for (int i = 0; p == 0; i++) {
+        if (es_primo(n - i))
+            p = n - i;
+        else if (es_primo(n + i))
+            p = n + i;
+    }
+
+    return p;
+}
