@@ -12,42 +12,64 @@ typedef struct {
         DNodo *ultimo;
 } DList;
 
-// Crea una lista doblemente enlazada
-DList *dlist_crear();
+/*
+ * Crea una lista doblemente enlazada vacía y devuelve un puntero a ella.
+ */
+DList *dlist_crear(void);
 
-// Agrega un elemento al inicio de la lista
+/*
+ * Inserta un elemento al inicio de la lista. Precondición: 'lista' no es NULL.
+ */
 void dlist_agregar_inicio(DList *lista, int dato);
 
-// Agrega un elemento al final de la lista
+/*
+ * Inserta un elemento al final de la lista. Precondición: 'lista' no es NULL.
+ */
 void dlist_agregar_final(DList *lista, int dato);
 
-// Elimina el primer elemento de la lista
+/*
+ * Elimina el primer elemento de la lista.
+ */
 void dlist_eliminar_inicio(DList *lista);
 
-// Elimina el ultimo elemento de la lista
+/*
+ * Elimina el último elemento de la lista.
+ */
 void dlist_eliminar_final(DList *lista);
 
-// Destruye la lista
+/*
+ * Libera toda la memoria asociada a la lista.
+ */
 void dlist_destruir(DList *lista);
 
-// Dada una lista, retorna una copia de la misma
+/*
+ * Devuelve una copia física de la lista.
+ */
 DList *dlist_copiar(DList *lista);
 
-// Dadas dos listas, devuelve 1 si son iguales y 0 si no
+/*
+ * Compara dos listas y devuelve 1 si son iguales elemento a elemento, 0 en caso contrario.
+ */
 int dlist_igual(DList *l1, DList *l2);
 
-// Dada una lista, la imprime
+/*
+ * Imprime el contenido de la lista en la salida estándar.
+ */
 void dlist_imprimir(DList *lista);
 
-// Dada una lista, retorna 1 si la lista tiene largo mayor a uno y 0 sino
+/*
+ * Devuelve 1 si la lista tiene longitud mayor a 1, 0 en caso contrario.
+ */
 int dlist_largo_mayor_a_uno(DList *lista);
 
-/* Dada una lista l cualquiera y una listaParametro se convierte l a listaParametro.
- * Es decir, se copia el valor de cada uno de los nodos de listaParametro a cada nodo de l. Si l tiene mas nodos que
- * listaParametro entonces se eliminan. Si l tiene menos nodos entonces se agregan. Esta funcion logra copiar una lista
- * reutilizando nodos ya definidos. De esta forma se reducen la cantidad de mallocs y frees realizados. Util cuando se
- * aplica una operacion sobre una lista y se quiere volver al estado anterior.
+/* Convierte la lista 'lista' en una copia de 'listaParametro', reutilizando nodos cuando sea posible.
+ * - Si 'lista' tiene más nodos que 'listaParametro', se eliminan los nodos sobrantes.
+ * - Si 'lista' tiene menos nodos, se crean nodos adicionales.
+ * - Se copian directamente los valores elemento a elemento.
+ *
+ * Esta función minimiza la cantidad de mallocs y frees realizados, lo que la hace útil cuando se requiere
+ * transformar una lista existente al estado de otra sin recrearla desde cero.
  */
-void dlist_transformar_int(DList *lista, DList *listaParametro);
+void dlist_convertir(DList *lista, DList *listaParametro);
 
 #endif /* __DLIST_H__ */

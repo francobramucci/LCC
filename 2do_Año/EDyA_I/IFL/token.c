@@ -1,8 +1,19 @@
 #include "token.h"
 #include <assert.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
+/**
+ * Avanza hasta el primer caracter distinto de espacio.
+ * Dado un input y un puntero, avanza desde la posicion almacenada en el puntero hasta el
+ * primer caracter distinto de espacio y actualiza el puntero a esa posicion.
+ */
 static void saltear_espacios(char *input, int *posActual);
+
+/**
+ * Dado un string, un inicio y final, retorna el substring delimitados por dicho inicio y final
+ */
 static char *copiar_substring(const char *str, int ini, int fin);
 
 Token *crear_token() {

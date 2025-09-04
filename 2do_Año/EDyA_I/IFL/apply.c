@@ -4,35 +4,35 @@
 #include <string.h>
 
 /*
- * Toma la definicion de una funcion de lista y la aplica a la lista.
- * Modifica la lista provista.
- * Retorna SUCCESS si la aplicacion fue exitosa, ERROR_DOMINIO si la lista no se encuentra en el dominio de la
- * funcion y ERROR_CANT_EJECUCIONES en caso de que se supere MAX_EJECUCIONES_APPLY.
+ * Aplica una función de lista sobre la lista provista.
+ * La lista es modificada en el lugar.
+ * Retorna:
+ *   - SUCCESS si la aplicación fue exitosa
+ *   - ERROR_DOMINIO si la lista no pertenece al dominio de la función
+ *   - ERROR_CANT_EJECUCIONES si se supera MAX_EJECUCIONES_APPLY
  */
 static int apply_flista(FLista *funcion, DList *lista, THash *tablaFunciones, int *cantMaxEjecuciones);
 
 /*
- * Dada una funcion de lista y una posicion donde se encuentra el comienzo de una repeticion, se devuelve el final de
- * dicha repeticion en la funcion.
+ * Dada una función de lista y la posición inicial de una repetición,
+ * devuelve la posición del final correspondiente de dicha repetición.
  */
 static int avanzar_hasta_repeticion_fin(FLista *funcion, int i);
 
-// Aplica la funcion de lista Oi que agrega un 0 a la izquierda
+/*
+ * Funciones primitivas de listas:
+ *   Oi -> agrega un 0 a la izquierda
+ *   Od -> agrega un 0 a la derecha
+ *   Si -> incrementa en 1 el elemento izquierdo
+ *   Sd -> incrementa en 1 el elemento derecho
+ *   Di -> elimina el elemento izquierdo
+ *   Dd -> elimina el elemento derecho
+ */
 static int Oi(DList *lista);
-
-// Aplica la funcion de lista Od que agrega un 0 a la derecha
 static int Od(DList *lista);
-
-// Aplica la funcion de lista Si que suma 1 al elemento izquierdo
 static int Si(DList *lista);
-
-// Aplica la funcion de lista Sd que suma 1 al elemento derecho
 static int Sd(DList *lista);
-
-// Aplica la funcion de lista Di que elimina el elemento izquierdo
 static int Di(DList *lista);
-
-// Aplica la funcion de lista Dd que elimina el elemento derecho
 static int Dd(DList *lista);
 
 int apply(FLista *funcion, DList *lista, THash *tablaFunciones, int imprimir) {

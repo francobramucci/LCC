@@ -2,7 +2,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
-// Dado un vector lo redimensiona al doble de la capacidad original
+/**
+ * Dado un vector lo redimensiona al doble de la capacidad original
+ */
 static void vector_redimensionar(Vector *vec);
 
 Vector *vector_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir) {

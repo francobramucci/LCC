@@ -5,22 +5,37 @@
 
 typedef Vector FLista;
 
-// Crea una funcion de lista
+/*
+ * Crea una función de lista vacía con la capacidad inicial especificada.
+ * Recibe funciones de copia y destrucción para manejar la memoria de los elementos.
+ * Retorna un puntero a la nueva función de lista.
+ */
 FLista *flista_crear(int capacidad, FuncionCopiadora copia, FuncionDestructora destruir);
 
-// Agrega un operador o identificador a una funcion de lista
+/*
+ * Inserta una subfunción (operador o identificador) al final de la función de lista.
+ */
 void flista_insertar(FLista *funcion, char *subFuncion);
 
-// Destruye una funcion de lista
+/*
+ * Libera toda la memoria asociada a la función de lista,
+ * destruyendo sus elementos con la función destructora provista.
+ */
 void flista_destruir(FLista *funcion);
 
-// Retorna si la funcion de lista es vacia o no
+/*
+ * Retorna 1 si la función de lista está vacía, 0 en caso contrario.
+ */
 int flista_es_vacia(FLista *funcion);
 
-// Accede a un elemento de la funcion de lista
+/*
+ * Devuelve la subfunción en la posición indicada (índice).
+ */
 char *flista_acceder(FLista *funcion, int indice);
 
-// Imprime la funcion de lista
+/*
+ * Imprime en salida estándar todos las subfunciones de la función de lista
+ */
 void flista_imprimir(FLista *funcion);
 
 #endif // !__FLISTA_H__

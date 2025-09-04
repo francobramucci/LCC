@@ -134,7 +134,7 @@ int dlist_largo_mayor_a_uno(DList *lista) {
     return lista->primero && lista->primero->sig;
 }
 
-void dlist_transformar_int(DList *lista, DList *listaParametro) {
+void dlist_convertir(DList *lista, DList *listaParametro) {
     DNodo *temp1 = lista->primero;
     DNodo *temp2 = listaParametro->primero;
 

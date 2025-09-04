@@ -1,4 +1,9 @@
 #include "parser.h"
+#include "dlist.h"
+#include "thash.h"
+#include "token.h"
+#include "utils.h"
+#include <stdio.h>
 
 /*
  * Verifica y procesa la definición de una lista en el input a partir de la posición dada.
@@ -53,6 +58,7 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
  * Imprime el mensaje de error correspondiente a un código de error.
  */
 static void imprimir_errores(int errorCode);
+
 void parsear_expresion(char *input, THash *tablaListas, THash *tablaFunciones) {
     int posActual = 0;
     Token *tok = crear_token();
@@ -350,9 +356,9 @@ static void parsear_apply(char *input, int *posActual, THash *tablaListas, THash
 static void parsear_search(char *input, int *posActual, THash *tablaListas, THash *tablaFunciones) {
     int errorCode = ERROR_SINTAXIS_SENTENCIA;
     int esValido = 1;
-    int esPrimerIdentificador = 1;
+    int esPrimeraLista = 1;
     int corcheteDerLeido = 0;
-    Vector *paresDeListas = vector_crear(50, retornar_puntero, funcion_vacia);
+    Vector *paresDeListas = vector_crear(50, (FuncionCopiadora)dlist_copiar, (FuncionDestructora)dlist_destruir);
 
     Token *tok = crear_token();
 
@@ -367,7 +373,7 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
 
         case TOKEN_LBRACE:
             obtener_siguiente_token(input, posActual, 1, tok);
-            if (tok->type != TOKEN_IDENTIFICADOR)
+            if (tok->type != TOKEN_IDENTIFICADOR && tok->type != TOKEN_LIST_LITERAL)
                 esValido = 0;
             break;
 
@@ -375,14 +381,14 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
             DList *lista = thash_buscar(tok->value, tablaListas);
             if (lista) {
                 obtener_siguiente_token(input, posActual, 1, tok);
-                if (esPrimerIdentificador) {
+                if (esPrimeraLista) {
                     if (tok->type != TOKEN_COMA)
                         esValido = 0;
                 } else {
                     if (tok->type != TOKEN_SEMICOLON && tok->type != TOKEN_RBRACE)
                         esValido = 0;
                 }
-                esPrimerIdentificador = !esPrimerIdentificador;
+                esPrimeraLista = !esPrimeraLista;
                 vector_insertar(paresDeListas, lista);
             } else {
                 esValido = 0;
@@ -391,9 +397,29 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
             break;
         }
 
+        case TOKEN_LIST_LITERAL: {
+            DList *lista = parsear_lista(tok->value);
+            if (lista) {
+                obtener_siguiente_token(input, posActual, 1, tok);
+                if (esPrimeraLista) {
+                    if (tok->type != TOKEN_COMA)
+                        esValido = 0;
+                } else {
+                    if (tok->type != TOKEN_SEMICOLON && tok->type != TOKEN_RBRACE)
+                        esValido = 0;
+                }
+                esPrimeraLista = !esPrimeraLista;
+                vector_insertar(paresDeListas, lista);
+            } else {
+                esValido = 0;
+                errorCode = ERROR_SINTAXIS_LISTA;
+            }
+            break;
+        }
+
         case TOKEN_COMA:
             obtener_siguiente_token(input, posActual, 1, tok);
-            if (tok->type != TOKEN_IDENTIFICADOR)
+            if (tok->type != TOKEN_IDENTIFICADOR && tok->type != TOKEN_LIST_LITERAL)
                 esValido = 0;
             break;
 
@@ -403,7 +429,7 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
                 if (tok->type != TOKEN_EOF)
                     esValido = 0;
             } else {
-                if (tok->type != TOKEN_IDENTIFICADOR)
+                if (tok->type != TOKEN_IDENTIFICADOR && tok->type != TOKEN_LIST_LITERAL)
                     esValido = 0;
             }
             break;

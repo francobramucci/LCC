@@ -8,7 +8,7 @@
  * La función recorre cada carácter de la cadena y combina su valor con un factor multiplicativo.
  * Devuelve el hash reducido al tamaño de la tabla (largoTabla) usando módulo.
  */
-// static unsigned thash_hash(char *key, int largoTabla);
+static unsigned thash_hash(char *key, int largoTabla);
 
 /*
  * Redimensiona la tabla hash duplicando su capacidad.
@@ -22,7 +22,7 @@ static void thash_rehash(THash *tablaHash);
  * Asigna memoria para la entrada, inicializa su clave, valor y el índice de la siguiente entrada en la lista mezclada
  * (sig) a -1.
  */
-static Entrada *entrada_crear(void *key, void *valor);
+static Entrada *entrada_crear(char *key, void *valor);
 
 /*
  * Determina si un número entero n es primo.
@@ -38,55 +38,48 @@ static int es_primo(int n);
  */
 static int primo_mas_cercano(int n);
 
-static void *retornar_puntero(void *dato);
-
 /*
  * Encadenamiento: requiere memoria adicional.
  * Listas mezcladas: eliminación costosa. No afecta en este caso.
  * Linear probing: clustering.
  * Doble hash: mayor costo computacional al
+ *
  * */
 
-THash *thash_crear(int capacidad, FuncionHash hash, FuncionCopiadora copiarKey, FuncionCopiadora copiarValor,
-                   FuncionDestructora destruirKey, FuncionDestructora destruirValor, FuncionComparadora compararKeys) {
+THash *thash_crear(int capacidad, FuncionDestructora destr) {
     THash *tablaHash = malloc(sizeof(THash));
     assert(tablaHash);
     tablaHash->capacidad = capacidad;
     tablaHash->tamRegionDirecciones = primo_mas_cercano(ceil(0.86 * (float)capacidad));
     tablaHash->tabla = calloc(capacidad, sizeof(Entrada *));
     tablaHash->indiceRegionColisiones = capacidad - 1;
-    tablaHash->hash = hash;
-    tablaHash->copiarKey = copiarKey;
-    tablaHash->copiarValor = copiarValor;
-    tablaHash->destruirKey = destruirKey;
-    tablaHash->destruirValor = destruirValor;
-    tablaHash->compararKeys = compararKeys;
+    tablaHash->destr = destr;
 
     return tablaHash;
 }
 
-void *thash_buscar(void *key, THash *tablaHash) {
+void *thash_buscar(char *key, THash *tablaHash) {
     Entrada **tabla = tablaHash->tabla;
-    int index = tablaHash->hash(key) % tablaHash->tamRegionDirecciones;
+    int index = thash_hash(key, tablaHash->tamRegionDirecciones);
     if (tabla[index] == NULL)
         return NULL;
-    while (index != -1 && tablaHash->compararKeys(tabla[index]->key, key)) {
+    while (index != -1 && strcmp(tabla[index]->key, key)) {
         index = tabla[index]->sig;
     }
     return index == -1 ? NULL : tabla[index]->valor;
 }
 
-void thash_insertar(void *key, void *value, THash *tablaHash) {
+void thash_insertar(char *key, void *value, THash *tablaHash) {
     Entrada **tabla = tablaHash->tabla;
-    int index = tablaHash->hash(key) % tablaHash->tamRegionDirecciones;
+    int index = thash_hash(key, tablaHash->tamRegionDirecciones);
     int indiceAnterior;
 
     if (tabla[index] == NULL) {
-        tabla[index] = entrada_crear(tablaHash->copiarKey(key), tablaHash->copiarValor(value));
+        tabla[index] = entrada_crear(key, value);
         return;
     }
 
-    while (index != -1 && tablaHash->compararKeys(tabla[index]->key, key)) {
+    while (index != -1 && strcmp(tabla[index]->key, key)) {
         indiceAnterior = index;
         index = tabla[index]->sig;
     }
@@ -96,22 +89,23 @@ void thash_insertar(void *key, void *value, THash *tablaHash) {
         while (indiceRegionColisiones >= 0 && tabla[indiceRegionColisiones] != NULL)
             indiceRegionColisiones--;
         tablaHash->indiceRegionColisiones = indiceRegionColisiones;
-        if (indiceRegionColisiones == -1) { // Tabla llena, rehash
+        if (indiceRegionColisiones == -1) { // Overflow
             thash_rehash(tablaHash);
             thash_insertar(key, value, tablaHash);
             return;
         }
         tabla[indiceAnterior]->sig = indiceRegionColisiones;
-        tabla[indiceRegionColisiones] = entrada_crear(tablaHash->copiarKey(key), tablaHash->copiarValor(value));
+        tabla[indiceRegionColisiones] = entrada_crear(key, value);
     }
 }
 
 void thash_destruir(THash *tablaHash) {
+    FuncionDestructora destr = tablaHash->destr;
     Entrada **tabla = tablaHash->tabla;
     for (int i = 0; i < tablaHash->capacidad; i++) {
         if (tabla[i] != NULL) {
-            tablaHash->destruirKey(tabla[i]->key);
-            tablaHash->destruirValor(tabla[i]->valor);
+            destr(tabla[i]->valor);
+            free(tabla[i]->key);
             free(tabla[i]);
         }
     }
@@ -119,31 +113,22 @@ void thash_destruir(THash *tablaHash) {
     free(tablaHash);
 }
 
-// static unsigned thash_hash(char *key, int largoTabla) {
-//     unsigned hashval;
-//
-//     for (hashval = 0; *key != '\0'; key++) {
-//         hashval = *key + 67 * hashval;
-//     }
-//
-//     return hashval % largoTabla;
-// }
+static unsigned thash_hash(char *key, int largoTabla) {
+    unsigned hashval;
+
+    for (hashval = 0; *key != '\0'; key++) {
+        hashval = *key + 67 * hashval;
+    }
+
+    return hashval % largoTabla;
+}
 
 static void thash_rehash(THash *tablaHash) {
     THash tablaVieja = *tablaHash;
-    tablaHash->capacidad *= 2;
+    tablaHash->capacidad = tablaHash->capacidad * 2;
     tablaHash->indiceRegionColisiones = tablaHash->capacidad - 1;
     tablaHash->tabla = calloc(tablaHash->capacidad, sizeof(Entrada *));
-    assert(tablaHash->tabla);
     tablaHash->tamRegionDirecciones = primo_mas_cercano(ceil(0.86 * (float)tablaHash->capacidad));
-
-    FuncionCopiadora copiarKey = tablaHash->copiarKey;
-    FuncionCopiadora copiarValor = tablaHash->copiarValor;
-    // Como no queremos hacer otras copias físicas del dato y la llave
-    // modificamos temporalmente las funciones de copia a una que
-    // retorna los punteros y reutilizamos thash_insertar.
-    tablaHash->copiarKey = (FuncionCopiadora)retornar_puntero;
-    tablaHash->copiarValor = (FuncionCopiadora)retornar_puntero;
 
     for (int i = 0; i < tablaVieja.capacidad; i++) {
         if (tablaVieja.tabla[i] != NULL) {
@@ -151,14 +136,10 @@ static void thash_rehash(THash *tablaHash) {
             free(tablaVieja.tabla[i]);
         }
     }
-
-    tablaHash->copiarKey = copiarKey;
-    tablaHash->copiarValor = copiarValor;
-
     free(tablaVieja.tabla);
 }
 
-static Entrada *entrada_crear(void *key, void *valor) {
+static Entrada *entrada_crear(char *key, void *valor) {
     Entrada *entrada = malloc(sizeof(Entrada));
     assert(entrada);
     entrada->key = key;
@@ -197,8 +178,4 @@ static int primo_mas_cercano(int n) {
     }
 
     return p;
-}
-
-static void *retornar_puntero(void *dato) {
-    return dato;
 }
