@@ -2,3 +2,4 @@ Crear make file con opciones de compilacion
 Agregar comentarios sobre cada funcion
 Crear algunos tests
 Hacer informe
+Mensaje de bienvenida
