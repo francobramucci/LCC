@@ -49,6 +49,16 @@ int vector_es_vacio(Vector *vec) {
     return vec->ultimo == -1;
 }
 
+void *vector_acceder(Vector *vec, int indice) {
+    if (indice >= 0 && indice <= vec->ultimo)
+        return vec->arr[indice];
+    return NULL;
+}
+
+int vector_cant_elementos(Vector *vec) {
+    return vec->ultimo + 1;
+}
+
 static void vector_redimensionar(Vector *vec) {
     vec->capacidad *= 2;
     vec->arr = realloc(vec->arr, vec->capacidad * sizeof(void *));

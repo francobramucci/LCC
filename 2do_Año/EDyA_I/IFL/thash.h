@@ -1,5 +1,6 @@
 #ifndef __THASH_H__
 #define __THASH_H__
+#include "vector.h"
 #include <stdlib.h>
 
 typedef void *(*FuncionCopiadora)(void *dato);
@@ -20,6 +21,7 @@ typedef struct _Entrada {
 typedef struct {
         Entrada **tabla;
         int capacidad;
+        int cantidadElementos;
         int tamRegionDirecciones;
         int indiceRegionColisiones;
         FuncionHash hash;
@@ -74,5 +76,10 @@ void thash_insertar(void *key, void *value, THash *hashTable);
  * la tabla y la estructura principal de la tabla de hash.
  */
 void thash_destruir(THash *hashTable);
+
+/**
+ * Copia las referencias de todas las entradas no vacias de la tabla hash a un vector
+ */
+Vector *thash_elementos_a_vector(THash *tablaHash);
 
 #endif // !__THASH_H__

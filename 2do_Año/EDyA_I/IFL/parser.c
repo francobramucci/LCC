@@ -460,37 +460,37 @@ static void imprimir_errores(int errorCode) {
     switch (errorCode) {
 
     case ERROR_SINTAXIS_SENTENCIA:
-        printf("Error: sintaxis de sentencia invalido");
+        printf("Error: sintaxis de sentencia invalido.");
         break;
 
     case ERROR_SINTAXIS_LISTA:
-        printf("Error: sintaxis de lista invalido");
+        printf("Error: sintaxis de lista invalido.");
         break;
 
     case ERROR_LISTA_NO_DEFINIDA:
-        printf("Error: lista no definida");
+        printf("Error: lista no definida.");
         break;
 
     case ERROR_LISTA_YA_DEFINIDA:
-        printf("Error: lista ya definida");
+        printf("Error: lista ya definida.");
         break;
 
     case ERROR_SUBFUNCION_NO_DEFINIDA:
-        printf("Error: subfuncion no definida");
+        printf("Error: subfuncion no definida.");
         break;
 
     case ERROR_SINTAXIS_FUNCION:
-        printf("Error: sintaxis de funcion invalida");
+        printf("Error: sintaxis de funcion invalida.");
         break;
 
     case ERROR_FUNCION_NO_DEFINIDA:
-        printf("Error: funcion no definida");
+        printf("Error: funcion no definida.");
         break;
 
     case ERROR_FUNCION_YA_DEFINIDA:
-        printf("Error: funcion ya definida");
+        printf("Error: funcion ya definida.");
         break;
     default:
-        printf("Error desconocido");
+        printf("Error desconocido.");
     }
 }

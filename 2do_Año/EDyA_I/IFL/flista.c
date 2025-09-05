@@ -1,4 +1,5 @@
 #include "flista.h"
+#include "vector.h"
 #include <stdio.h>
 
 FLista *flista_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir) {
@@ -23,7 +24,7 @@ void flista_eliminar_ultimo(FLista *funcion) {
 }
 
 char *flista_acceder(FLista *funcion, int indice) {
-    return (char *)funcion->arr[indice];
+    return (char *)vector_acceder(funcion, indice);
 }
 
 void flista_imprimir(FLista *funcion) {

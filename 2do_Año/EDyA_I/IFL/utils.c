@@ -14,6 +14,12 @@ char *copiar_string(char *str) {
     return copia;
 }
 
+int *copia_fisica_int(int *i) {
+    int *copia = malloc(sizeof(int));
+    *copia = *i;
+    return copia;
+}
+
 void *retornar_puntero(void *a) {
     return a;
 }

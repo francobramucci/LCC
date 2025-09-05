@@ -6,26 +6,14 @@
 
 static void imprimir_ayuda();
 static void insertar_funciones_primitivas(THash *tablaFunciones);
-
-unsigned thash_hash(char *key) {
-    unsigned hashval;
-
-    for (hashval = 0; *key != '\0'; key++) {
-        hashval = *key + 67 * hashval;
-    }
-
-    return hashval;
-}
-
-int comparar_strings(void *str1, void *str2) {
-    return strcmp((char *)str1, (char *)str2);
-}
+unsigned hash(char *key);
+int comparar_strings(void *str1, void *str2);
 
 int main() {
-    THash *tablaListas = thash_crear(1000, (FuncionHash)thash_hash, retornar_puntero, retornar_puntero, liberar_puntero,
+    THash *tablaListas = thash_crear(1000, (FuncionHash)hash, retornar_puntero, retornar_puntero, liberar_puntero,
                                      (FuncionDestructora)dlist_destruir, comparar_strings);
-    THash *tablaFunciones = thash_crear(1000, (FuncionHash)thash_hash, retornar_puntero, retornar_puntero,
-                                        liberar_puntero, (FuncionDestructora)flista_destruir, comparar_strings);
+    THash *tablaFunciones = thash_crear(1000, (FuncionHash)hash, retornar_puntero, retornar_puntero, liberar_puntero,
+                                        (FuncionDestructora)flista_destruir, comparar_strings);
 
     insertar_funciones_primitivas(tablaFunciones);
 
@@ -44,9 +32,10 @@ int main() {
     parsear_expresion("deff Ddi = Od <Sd> Mi;", tablaListas, tablaFunciones);
     parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di Md;", tablaListas, tablaFunciones);
     parsear_expresion("search{L1,L2; L3,L4};", tablaListas, tablaFunciones);
-    parsear_expresion("search{A,B;C,D};", tablaListas, tablaFunciones);
+    // parsear_expresion("search{A,B;C,D};", tablaListas, tablaFunciones);
     parsear_expresion("defl L5 = [23,1923,12931,2393];", tablaListas, tablaFunciones);
-    printf("Interprete de funciones de listas. Escriba help para obtener información.");
+    printf("Interprete de funciones de listas. Escriba 'help' para obtener informacion, 'exit' para terminar la "
+           "ejecucion.");
     while (!exit) {
         char buffer[1000];
         printf("\n> ");
@@ -96,4 +85,18 @@ static void imprimir_ayuda() {
         "search {L1,L2};\n\n"
 
         "Los nombres de listas y funciones deben estar compuestos por alfanumericos o el simbolo '_' ");
+}
+
+unsigned hash(char *key) {
+    unsigned hashval;
+
+    for (hashval = 0; *key != '\0'; key++) {
+        hashval = *key + 67 * hashval;
+    }
+
+    return hashval;
+}
+
+int comparar_strings(void *str1, void *str2) {
+    return strcmp((char *)str1, (char *)str2);
 }

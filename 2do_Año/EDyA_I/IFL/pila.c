@@ -1,24 +1,26 @@
 #include "pila.h"
+#include "vector.h"
 
-Pila pila_crear() {
-    return dlist_crear();
+Pila *pila_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir) {
+    return vector_crear(capacidad, copiar, destruir);
 }
 
-void pila_push(Pila p, int dato) {
-    dlist_agregar_inicio(p, dato);
+void pila_push(Pila *p, void *dato) {
+    vector_insertar(p, dato);
 }
 
-void pila_pop(Pila p) {
-    dlist_eliminar_inicio(p);
+void pila_pop(Pila *p) {
+    vector_eliminar_ultimo(p);
 }
 
-int pila_top(Pila p) {
-    if (!p->primero)
-        return -1;
-
-    return p->primero->dato;
+void *pila_top(Pila *p) {
+    return vector_acceder(p, p->ultimo);
 }
 
-void pila_destruir(Pila p) {
-    dlist_destruir(p);
+int pila_cant_elementos(Pila *p) {
+    return vector_cant_elementos(p);
+}
+
+void pila_destruir(Pila *p) {
+    vector_destruir(p);
 }

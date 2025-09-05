@@ -1,6 +1,10 @@
 #include "search.h"
 #include "dlist.h"
+#include "flista.h"
+#include "pila.h"
+#include "thash.h"
 #include "utils.h"
+#include "vector.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -16,7 +20,7 @@
  * En cada llamada de la función se pasa listaInput modificada con la última aplicacion hecha, de esta forma no se
  * recomputa toda la función en cada llamada sino que se va almacenando el resultado.
  *
- * En caso de que la aplicacion_singular o probar_funcion_con_resto_de_pares de una funcion arroje error hará que dicha
+ * En caso de que aplicacion_singular o probar_funcion_con_resto_de_pares de una funcion arroje error hará que dicha
  * función no se considere, por lo que elimina la última subfuncion y continúa probando con el resto.
  *
  * Si se encuentra una función válida que transforma la listaInput original con listaOutput entonces se prueba con el
@@ -24,8 +28,8 @@
  *
  * Si no se encuentra ninguna, retorna 0.
  */
-static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput, THash *tablaFunciones,
-                          Vector *paresDeListas);
+static int buscar_funcion(Pila *pilaFuncion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
+                          THash *tablaFunciones, Vector *paresDeListas);
 
 /*
  * Determina si conviene podar la búsqueda en función de la última subfunción aplicada.
@@ -33,10 +37,10 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
  * Retorna 1 si agregar una subfuncion inmediatamente después de la última función aplicada en funcion es redundante
  * o contradictorio (por ejemplo, "Oi" seguido de "Di"). En caso contrario retorna 0.
  */
-static int podar(FLista *funcion, char *subfuncion);
+static int podar(Pila *pilaFuncion, char *subfuncion);
 
 /*
- * Verifica que la función encontrada funcione correctamente no solo con el par (listaInput, listaOutput) actual,
+ * Verifica que la función encontrada sirva no solo con el par (listaInput, listaOutput) actual,
  * sino también con el resto de pares en listas.
  *
  * Para cada par de listas adicionales en listas, aplica funcion a la lista de entrada y compara con la salida esperada.
@@ -48,56 +52,63 @@ static int podar(FLista *funcion, char *subfuncion);
 static int probar_funcion_con_resto_de_pares(FLista *funcion, Vector *listas, THash *tablaFunciones);
 
 void search(Vector *paresDeListas, THash *tablaFunciones) {
-    FLista *funcion = flista_crear(PROFUNDIDAD_MAX, retornar_puntero, funcion_vacia);
+    Vector *elementosTabla = thash_elementos_a_vector(tablaFunciones);
+    Pila *pilaFuncion = pila_crear(PROFUNDIDAD_MAX, retornar_puntero, funcion_vacia);
 
-    int funcionEncontrada = buscar_funcion(funcion, (DList *)paresDeListas->arr[0], (DList *)paresDeListas->arr[1],
-                                           tablaFunciones, paresDeListas);
+    int funcionEncontrada = buscar_funcion(pilaFuncion, (DList *)paresDeListas->arr[0], (DList *)paresDeListas->arr[1],
+                                           elementosTabla, tablaFunciones, paresDeListas);
     if (funcionEncontrada == 1) {
-        for (int i = 0; i <= funcion->ultimo; i++) {
-            printf("%s ", flista_acceder(funcion, i));
+        for (int i = 0; i <= pilaFuncion->ultimo; i++) {
+            printf("%s ", (char *)pila_top(pilaFuncion));
+            pila_pop(pilaFuncion);
         }
     } else {
-        printf("No se ha encontrado la funcion");
+        printf("No se ha encontrado la funcion.");
     }
 
-    flista_destruir(funcion);
+    pila_destruir(pilaFuncion);
+    vector_destruir(elementosTabla);
 }
 
-static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput, THash *tablaFunciones,
-                          Vector *paresDeListas) {
+static int buscar_funcion(Pila *pilaFuncion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
+                          THash *tablaFunciones, Vector *paresDeListas) {
 
-    if (funcion->ultimo + 1 >= PROFUNDIDAD_MAX)
+    if (pila_cant_elementos(pilaFuncion) >= PROFUNDIDAD_MAX)
         return 0;
 
+    Entrada **funciones = (Entrada **)elementosTabla->arr;
+    int cantFunciones = elementosTabla->capacidad;
     DList *copiaInput = dlist_copiar(listaInput);
 
     int funcionEncontrada = 0;
 
-    for (int i = 0; i < tablaFunciones->capacidad && !funcionEncontrada; i++) {
-        if (tablaFunciones->tabla[i] && !podar(funcion, tablaFunciones->tabla[i]->key)) {
-            char *subFuncion = tablaFunciones->tabla[i]->key;
+    for (int i = 0; i < cantFunciones && !funcionEncontrada; i++) {
+        if (funciones[i] && !podar(pilaFuncion, funciones[i]->key)) {
+            char *subFuncion = funciones[i]->key;
 
             int cantMaxEjecuciones = MAX_EJEC_APPLY_PARA_SEARCH;
             int resultadoAplicacion = aplicacion_singular(subFuncion, copiaInput, tablaFunciones, &cantMaxEjecuciones);
 
             if (resultadoAplicacion != ERROR_DOMINIO && resultadoAplicacion != ERROR_CANT_EJECUCIONES) {
-                flista_insertar(funcion, subFuncion);
+                pila_push(pilaFuncion, subFuncion);
 
                 if (dlist_igual(copiaInput, listaOutput)) {
-                    int resultadoResto = probar_funcion_con_resto_de_pares(funcion, paresDeListas, tablaFunciones);
+                    FLista *funcion = (FLista *)pilaFuncion;
+                    int resultadoResto = probar_funcion_con_resto_de_pares(pilaFuncion, paresDeListas, tablaFunciones);
 
                     if (resultadoResto == SUCCESS) {
                         funcionEncontrada = 1;
                     }
                     if (resultadoResto == FAIL) {
-                        funcionEncontrada =
-                            buscar_funcion(funcion, copiaInput, listaOutput, tablaFunciones, paresDeListas);
+                        funcionEncontrada = buscar_funcion(pilaFuncion, copiaInput, listaOutput, elementosTabla,
+                                                           tablaFunciones, paresDeListas);
                     }
                 } else
-                    funcionEncontrada = buscar_funcion(funcion, copiaInput, listaOutput, tablaFunciones, paresDeListas);
+                    funcionEncontrada = buscar_funcion(pilaFuncion, copiaInput, listaOutput, elementosTabla,
+                                                       tablaFunciones, paresDeListas);
 
                 if (!funcionEncontrada)
-                    vector_eliminar_ultimo(funcion);
+                    pila_pop(pilaFuncion);
             }
 
             dlist_convertir(copiaInput, listaInput);
@@ -109,9 +120,9 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
     return funcionEncontrada;
 }
 
-static int podar(FLista *funcion, char *subfuncion) {
-    if (!flista_es_vacia(funcion)) {
-        char *ultimaFuncion = flista_acceder(funcion, funcion->ultimo);
+static int podar(Pila *pilaFuncion, char *subfuncion) {
+    if (!flista_es_vacia(pilaFuncion)) {
+        char *ultimaFuncion = pila_top(pilaFuncion);
         return (strcmp(ultimaFuncion, "Oi") == 0 && strcmp(subfuncion, "Di") == 0) ||
                (strcmp(ultimaFuncion, "Od") == 0 && strcmp(subfuncion, "Dd") == 0) ||
                (strcmp(ultimaFuncion, "Si") == 0 && strcmp(subfuncion, "Di") == 0) ||
@@ -120,17 +131,18 @@ static int podar(FLista *funcion, char *subfuncion) {
     return 0;
 }
 
-static int probar_funcion_con_resto_de_pares(FLista *funcion, Vector *listas, THash *tablaFunciones) {
+static int probar_funcion_con_resto_de_pares(Pila *pilaFuncion, Vector *paresDeListas, THash *tablaFunciones) {
     int sonIguales = 1;
     int resultadoApply = SUCCESS;
+    FLista *funcion = (FLista *)pilaFuncion;
 
-    if (listas->ultimo < 2) {
+    if (vector_cant_elementos(paresDeListas) < 2) {
         return SUCCESS;
     }
 
-    for (int i = 2; i < listas->ultimo && sonIguales && resultadoApply == SUCCESS; i += 2) {
-        DList *listaInput = dlist_copiar(listas->arr[i]);
-        DList *listaOutput = listas->arr[i + 1];
+    for (int i = 2; i < paresDeListas->ultimo && sonIguales && resultadoApply == SUCCESS; i += 2) {
+        DList *listaInput = dlist_copiar(paresDeListas->arr[i]);
+        DList *listaOutput = paresDeListas->arr[i + 1];
 
         resultadoApply = apply(funcion, listaInput, tablaFunciones, 0);
         if (resultadoApply == SUCCESS)

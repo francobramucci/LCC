@@ -3,6 +3,8 @@
 
 char *copiar_string(char *str);
 
+int *copia_fisica_int(int *i);
+
 void *retornar_puntero(void *a);
 
 void liberar_puntero(void *a);
