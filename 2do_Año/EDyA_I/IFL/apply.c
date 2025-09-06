@@ -1,4 +1,6 @@
 #include "apply.h"
+#include "dlist.h"
+#include "flista.h"
 #include "pila.h"
 #include "thash.h"
 #include "utils.h"
@@ -60,15 +62,16 @@ int apply(FLista *funcion, DList *lista, THash *tablaFunciones, int imprimir) {
 static int apply_flista(FLista *funcion, DList *lista, THash *tablaFunciones, int *cantMaxEjecuciones) {
     int errorCode = SUCCESS;
     Pila *p = pila_crear(50, (FuncionCopiadora)copia_fisica_int, liberar_puntero);
+    int largoFuncion = flista_largo(funcion);
 
-    for (int i = 0; i <= funcion->ultimo && errorCode == SUCCESS; i++) {
+    for (int i = 0; i < largoFuncion && errorCode == SUCCESS; i++) {
 
         if (!(*cantMaxEjecuciones))
             errorCode = ERROR_CANT_EJECUCIONES;
 
         if (flista_acceder(funcion, i)[0] == '<') {
             if (dlist_largo_mayor_a_uno(lista)) {
-                if (lista->primero->dato != lista->ultimo->dato) // FUNCIONCOMPARAREXTREMOS
+                if (!dlist_comparar_extremos(lista))
                     pila_push(p, &i);
                 else
                     i = avanzar_hasta_repeticion_fin(funcion, i);
@@ -78,7 +81,7 @@ static int apply_flista(FLista *funcion, DList *lista, THash *tablaFunciones, in
 
         else if (flista_acceder(funcion, i)[0] == '>') {
             if (dlist_largo_mayor_a_uno(lista)) {
-                if (lista->primero->dato != lista->ultimo->dato)
+                if (!dlist_comparar_extremos(lista))
                     i = *(int *)pila_top(p);
                 else
                     pila_pop(p);

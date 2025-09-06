@@ -62,7 +62,13 @@ void dlist_imprimir(DList *lista);
  */
 int dlist_largo_mayor_a_uno(DList *lista);
 
-/* Convierte la lista 'lista' en una copia de 'listaParametro', reutilizando nodos cuando sea posible.
+/**
+ * Devuelve 1 si los extremos de la lista son iguales, 0 si no.
+ */
+int dlist_comparar_extremos(DList *lista);
+
+/**
+ * Convierte la lista 'lista' en una copia de 'listaParametro', reutilizando nodos cuando sea posible.
  * - Si 'lista' tiene más nodos que 'listaParametro', se eliminan los nodos sobrantes.
  * - Si 'lista' tiene menos nodos, se crean nodos adicionales.
  * - Se copian directamente los valores elemento a elemento.

@@ -27,6 +27,10 @@ char *flista_acceder(FLista *funcion, int indice) {
     return (char *)vector_acceder(funcion, indice);
 }
 
+int flista_largo(FLista *funcion) {
+    return vector_largo(funcion);
+}
+
 void flista_imprimir(FLista *funcion) {
     char *opAnt = flista_acceder(funcion, 0);
     printf("%s", flista_acceder(funcion, 0));

@@ -55,16 +55,18 @@ void search(Vector *paresDeListas, THash *tablaFunciones) {
     Vector *elementosTabla = thash_elementos_a_vector(tablaFunciones);
     Pila *pilaFuncion = pila_crear(PROFUNDIDAD_MAX, retornar_puntero, funcion_vacia);
 
-    int funcionEncontrada = buscar_funcion(pilaFuncion, (DList *)paresDeListas->arr[0], (DList *)paresDeListas->arr[1],
-                                           elementosTabla, tablaFunciones, paresDeListas);
+    int funcionEncontrada =
+        buscar_funcion(pilaFuncion, (DList *)vector_acceder(paresDeListas, 0),
+                       (DList *)vector_acceder(paresDeListas, 1), elementosTabla, tablaFunciones, paresDeListas);
+
     if (funcionEncontrada == 1) {
-        for (int i = 0; i <= pilaFuncion->ultimo; i++) {
-            printf("%s ", (char *)pila_top(pilaFuncion));
-            pila_pop(pilaFuncion);
+        for (int i = 0; i < pila_largo(pilaFuncion); i++) {
+            printf("%s ", (char *)vector_acceder(pilaFuncion, i)); // FUNCION IMPRIMIR VECTOR
         }
-    } else {
-        printf("No se ha encontrado la funcion.");
     }
+
+    else
+        printf("No se ha encontrado la funcion.");
 
     pila_destruir(pilaFuncion);
     vector_destruir(elementosTabla);
@@ -73,11 +75,11 @@ void search(Vector *paresDeListas, THash *tablaFunciones) {
 static int buscar_funcion(Pila *pilaFuncion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
                           THash *tablaFunciones, Vector *paresDeListas) {
 
-    if (pila_cant_elementos(pilaFuncion) >= PROFUNDIDAD_MAX)
+    if (pila_largo(pilaFuncion) >= PROFUNDIDAD_MAX)
         return 0;
 
     Entrada **funciones = (Entrada **)elementosTabla->arr;
-    int cantFunciones = elementosTabla->capacidad;
+    int cantFunciones = vector_largo(elementosTabla);
     DList *copiaInput = dlist_copiar(listaInput);
 
     int funcionEncontrada = 0;
@@ -135,14 +137,17 @@ static int probar_funcion_con_resto_de_pares(Pila *pilaFuncion, Vector *paresDeL
     int sonIguales = 1;
     int resultadoApply = SUCCESS;
     FLista *funcion = (FLista *)pilaFuncion;
+    int largo = vector_largo(paresDeListas);
 
-    if (vector_cant_elementos(paresDeListas) < 2) {
+    if (vector_largo(paresDeListas) <= 2) {
         return SUCCESS;
     }
 
-    for (int i = 2; i < paresDeListas->ultimo && sonIguales && resultadoApply == SUCCESS; i += 2) {
-        DList *listaInput = dlist_copiar(paresDeListas->arr[i]);
-        DList *listaOutput = paresDeListas->arr[i + 1];
+    // En las posiciones pares se guardan las listas de input y en las impares
+    // las listas de output
+    for (int i = 2; i < largo - 1 && sonIguales && resultadoApply == SUCCESS; i += 2) {
+        DList *listaInput = dlist_copiar((DList *)vector_acceder(paresDeListas, i));
+        DList *listaOutput = (DList *)vector_acceder(paresDeListas, i + 1);
 
         resultadoApply = apply(funcion, listaInput, tablaFunciones, 0);
         if (resultadoApply == SUCCESS)

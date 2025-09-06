@@ -43,8 +43,8 @@ int vector_es_vacio(Vector *vec);
 void *vector_acceder(Vector *vec, int indice);
 
 /**
- * Devuelve la cantidad de elementos presentes en el vector.
+ * Devuelve la cantidad de elementos del vector.
  */
-int vector_cant_elementos(Vector *vec);
+int vector_largo(Vector *vec);
 
 #endif // !__VECTOR_H__

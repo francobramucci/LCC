@@ -17,8 +17,12 @@ void *pila_top(Pila *p) {
     return vector_acceder(p, p->ultimo);
 }
 
-int pila_cant_elementos(Pila *p) {
-    return vector_cant_elementos(p);
+int pila_es_vacia(Pila *p) {
+    return vector_es_vacio(p);
+}
+
+int pila_largo(Pila *p) {
+    return vector_largo(p);
 }
 
 void pila_destruir(Pila *p) {

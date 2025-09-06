@@ -55,7 +55,7 @@ void *vector_acceder(Vector *vec, int indice) {
     return NULL;
 }
 
-int vector_cant_elementos(Vector *vec) {
+int vector_largo(Vector *vec) {
     return vec->ultimo + 1;
 }
 

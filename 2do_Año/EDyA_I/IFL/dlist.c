@@ -134,6 +134,10 @@ int dlist_largo_mayor_a_uno(DList *lista) {
     return lista->primero && lista->primero->sig;
 }
 
+int dlist_comparar_extremos(DList *lista) {
+    return lista->primero->dato == lista->ultimo->dato;
+}
+
 void dlist_convertir(DList *lista, DList *listaParametro) {
     DNodo *temp1 = lista->primero;
     DNodo *temp2 = listaParametro->primero;
