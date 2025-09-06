@@ -1,7 +1,8 @@
 #ifndef __APPLY_H__
 #define __APPLY_H__
-#include "dlist.h"
+
 #include "flista.h"
+#include "lista.h"
 #include "thash.h"
 
 #define MAX_EJECUCIONES_APPLY 1e8
@@ -22,7 +23,7 @@ enum {
  * - El parámetro `imprimir` indica si deben mostrarse resultados y/o errores.
  * Retorna un código definido en la enumeración anterior.
  */
-int apply(FLista *funcion, DList *lista, THash *tablaFunciones, int imprimir);
+int apply(FLista *funcion, Lista *lista, THash *tablaFunciones, int imprimir);
 
 /*
  * Aplica una función singular sobre una lista.
@@ -31,6 +32,6 @@ int apply(FLista *funcion, DList *lista, THash *tablaFunciones, int imprimir);
  * - `cantMaxEjecuciones` se utiliza como contador/límite de aplicaciones.
  * Retorna un código definido en la enumeración anterior.
  */
-int aplicacion_singular(char *id, DList *lista, THash *tablaFunciones, int *cantMaxEjecuciones);
+int aplicacion_singular(char *id, Lista *lista, THash *tablaFunciones, int *cantMaxEjecuciones);
 
 #endif // !__APPLY_H__

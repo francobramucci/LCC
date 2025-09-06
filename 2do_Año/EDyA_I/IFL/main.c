@@ -11,7 +11,7 @@ int comparar_strings(void *str1, void *str2);
 
 int main() {
     THash *tablaListas = thash_crear(1000, (FuncionHash)hash, retornar_puntero, retornar_puntero, liberar_puntero,
-                                     (FuncionDestructora)dlist_destruir, comparar_strings);
+                                     (FuncionDestructora)lista_destruir, comparar_strings);
     THash *tablaFunciones = thash_crear(1000, (FuncionHash)hash, retornar_puntero, retornar_puntero, liberar_puntero,
                                         (FuncionDestructora)flista_destruir, comparar_strings);
 
@@ -32,8 +32,8 @@ int main() {
     parsear_expresion("deff Ddi = Od <Sd> Mi;", tablaListas, tablaFunciones);
     parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di Md;", tablaListas, tablaFunciones);
     parsear_expresion("search{L1,L2; L3,L4};", tablaListas, tablaFunciones);
-    // parsear_expresion("search{A,B;C,D};", tablaListas, tablaFunciones);
-    parsear_expresion("defl L5 = [23,1923,12931,2393];", tablaListas, tablaFunciones);
+    // // parsear_expresion("search{A,B;C,D};", tablaListas, tablaFunciones);
+    // parsear_expresion("defl L5 = [23,1923,12931,2393];", tablaListas, tablaFunciones);
     printf("Interprete de funciones de listas. Escriba 'help' para obtener informacion, 'exit' para terminar la "
            "ejecucion.");
     while (!exit) {

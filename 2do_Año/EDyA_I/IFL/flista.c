@@ -1,10 +1,12 @@
 #include "flista.h"
 #include "vector.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 FLista *flista_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir) {
     FLista *funcion = malloc(sizeof(FLista));
+    assert(funcion);
     funcion->vec = vector_crear(capacidad, copiar, destruir);
     return funcion;
 }
@@ -14,8 +16,10 @@ void flista_insertar(FLista *funcion, char *subFuncion) {
 }
 
 void flista_destruir(FLista *funcion) {
-    vector_destruir(funcion->vec);
-    free(funcion);
+    if (funcion) {
+        vector_destruir(funcion->vec);
+        free(funcion);
+    }
 }
 
 int flista_es_vacia(FLista *funcion) {

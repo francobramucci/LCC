@@ -12,50 +12,55 @@ typedef struct {
         DNodo *ultimo;
 } DList;
 
-/*
+/**
  * Crea una lista doblemente enlazada vacía y devuelve un puntero a ella.
  */
-DList *dlist_crear(void);
+DList *dlist_crear();
 
-/*
+/**
  * Inserta un elemento al inicio de la lista. Precondición: 'lista' no es NULL.
  */
 void dlist_agregar_inicio(DList *lista, int dato);
 
-/*
+/**
  * Inserta un elemento al final de la lista. Precondición: 'lista' no es NULL.
  */
 void dlist_agregar_final(DList *lista, int dato);
 
-/*
+/**
  * Elimina el primer elemento de la lista.
  */
 void dlist_eliminar_inicio(DList *lista);
 
-/*
+/**
  * Elimina el último elemento de la lista.
  */
 void dlist_eliminar_final(DList *lista);
 
-/*
+/**
  * Libera toda la memoria asociada a la lista.
  */
 void dlist_destruir(DList *lista);
 
-/*
+/**
  * Devuelve una copia física de la lista.
  */
 DList *dlist_copiar(DList *lista);
 
-/*
+/**
  * Compara dos listas y devuelve 1 si son iguales elemento a elemento, 0 en caso contrario.
  */
 int dlist_igual(DList *l1, DList *l2);
 
-/*
+/**
  * Imprime el contenido de la lista en la salida estándar.
  */
 void dlist_imprimir(DList *lista);
+
+/**
+ * Devuelve si la dlist es vacía o no.
+ */
+int dlist_es_vacia(DList *lista);
 
 /*
  * Devuelve 1 si la lista tiene longitud mayor a 1, 0 en caso contrario.

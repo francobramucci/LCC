@@ -1,11 +1,11 @@
 #include "parser.h"
-#include "dlist.h"
+#include "lista.h"
 #include "thash.h"
 #include "token.h"
 #include "utils.h"
 #include <stdio.h>
 
-/*
+/**
  * Verifica y procesa la definición de una lista en el input a partir de la posición dada.
  * Formato esperado: identificador = [a_0, a_1, ..., a_n];
  * - Cada a_i debe ser un número natural.
@@ -15,15 +15,15 @@
  */
 static void parsear_defl(char *input, int *posActual, THash *tablaListas);
 
-/*
+/**
  * Parsea un string con el formato de lista: [a_0, a_1, ..., a_n]
  * - Cada a_i debe ser un número natural.
  * - Se permiten espacios arbitrarios entre números y símbolos.
- * Retorna la lista como un DList* o NULL en caso de error.
+ * Retorna la lista como un Lista* o NULL en caso de error.
  */
-static DList *parsear_lista(char *lista);
+static Lista *parsear_lista(char *lista);
 
-/*
+/**
  * Verifica y procesa la definición de una función de lista en el input a partir de la posición dada.
  * Formato esperado: identificador = funcion_de_lista;
  * Si es válida, la función se almacena en la tabla de funciones usando el identificador como clave.
@@ -31,7 +31,7 @@ static DList *parsear_lista(char *lista);
  */
 static void parsear_deff(char *input, int *posActual, THash *tablaFunciones);
 
-/*
+/**
  * Parsea y valida una función de lista desde el input.
  * - Comprueba que cada subfunción esté definida.
  * - Garantiza que los identificadores estén separados por un solo espacio.
@@ -40,21 +40,22 @@ static void parsear_deff(char *input, int *posActual, THash *tablaFunciones);
  */
 static FLista *parsear_funcion(char *input, int *posActual, THash *tablaHash, int *errorCode);
 
-/*
+/**
  * Parsea y ejecuta una aplicación de función sobre una lista.
  * Formato esperado: identificador_funcion identificador_lista | lista_literal
  * Si es válido, aplica la función a la lista. En caso contrario, imprime un error.
  */
 static void parsear_apply(char *input, int *posActual, THash *tablaListas, THash *tablaFunciones);
 
-/*
- * Parsea y valida un bloque de pares de listas en el formato:
+/**
+ * Parsea y valida una lista de pares de listas en el formato:
  *   {L11, L12; L21, L22; ... Ln1, Ln2};
- * Si es válido, aplica la función de búsqueda sobre cada par.
+ * donde Lij pueden ser tanto identificadores de listas como listas literales
+ * Si es válido, aplica search en dicha lista de pares.
  */
 static void parsear_search(char *input, int *posActual, THash *tablaListas, THash *tablaFunciones);
 
-/*
+/**
  * Imprime el mensaje de error correspondiente a un código de error.
  */
 static void imprimir_errores(int errorCode);
@@ -90,7 +91,7 @@ static void parsear_defl(char *input, int *posActual, THash *tablaListas) {
     int errorCode = ERROR_SINTAXIS_SENTENCIA;
     char *identificador = NULL;
     char *listaLiteral = NULL;
-    DList *dlist = NULL;
+    Lista *lista = NULL;
     Token *tok = crear_token();
 
     obtener_siguiente_token(input, posActual, 1, tok);
@@ -112,16 +113,16 @@ static void parsear_defl(char *input, int *posActual, THash *tablaListas) {
                     obtener_siguiente_token(input, posActual, 1, tok);
                     if (tok->type == TOKEN_EOF) {
 
-                        dlist = parsear_lista(listaLiteral);
-                        if (dlist && !thash_buscar(identificador, tablaListas)) {
+                        lista = parsear_lista(listaLiteral);
+                        if (lista && !thash_buscar(identificador, tablaListas)) {
 
-                            thash_insertar(identificador, dlist, tablaListas);
+                            thash_insertar(identificador, lista, tablaListas);
                             esValido = 1;
 
                             printf("%s <-- ", identificador);
-                            dlist_imprimir(dlist);
+                            lista_imprimir(lista);
                         } else {
-                            if (!dlist)
+                            if (!lista)
                                 errorCode = ERROR_SINTAXIS_LISTA;
                             else
                                 errorCode = ERROR_LISTA_YA_DEFINIDA;
@@ -135,20 +136,20 @@ static void parsear_defl(char *input, int *posActual, THash *tablaListas) {
     if (!esValido) {
         imprimir_errores(errorCode);
         free(identificador);
-        dlist_destruir(dlist);
+        lista_destruir(lista);
     }
 
     free(listaLiteral);
     liberar_token(tok);
 }
 
-static DList *parsear_lista(char *lista) {
+static Lista *parsear_lista(char *listaLiteral) {
     int posActual = 0;
     int esValido = 1;
-    DList *dlist = dlist_crear();
+    Lista *lista = lista_crear();
     Token *tok = crear_token();
 
-    obtener_siguiente_token_lista(lista, &posActual, tok);
+    obtener_siguiente_token_lista(listaLiteral, &posActual, tok);
     if (tok->type == TOKEN_NUM || tok->type == TOKEN_EOF) {
 
         while (tok->type != TOKEN_EOF && esValido) {
@@ -156,15 +157,15 @@ static DList *parsear_lista(char *lista) {
 
             case TOKEN_NUM: {
                 int num = atoi(tok->value);
-                dlist_agregar_final(dlist, num);
+                lista_agregar_final(lista, num);
 
-                obtener_siguiente_token_lista(lista, &posActual, tok);
+                obtener_siguiente_token_lista(listaLiteral, &posActual, tok);
                 if (tok->type != TOKEN_COMA && tok->type != TOKEN_EOF)
                     esValido = 0;
                 break;
             }
             case TOKEN_COMA:
-                obtener_siguiente_token_lista(lista, &posActual, tok);
+                obtener_siguiente_token_lista(listaLiteral, &posActual, tok);
                 if (tok->type != TOKEN_NUM)
                     esValido = 0;
                 break;
@@ -178,11 +179,11 @@ static DList *parsear_lista(char *lista) {
     liberar_token(tok);
 
     if (!esValido) {
-        dlist_destruir(dlist);
+        lista_destruir(lista);
         return NULL;
     }
 
-    return dlist;
+    return lista;
 }
 
 static void parsear_deff(char *input, int *posActual, THash *tablaFunciones) {
@@ -311,7 +312,7 @@ static void parsear_apply(char *input, int *posActual, THash *tablaListas, THash
             obtener_siguiente_token(input, posActual, 1, tok);
             if (tok->type == TOKEN_IDENTIFICADOR) {
 
-                DList *lista = thash_buscar(tok->value, tablaListas);
+                Lista *lista = thash_buscar(tok->value, tablaListas);
                 if (lista) {
 
                     obtener_siguiente_token(input, posActual, 1, tok);
@@ -320,9 +321,9 @@ static void parsear_apply(char *input, int *posActual, THash *tablaListas, THash
                         obtener_siguiente_token(input, posActual, 1, tok);
                         if (tok->type == TOKEN_EOF) {
                             esValido = 1;
-                            DList *copia = dlist_copiar(lista);
+                            Lista *copia = lista_copiar(lista);
                             apply(funcion, copia, tablaFunciones, 1);
-                            dlist_destruir(copia);
+                            lista_destruir(copia);
                         }
                     }
                 } else
@@ -330,7 +331,7 @@ static void parsear_apply(char *input, int *posActual, THash *tablaListas, THash
             }
 
             if (tok->type == TOKEN_LIST_LITERAL) {
-                DList *lista = parsear_lista(tok->value);
+                Lista *lista = parsear_lista(tok->value);
 
                 obtener_siguiente_token(input, posActual, 1, tok);
                 if (tok->type == TOKEN_SEMICOLON) {
@@ -341,7 +342,7 @@ static void parsear_apply(char *input, int *posActual, THash *tablaListas, THash
                         apply(funcion, lista, tablaFunciones, 1);
                     }
                 }
-                dlist_destruir(lista);
+                lista_destruir(lista);
             }
         } else {
             errorCode = ERROR_FUNCION_NO_DEFINIDA;
@@ -358,15 +359,13 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
     int esValido = 1;
     int esPrimeraLista = 1;
     int corcheteDerLeido = 0;
-    Vector *paresDeListas = vector_crear(50, (FuncionCopiadora)dlist_copiar, (FuncionDestructora)dlist_destruir);
+    Vector *paresDeListas = vector_crear(50, (FuncionCopiadora)lista_copiar, (FuncionDestructora)lista_destruir);
 
     Token *tok = crear_token();
 
     obtener_siguiente_token(input, posActual, 1, tok);
-    if (tok->type != TOKEN_LBRACE) {
-        liberar_token(tok);
-        return;
-    }
+    if (tok->type != TOKEN_LBRACE)
+        esValido = 0;
 
     while (tok->type != TOKEN_EOF && esValido) {
         switch (tok->type) {
@@ -378,7 +377,7 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
             break;
 
         case TOKEN_IDENTIFICADOR: {
-            DList *lista = thash_buscar(tok->value, tablaListas);
+            Lista *lista = thash_buscar(tok->value, tablaListas);
             if (lista) {
                 obtener_siguiente_token(input, posActual, 1, tok);
                 if (esPrimeraLista) {
@@ -398,7 +397,7 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
         }
 
         case TOKEN_LIST_LITERAL: {
-            DList *lista = parsear_lista(tok->value);
+            Lista *lista = parsear_lista(tok->value);
             if (lista) {
                 obtener_siguiente_token(input, posActual, 1, tok);
                 if (esPrimeraLista) {
@@ -414,6 +413,7 @@ static void parsear_search(char *input, int *posActual, THash *tablaListas, THas
                 esValido = 0;
                 errorCode = ERROR_SINTAXIS_LISTA;
             }
+            lista_destruir(lista);
             break;
         }
 
@@ -460,11 +460,11 @@ static void imprimir_errores(int errorCode) {
     switch (errorCode) {
 
     case ERROR_SINTAXIS_SENTENCIA:
-        printf("Error: sintaxis de sentencia invalido.");
+        printf("Error: sintaxis de sentencia invalida.");
         break;
 
     case ERROR_SINTAXIS_LISTA:
-        printf("Error: sintaxis de lista invalido.");
+        printf("Error: sintaxis de lista invalida.");
         break;
 
     case ERROR_LISTA_NO_DEFINIDA:

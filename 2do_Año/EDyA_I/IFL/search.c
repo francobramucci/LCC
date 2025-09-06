@@ -1,6 +1,6 @@
 #include "search.h"
-#include "dlist.h"
 #include "flista.h"
+#include "lista.h"
 #include "thash.h"
 #include "utils.h"
 #include "vector.h"
@@ -27,7 +27,7 @@
  *
  * Si no se encuentra ninguna, retorna 0.
  */
-static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
+static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput, Vector *elementosTabla,
                           THash *tablaFunciones, Vector *paresDeListas);
 
 /*
@@ -55,7 +55,7 @@ void search(Vector *paresDeListas, THash *tablaFunciones) {
     FLista *funcion = flista_crear(PROFUNDIDAD_MAX, retornar_puntero, funcion_vacia);
 
     int funcionEncontrada =
-        buscar_funcion(funcion, (DList *)vector_acceder(paresDeListas, 0), (DList *)vector_acceder(paresDeListas, 1),
+        buscar_funcion(funcion, (Lista *)vector_acceder(paresDeListas, 0), (Lista *)vector_acceder(paresDeListas, 1),
                        elementosTabla, tablaFunciones, paresDeListas);
 
     if (funcionEncontrada == 1) {
@@ -69,7 +69,7 @@ void search(Vector *paresDeListas, THash *tablaFunciones) {
     vector_destruir(elementosTabla);
 }
 
-static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
+static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput, Vector *elementosTabla,
                           THash *tablaFunciones, Vector *paresDeListas) {
 
     if (flista_largo(funcion) >= PROFUNDIDAD_MAX)
@@ -77,7 +77,7 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
 
     Entrada **funciones = (Entrada **)elementosTabla->arr;
     int cantFunciones = vector_largo(elementosTabla);
-    DList *copiaInput = dlist_copiar(listaInput);
+    Lista *copiaInput = lista_copiar(listaInput);
 
     int funcionEncontrada = 0;
 
@@ -91,7 +91,7 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
             if (resultadoAplicacion != ERROR_DOMINIO && resultadoAplicacion != ERROR_CANT_EJECUCIONES) {
                 flista_insertar(funcion, subFuncion);
 
-                if (dlist_igual(copiaInput, listaOutput)) {
+                if (lista_igual(copiaInput, listaOutput)) {
                     int resultadoResto = probar_funcion_con_resto_de_pares(funcion, paresDeListas, tablaFunciones);
 
                     if (resultadoResto == SUCCESS) {
@@ -109,11 +109,11 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
                     flista_eliminar_ultimo(funcion);
             }
 
-            dlist_convertir(copiaInput, listaInput);
+            lista_convertir(copiaInput, listaInput);
         }
     }
 
-    dlist_destruir(copiaInput);
+    lista_destruir(copiaInput);
 
     return funcionEncontrada;
 }
@@ -141,14 +141,14 @@ static int probar_funcion_con_resto_de_pares(FLista *funcion, Vector *paresDeLis
     // En las posiciones pares se guardan las listas de input y en las impares
     // las listas de output
     for (int i = 2; i < largo - 1 && sonIguales && resultadoApply == SUCCESS; i += 2) {
-        DList *listaInput = dlist_copiar((DList *)vector_acceder(paresDeListas, i));
-        DList *listaOutput = (DList *)vector_acceder(paresDeListas, i + 1);
+        Lista *listaInput = lista_copiar((Lista *)vector_acceder(paresDeListas, i));
+        Lista *listaOutput = (Lista *)vector_acceder(paresDeListas, i + 1);
 
         resultadoApply = apply(funcion, listaInput, tablaFunciones, 0);
         if (resultadoApply == SUCCESS)
-            sonIguales = dlist_igual(listaInput, listaOutput);
+            sonIguales = lista_igual(listaInput, listaOutput);
 
-        dlist_destruir(listaInput);
+        lista_destruir(listaInput);
     }
 
     if (resultadoApply == SUCCESS && sonIguales)

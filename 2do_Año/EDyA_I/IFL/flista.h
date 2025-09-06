@@ -3,8 +3,6 @@
 
 #include "vector.h"
 
-// typedef Vector FLista;
-
 typedef struct {
         Vector *vec;
 } FLista;

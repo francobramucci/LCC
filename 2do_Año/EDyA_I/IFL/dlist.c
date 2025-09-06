@@ -73,9 +73,9 @@ void dlist_eliminar_final(DList *lista) {
 }
 
 void dlist_destruir(DList *lista) {
-    if (lista != NULL) {
+    if (lista) {
         DNodo *nodoAEliminar;
-        while (lista->primero != NULL) {
+        while (lista->primero) {
             nodoAEliminar = lista->primero;
             lista->primero = lista->primero->sig;
             free(nodoAEliminar);
@@ -128,6 +128,10 @@ void dlist_imprimir(DList *lista) {
         }
         printf("]");
     }
+}
+
+int dlist_es_vacia(DList *lista) {
+    return (lista->primero == NULL);
 }
 
 int dlist_largo_mayor_a_uno(DList *lista) {
