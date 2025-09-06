@@ -1,6 +1,7 @@
-#include "search.h"
 #include "dlist.h"
 #include "flista.h"
+#include "pila.h"
+#include "search.h"
 #include "thash.h"
 #include "utils.h"
 #include "vector.h"
@@ -27,7 +28,7 @@
  *
  * Si no se encuentra ninguna, retorna 0.
  */
-static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
+static int buscar_funcion(Pila *pilaFuncion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
                           THash *tablaFunciones, Vector *paresDeListas);
 
 /*
@@ -36,7 +37,7 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
  * Retorna 1 si agregar una subfuncion inmediatamente después de la última función aplicada en funcion es redundante
  * o contradictorio (por ejemplo, "Oi" seguido de "Di"). En caso contrario retorna 0.
  */
-static int podar(FLista *funcion, char *subfuncion);
+static int podar(Pila *pilaFuncion, char *subfuncion);
 
 /*
  * Verifica que la función encontrada sirva no solo con el par (listaInput, listaOutput) actual,
@@ -52,27 +53,29 @@ static int probar_funcion_con_resto_de_pares(FLista *funcion, Vector *listas, TH
 
 void search(Vector *paresDeListas, THash *tablaFunciones) {
     Vector *elementosTabla = thash_elementos_a_vector(tablaFunciones);
-    FLista *funcion = flista_crear(PROFUNDIDAD_MAX, retornar_puntero, funcion_vacia);
+    Pila *pilaFuncion = pila_crear(PROFUNDIDAD_MAX, retornar_puntero, funcion_vacia);
 
     int funcionEncontrada =
-        buscar_funcion(funcion, (DList *)vector_acceder(paresDeListas, 0), (DList *)vector_acceder(paresDeListas, 1),
-                       elementosTabla, tablaFunciones, paresDeListas);
+        buscar_funcion(pilaFuncion, (DList *)vector_acceder(paresDeListas, 0),
+                       (DList *)vector_acceder(paresDeListas, 1), elementosTabla, tablaFunciones, paresDeListas);
 
     if (funcionEncontrada == 1) {
-        flista_imprimir(funcion);
+        for (int i = 0; i < pila_largo(pilaFuncion); i++) {
+            printf("%s ", (char *)vector_acceder(pilaFuncion, i)); // FUNCION IMPRIMIR VECTOR
+        }
     }
 
     else
         printf("No se ha encontrado la funcion.");
 
-    flista_destruir(funcion);
+    pila_destruir(pilaFuncion);
     vector_destruir(elementosTabla);
 }
 
-static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
+static int buscar_funcion(Pila *pilaFuncion, DList *listaInput, DList *listaOutput, Vector *elementosTabla,
                           THash *tablaFunciones, Vector *paresDeListas) {
 
-    if (flista_largo(funcion) >= PROFUNDIDAD_MAX)
+    if (pila_largo(pilaFuncion) >= PROFUNDIDAD_MAX)
         return 0;
 
     Entrada **funciones = (Entrada **)elementosTabla->arr;
@@ -82,31 +85,33 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
     int funcionEncontrada = 0;
 
     for (int i = 0; i < cantFunciones && !funcionEncontrada; i++) {
-        if (funciones[i] && !podar(funcion, funciones[i]->key)) {
+        if (funciones[i] && !podar(pilaFuncion, funciones[i]->key)) {
             char *subFuncion = funciones[i]->key;
 
             int cantMaxEjecuciones = MAX_EJEC_APPLY_PARA_SEARCH;
             int resultadoAplicacion = aplicacion_singular(subFuncion, copiaInput, tablaFunciones, &cantMaxEjecuciones);
 
             if (resultadoAplicacion != ERROR_DOMINIO && resultadoAplicacion != ERROR_CANT_EJECUCIONES) {
-                flista_insertar(funcion, subFuncion);
+
+                pila_push(pilaFuncion, subFuncion);
 
                 if (dlist_igual(copiaInput, listaOutput)) {
-                    int resultadoResto = probar_funcion_con_resto_de_pares(funcion, paresDeListas, tablaFunciones);
+                    FLista *funcion = (FLista *)pilaFuncion;
+                    int resultadoResto = probar_funcion_con_resto_de_pares(pilaFuncion, paresDeListas, tablaFunciones);
 
                     if (resultadoResto == SUCCESS) {
                         funcionEncontrada = 1;
                     }
                     if (resultadoResto == FAIL) {
-                        funcionEncontrada = buscar_funcion(funcion, copiaInput, listaOutput, elementosTabla,
+                        funcionEncontrada = buscar_funcion(pilaFuncion, copiaInput, listaOutput, elementosTabla,
                                                            tablaFunciones, paresDeListas);
                     }
                 } else
-                    funcionEncontrada =
-                        buscar_funcion(funcion, copiaInput, listaOutput, elementosTabla, tablaFunciones, paresDeListas);
+                    funcionEncontrada = buscar_funcion(pilaFuncion, copiaInput, listaOutput, elementosTabla,
+                                                       tablaFunciones, paresDeListas);
 
                 if (!funcionEncontrada)
-                    flista_eliminar_ultimo(funcion);
+                    pila_pop(pilaFuncion);
             }
 
             dlist_convertir(copiaInput, listaInput);
@@ -118,9 +123,9 @@ static int buscar_funcion(FLista *funcion, DList *listaInput, DList *listaOutput
     return funcionEncontrada;
 }
 
-static int podar(FLista *funcion, char *subfuncion) {
-    if (!flista_es_vacia(funcion)) {
-        char *ultimaFuncion = flista_ultimo_elemento(funcion);
+static int podar(Pila *pilaFuncion, char *subfuncion) {
+    if (!flista_es_vacia(pilaFuncion)) {
+        char *ultimaFuncion = pila_top(pilaFuncion);
         return (strcmp(ultimaFuncion, "Oi") == 0 && strcmp(subfuncion, "Di") == 0) ||
                (strcmp(ultimaFuncion, "Od") == 0 && strcmp(subfuncion, "Dd") == 0) ||
                (strcmp(ultimaFuncion, "Si") == 0 && strcmp(subfuncion, "Di") == 0) ||
@@ -129,9 +134,10 @@ static int podar(FLista *funcion, char *subfuncion) {
     return 0;
 }
 
-static int probar_funcion_con_resto_de_pares(FLista *funcion, Vector *paresDeListas, THash *tablaFunciones) {
+static int probar_funcion_con_resto_de_pares(Pila *pilaFuncion, Vector *paresDeListas, THash *tablaFunciones) {
     int sonIguales = 1;
     int resultadoApply = SUCCESS;
+    FLista *funcion = (FLista *)pilaFuncion;
     int largo = vector_largo(paresDeListas);
 
     if (vector_largo(paresDeListas) <= 2) {
