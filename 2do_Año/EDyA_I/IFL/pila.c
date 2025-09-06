@@ -1,30 +1,35 @@
 #include "pila.h"
-#include "vector.h"
+#include "dlist.h"
+#include <stdlib.h>
 
-Pila *pila_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir) {
-    return vector_crear(capacidad, copiar, destruir);
+Pila *pila_crear(FuncionCopiadora copiar, FuncionDestructora destruir) {
+    Pila *pila = malloc(sizeof(Pila));
+    pila->dlist = dlist_crear(copiar, destruir);
+
+    return pila;
 }
 
 void pila_push(Pila *p, void *dato) {
-    vector_insertar(p, dato);
+    dlist_agregar_inicio(p->dlist, dato);
 }
 
 void pila_pop(Pila *p) {
-    vector_eliminar_ultimo(p);
+    dlist_eliminar_inicio(p->dlist);
 }
 
 void *pila_top(Pila *p) {
-    return vector_acceder(p, p->ultimo);
+    if (p && !dlist_es_vacia(p->dlist))
+        return p->dlist->primero->dato;
+    return NULL;
 }
 
 int pila_es_vacia(Pila *p) {
-    return vector_es_vacio(p);
-}
-
-int pila_largo(Pila *p) {
-    return vector_largo(p);
+    return dlist_es_vacia(p->dlist);
 }
 
 void pila_destruir(Pila *p) {
-    vector_destruir(p);
+    if (p) {
+        dlist_destruir(p->dlist);
+        free(p);
+    }
 }

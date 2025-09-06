@@ -1,14 +1,16 @@
 #ifndef __PILA_H_
 #define __PILA_H_
 
-#include "vector.h"
+#include "dlist.h"
 
-typedef Vector Pila;
+typedef struct {
+        DList *dlist;
+} Pila;
 
 /**
  * Crea una pila vacía y retorna un puntero a ella.
  */
-Pila *pila_crear(int capacidad, FuncionCopiadora copiar, FuncionDestructora destruir);
+Pila *pila_crear(FuncionCopiadora copiar, FuncionDestructora destruir);
 
 /**
  * Inserta un elemento en el tope de la pila.
@@ -36,9 +38,4 @@ void pila_destruir(Pila *p);
  */
 int pila_es_vacia(Pila *p);
 
-/*
- * Libera toda la memoria asociada a la pila.
- */
-int pila_largo(Pila *p);
-
-#endif // __PILA_H_
+#endif // __PILA_H__

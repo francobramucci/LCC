@@ -58,17 +58,12 @@ DList *dlist_copiar(DList *lista);
  */
 int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar);
 
-// /**
-//  * Imprime el contenido de la lista en la salida estándar.
-//  */
-// void dlist_imprimir(DList *lista);
-
 /**
  * Devuelve si la dlist es vacía o no.
  */
 int dlist_es_vacia(DList *lista);
 
-/*
+/**
  * Devuelve 1 si la lista tiene longitud mayor a 1, 0 en caso contrario.
  */
 int dlist_largo_mayor_a_uno(DList *lista);
@@ -78,4 +73,4 @@ int dlist_largo_mayor_a_uno(DList *lista);
  */
 int dlist_comparar_extremos(DList *lista, FuncionComparadora);
 
-#endif /* __DLIST_H__ */
+#endif // __DLIST_H__

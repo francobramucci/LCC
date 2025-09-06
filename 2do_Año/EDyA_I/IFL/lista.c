@@ -1,28 +1,9 @@
 #include "lista.h"
 #include "dlist.h"
+#include "utils.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-int *copiar_entero(int *i) {
-    int *j = malloc(sizeof(int));
-    assert(j);
-    *j = *i;
-
-    return j;
-}
-
-void destruir_entero(int *i) {
-    free(i);
-}
-
-int comparar_enteros(int *i, int *j) {
-    if (*i < *j)
-        return -1;
-    if (*i > *j)
-        return 1;
-    return 0;
-}
 
 Lista *lista_crear() {
     Lista *lista = malloc(sizeof(Lista));

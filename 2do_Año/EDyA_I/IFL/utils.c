@@ -14,10 +14,24 @@ char *copiar_string(char *str) {
     return copia;
 }
 
-int *copia_fisica_int(int *i) {
-    int *copia = malloc(sizeof(int));
-    *copia = *i;
-    return copia;
+int *copiar_entero(int *i) {
+    int *j = malloc(sizeof(int));
+    assert(j);
+    *j = *i;
+
+    return j;
+}
+
+void destruir_entero(int *i) {
+    free(i);
+}
+
+int comparar_enteros(int *i, int *j) {
+    if (*i < *j)
+        return -1;
+    if (*i > *j)
+        return 1;
+    return 0;
 }
 
 void *retornar_puntero(void *a) {

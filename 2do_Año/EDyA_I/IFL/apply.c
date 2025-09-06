@@ -1,4 +1,5 @@
 #include "apply.h"
+#include "dlist.h"
 #include "flista.h"
 #include "lista.h"
 #include "pila.h"
@@ -61,7 +62,7 @@ int apply(FLista *funcion, Lista *lista, THash *tablaFunciones, int imprimir) {
 
 static int apply_flista(FLista *funcion, Lista *lista, THash *tablaFunciones, int *cantMaxEjecuciones) {
     int errorCode = SUCCESS;
-    Pila *p = pila_crear(50, (FuncionCopiadora)copia_fisica_int, liberar_puntero);
+    Pila *p = pila_crear((FuncionCopiadora)copiar_entero, (FuncionDestructora)destruir_entero);
     int largoFuncion = flista_largo(funcion);
 
     for (int i = 0; i < largoFuncion && errorCode == SUCCESS; i++) {
