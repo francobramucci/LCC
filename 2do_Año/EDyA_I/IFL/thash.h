@@ -7,7 +7,6 @@ typedef void *(*FuncionCopiadora)(void *dato);
 typedef int (*FuncionComparadora)(void *dato1, void *dato2);
 typedef void (*FuncionDestructora)(void *dato);
 typedef unsigned (*FuncionHash)(void *dato);
-typedef void (*FuncionDestructora)(void *dato);
 
 /**
  * Cada una de las entradas de la tabla hash.
@@ -36,7 +35,7 @@ typedef struct {
  * Crea e inicializa una nueva tabla de hash.
  * Reserva la memoria necesaria para la tabla y sus estructuras.
  * En esta implementación de listas mezcladas se utiliza una región de direcciones con un tamaño aproximado del 86%
- *  de la capacidad total (consultar Vitter, J.S. Implementations for Coalesced Hashing, 1982), ajustado al primo mas
+ * de la capacidad total (consultar Vitter, J.S. Implementations for Coalesced Hashing, 1982), ajustado al primo mas
  * cercano. El resto se utiliza como region de colisiones o "cellar", es decir que al producirse una colision en la
  * region de direcciones, se resuelve agregando el elemento en la region de colisiones y actualizando el campo sig en el
  * nodo donde se produjo la colision. En caso de que la region de colisiones se haya llenado entonces se continua

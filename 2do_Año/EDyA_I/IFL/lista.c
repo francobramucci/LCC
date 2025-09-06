@@ -1,12 +1,33 @@
 #include "lista.h"
 #include "dlist.h"
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
+
+int *copiar_entero(int *i) {
+    int *j = malloc(sizeof(int));
+    assert(j);
+    *j = *i;
+
+    return j;
+}
+
+void destruir_entero(int *i) {
+    free(i);
+}
+
+int comparar_enteros(int *i, int *j) {
+    if (*i < *j)
+        return -1;
+    if (*i > *j)
+        return 1;
+    return 0;
+}
 
 Lista *lista_crear() {
     Lista *lista = malloc(sizeof(Lista));
     assert(lista);
-    lista->dlist = dlist_crear();
+    lista->dlist = dlist_crear((FuncionCopiadora)copiar_entero, (FuncionDestructora)destruir_entero);
 
     return lista;
 }
@@ -19,23 +40,23 @@ void lista_destruir(Lista *lista) {
 }
 
 int lista_comparar_extremos(Lista *lista) {
-    return dlist_comparar_extremos(lista->dlist);
+    return dlist_comparar_extremos(lista->dlist, (FuncionComparadora)comparar_enteros);
 }
 
 void lista_agregar_inicio(Lista *lista, int nat) {
-    dlist_agregar_inicio(lista->dlist, nat);
+    dlist_agregar_inicio(lista->dlist, &nat);
 }
 
 void lista_agregar_final(Lista *lista, int nat) {
-    dlist_agregar_final(lista->dlist, nat);
+    dlist_agregar_final(lista->dlist, &nat);
 }
 
 void lista_incrementar_izq(Lista *lista) {
-    lista->dlist->primero->dato++;
+    (*(int *)lista->dlist->primero->dato)++;
 }
 
 void lista_incrementar_der(Lista *lista) {
-    lista->dlist->ultimo->dato++;
+    (*(int *)lista->dlist->ultimo->dato)++;
 }
 
 void lista_eliminar_izq(Lista *lista) {
@@ -59,17 +80,21 @@ int lista_es_vacia(Lista *lista) {
 }
 
 int lista_igual(Lista *l1, Lista *l2) {
-    return dlist_igual(l1->dlist, l2->dlist);
+    return dlist_igual(l1->dlist, l2->dlist, (FuncionComparadora)comparar_enteros);
 }
 
 void lista_imprimir(Lista *lista) {
-    dlist_imprimir(lista->dlist);
+    if (lista->dlist != NULL) {
+        printf("[");
+        for (DNodo *temp = lista->dlist->primero; temp != NULL; temp = temp->sig) {
+            printf("%d", *(int *)temp->dato);
+            if (temp->sig != NULL)
+                printf(",");
+        }
+        printf("]");
+    }
 }
 
 int lista_largo_mayor_a_uno(Lista *lista) {
     return dlist_largo_mayor_a_uno(lista->dlist);
-}
-
-void lista_convertir(Lista *lista, Lista *listaParametro) {
-    dlist_convertir(lista->dlist, listaParametro->dlist);
 }

@@ -46,7 +46,7 @@ void flista_imprimir(FLista *funcion) {
     char *opAnt = flista_acceder(funcion, 0);
     printf("%s", flista_acceder(funcion, 0));
 
-    for (int i = 1; i <= funcion->vec->ultimo; i++) {
+    for (int i = 1; i < flista_largo(funcion); i++) {
         char *opActual = flista_acceder(funcion, i);
         if (opAnt[0] == '<' || opActual[0] == '>')
             printf("%s", opActual);

@@ -10,7 +10,7 @@
 #define PROFUNDIDAD_MAX 8
 #define MAX_EJEC_APPLY_PARA_SEARCH 10000
 
-/*
+/**
  * Busca recursivamente una secuencia de subfunciones que transforme listaInput en listaOutput.
  *
  * La búsqueda se realiza explorando todas las funciones definidas en tablaFunciones, aplicándolas a una copia
@@ -30,7 +30,7 @@
 static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput, Vector *elementosTabla,
                           THash *tablaFunciones, Vector *paresDeListas);
 
-/*
+/**
  * Determina si conviene podar la búsqueda en función de la última subfunción aplicada.
  *
  * Retorna 1 si agregar una subfuncion inmediatamente después de la última función aplicada en funcion es redundante
@@ -38,7 +38,7 @@ static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput
  */
 static int podar(FLista *funcion, char *subfuncion);
 
-/*
+/**
  * Verifica que la función encontrada sirva no solo con el par (listaInput, listaOutput) actual,
  * sino también con el resto de pares en listas.
  *
@@ -77,13 +77,14 @@ static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput
 
     Entrada **funciones = (Entrada **)elementosTabla->arr;
     int cantFunciones = vector_largo(elementosTabla);
-    Lista *copiaInput = lista_copiar(listaInput);
 
     int funcionEncontrada = 0;
 
     for (int i = 0; i < cantFunciones && !funcionEncontrada; i++) {
         if (funciones[i] && !podar(funcion, funciones[i]->key)) {
             char *subFuncion = funciones[i]->key;
+
+            Lista *copiaInput = lista_copiar(listaInput);
 
             int cantMaxEjecuciones = MAX_EJEC_APPLY_PARA_SEARCH;
             int resultadoAplicacion = aplicacion_singular(subFuncion, copiaInput, tablaFunciones, &cantMaxEjecuciones);
@@ -109,11 +110,9 @@ static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput
                     flista_eliminar_ultimo(funcion);
             }
 
-            lista_convertir(copiaInput, listaInput);
+            lista_destruir(copiaInput);
         }
     }
-
-    lista_destruir(copiaInput);
 
     return funcionEncontrada;
 }

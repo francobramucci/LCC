@@ -1,8 +1,12 @@
 #ifndef __DLIST_H__
 #define __DLIST_H__
 
+typedef void *(*FuncionCopiadora)(void *dato);
+typedef int (*FuncionComparadora)(void *dato1, void *dato2);
+typedef void (*FuncionDestructora)(void *dato);
+
 typedef struct _DNodo {
-        int dato;
+        void *dato;
         struct _DNodo *sig;
         struct _DNodo *ant;
 } DNodo;
@@ -10,22 +14,24 @@ typedef struct _DNodo {
 typedef struct {
         DNodo *primero;
         DNodo *ultimo;
+        FuncionCopiadora copiar;
+        FuncionDestructora destruir;
 } DList;
 
 /**
  * Crea una lista doblemente enlazada vacía y devuelve un puntero a ella.
  */
-DList *dlist_crear();
+DList *dlist_crear(FuncionCopiadora copiar, FuncionDestructora destruir);
 
 /**
  * Inserta un elemento al inicio de la lista. Precondición: 'lista' no es NULL.
  */
-void dlist_agregar_inicio(DList *lista, int dato);
+void dlist_agregar_inicio(DList *lista, void *dato);
 
 /**
  * Inserta un elemento al final de la lista. Precondición: 'lista' no es NULL.
  */
-void dlist_agregar_final(DList *lista, int dato);
+void dlist_agregar_final(DList *lista, void *dato);
 
 /**
  * Elimina el primer elemento de la lista.
@@ -50,12 +56,12 @@ DList *dlist_copiar(DList *lista);
 /**
  * Compara dos listas y devuelve 1 si son iguales elemento a elemento, 0 en caso contrario.
  */
-int dlist_igual(DList *l1, DList *l2);
+int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar);
 
-/**
- * Imprime el contenido de la lista en la salida estándar.
- */
-void dlist_imprimir(DList *lista);
+// /**
+//  * Imprime el contenido de la lista en la salida estándar.
+//  */
+// void dlist_imprimir(DList *lista);
 
 /**
  * Devuelve si la dlist es vacía o no.
@@ -70,17 +76,6 @@ int dlist_largo_mayor_a_uno(DList *lista);
 /**
  * Devuelve 1 si los extremos de la lista son iguales, 0 si no.
  */
-int dlist_comparar_extremos(DList *lista);
-
-/**
- * Convierte la lista 'lista' en una copia de 'listaParametro', reutilizando nodos cuando sea posible.
- * - Si 'lista' tiene más nodos que 'listaParametro', se eliminan los nodos sobrantes.
- * - Si 'lista' tiene menos nodos, se crean nodos adicionales.
- * - Se copian directamente los valores elemento a elemento.
- *
- * Esta función minimiza la cantidad de mallocs y frees realizados, lo que la hace útil cuando se requiere
- * transformar una lista existente al estado de otra sin recrearla desde cero.
- */
-void dlist_convertir(DList *lista, DList *listaParametro);
+int dlist_comparar_extremos(DList *lista, FuncionComparadora);
 
 #endif /* __DLIST_H__ */

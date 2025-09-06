@@ -19,23 +19,24 @@ int main() {
 
     int exit = 0;
 
-    parsear_expresion("defl L1 = [0,1,2];", tablaListas, tablaFunciones);
-    parsear_expresion("defl L2 = [1,2,3];", tablaListas, tablaFunciones);
-    parsear_expresion("defl L3 = [0,0,0];", tablaListas, tablaFunciones);
-    parsear_expresion("defl L4 = [1,1,1];", tablaListas, tablaFunciones);
-    parsear_expresion("defl A = [0,0];", tablaListas, tablaFunciones);
-    parsear_expresion("defl B = [7,0];", tablaListas, tablaFunciones);
-    parsear_expresion("defl C = [3];", tablaListas, tablaFunciones);
-    parsear_expresion("defl D = [10];", tablaListas, tablaFunciones);
-    parsear_expresion("deff Md = Od <Sd> Di;", tablaListas, tablaFunciones);
-    parsear_expresion("deff Mi = Oi <Si> Dd;", tablaListas, tablaFunciones);
-    parsear_expresion("deff Ddi = Od <Sd> Mi;", tablaListas, tablaFunciones);
-    parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di Md;", tablaListas, tablaFunciones);
-    parsear_expresion("search{L1,L2; L3,L4};", tablaListas, tablaFunciones);
-    // // parsear_expresion("search{A,B;C,D};", tablaListas, tablaFunciones);
+    // parsear_expresion("defl L1 = [0,1,2];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl L2 = [1,2,3];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl L3 = [0,0,0];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl L4 = [1,1,1];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl A = [0,0];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl B = [8,0];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl C = [3];", tablaListas, tablaFunciones);
+    // parsear_expresion("defl D = [11];", tablaListas, tablaFunciones);
+    // parsear_expresion("deff Md = Od <Sd> Di;", tablaListas, tablaFunciones);
+    // parsear_expresion("deff Mi = Oi <Si> Dd;", tablaListas, tablaFunciones);
+    // parsear_expresion("deff Ddi = Od <Sd> Mi;", tablaListas, tablaFunciones);
+    // parsear_expresion("deff S = Md Oi Mi Oi <Si Md Md Si Mi Mi> Dd Di Md;", tablaListas, tablaFunciones);
+    // parsear_expresion("search{L1,L2; L3,L4};", tablaListas, tablaFunciones);
+    // parsear_expresion("search{A,B;C,D};", tablaListas, tablaFunciones);
     // parsear_expresion("defl L5 = [23,1923,12931,2393];", tablaListas, tablaFunciones);
     printf("Interprete de funciones de listas. Escriba 'help' para obtener informacion, 'exit' para terminar la "
            "ejecucion.");
+
     while (!exit) {
         char buffer[1000];
         printf("\n> ");

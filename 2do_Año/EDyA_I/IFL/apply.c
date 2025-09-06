@@ -71,7 +71,7 @@ static int apply_flista(FLista *funcion, Lista *lista, THash *tablaFunciones, in
 
         if (flista_acceder(funcion, i)[0] == '<') {
             if (lista_largo_mayor_a_uno(lista)) {
-                if (!lista_comparar_extremos(lista))
+                if (lista_comparar_extremos(lista))
                     pila_push(p, &i);
                 else
                     i = avanzar_hasta_repeticion_fin(funcion, i);
@@ -81,7 +81,7 @@ static int apply_flista(FLista *funcion, Lista *lista, THash *tablaFunciones, in
 
         else if (flista_acceder(funcion, i)[0] == '>') {
             if (lista_largo_mayor_a_uno(lista)) {
-                if (!lista_comparar_extremos(lista))
+                if (lista_comparar_extremos(lista))
                     i = *(int *)pila_top(p);
                 else
                     pila_pop(p);

@@ -35,6 +35,4 @@ void lista_imprimir(Lista *lista);
 
 int lista_largo_mayor_a_uno(Lista *lista);
 
-void lista_convertir(Lista *lista, Lista *listaParametro);
-
 #endif
