@@ -47,4 +47,4 @@ void *vector_acceder(Vector *vec, int indice);
  */
 int vector_largo(Vector *vec);
 
-#endif // !__VECTOR_H__
+#endif // __VECTOR_H__

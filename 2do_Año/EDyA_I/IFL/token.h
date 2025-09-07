@@ -38,26 +38,26 @@ typedef struct {
         char *value;
 } Token;
 
-/*
- * Crea un nuevo token en memoria lo retorna.
+/**
+ * Crea un nuevo token en memoria y lo retorna.
  */
 Token *crear_token();
 
-/*
+/**
  * Libera la memoria asociada a un token previamente creado.
  * Libera cualquier string almacenado como valor.
  */
 void liberar_token(Token *token);
 
-/*
+/**
  * Función para tokenizar posibles inputs del intérprete de funciones de listas.
  * Extrae el siguiente token del input a partir de la posición indicada por posActual. Dicho token puede ser de
  * cualquier tipo perteneciente a TokenType. Si saltearEspacios es distinto de cero, ignora los espacios en blanco antes
- * de obtener el token. Almacena el token obtenido en la estructura proporcionada por el puntero token.
+ * de obtener el token. Almacena el token obtenido en el puntero a Token.
  */
 void obtener_siguiente_token(char *input, int *posActual, int saltearEspacios, Token *token);
 
-/*
+/**
  * Función para tokenizar listas.
  * Extrae el siguiente token de una lista en formato string a partir de la posición posActual.
  * Diseñada para listas numéricas con elementos separados por comas es decir de la forma a_1, a_2, ..., a_n sin
@@ -65,4 +65,4 @@ void obtener_siguiente_token(char *input, int *posActual, int saltearEspacios, T
  */
 void obtener_siguiente_token_lista(char *lista, int *posActual, Token *token);
 
-#endif // !__TOKEN_H__
+#endif // __TOKEN_H__

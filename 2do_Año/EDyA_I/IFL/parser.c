@@ -79,7 +79,7 @@ void parsear_expresion(char *input, THash *tablaListas, THash *tablaFunciones) {
         parsear_search(input, &posActual, tablaListas, tablaFunciones);
         break;
     default:
-        printf("Tipo de sentencia invalida");
+        printf("Tipo de sentencia invalida.");
         break;
     }
 

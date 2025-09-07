@@ -18,13 +18,13 @@ Pila *pila_crear(FuncionCopiadora copiar, FuncionDestructora destruir);
 void pila_push(Pila *p, void *dato);
 
 /**
- * Elimina el elemento en el tope de la pila.
+ * Elimina el elemento del tope de la pila.
  */
 void pila_pop(Pila *p);
 
 /**
  * Retorna el valor almacenado en el tope de la pila sin eliminarlo.
- * Si la pila está vacía, retorna -1.
+ * Si la pila está vacía, retorna NULL.
  */
 void *pila_top(Pila *p);
 

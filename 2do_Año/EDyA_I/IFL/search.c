@@ -81,7 +81,7 @@ static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput
     int funcionEncontrada = 0;
 
     for (int i = 0; i < cantFunciones && !funcionEncontrada; i++) {
-        if (funciones[i] && !podar(funcion, funciones[i]->key)) {
+        if (!podar(funcion, funciones[i]->key)) {
             char *subFuncion = funciones[i]->key;
 
             Lista *copiaInput = lista_copiar(listaInput);

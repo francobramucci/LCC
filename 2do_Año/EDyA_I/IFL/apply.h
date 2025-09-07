@@ -17,19 +17,19 @@ enum {
     FAIL
 };
 
-/*
+/**
  * Aplica una función de lista sobre la lista dada.
  * - La lista es modificada en el lugar.
- * - El parámetro `imprimir` indica si deben mostrarse resultados y/o errores.
+ * - El parámetro 'imprimir' indica si deben mostrarse resultados y/o errores.
  * Retorna un código definido en la enumeración anterior.
  */
 int apply(FLista *funcion, Lista *lista, THash *tablaFunciones, int imprimir);
 
-/*
+/**
  * Aplica una función singular sobre una lista.
- * - Si `id` corresponde a una función primitiva, se ejecuta directamente.
- * - En caso contrario, se busca su definición en `tablaFunciones` y se llama a `apply_flista`.
- * - `cantMaxEjecuciones` se utiliza como contador/límite de aplicaciones.
+ * - Si 'id' corresponde a una función primitiva, se ejecuta directamente.
+ * - En caso contrario, se busca su definición en 'tablaFunciones' y se llama a 'apply_flista'.
+ * - 'cantMaxEjecuciones' se utiliza como contador/límite de aplicaciones.
  * Retorna un código definido en la enumeración anterior.
  */
 int aplicacion_singular(char *id, Lista *lista, THash *tablaFunciones, int *cantMaxEjecuciones);

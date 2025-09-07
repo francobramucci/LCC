@@ -81,4 +81,4 @@ void thash_destruir(THash *hashTable);
  */
 Vector *thash_elementos_a_vector(THash *tablaHash);
 
-#endif // !__THASH_H__
+#endif // __THASH_H__

@@ -37,18 +37,18 @@ int main() {
     printf("Interprete de funciones de listas. Escriba 'help' para obtener informacion, 'exit' para terminar la "
            "ejecucion.");
 
-    // while (!exit) {
-    //     char buffer[1000];
-    //     printf("\n> ");
-    //     scanf(" %[^\n]", buffer);
-    //
-    //     if (!strcmp(buffer, "exit"))
-    //         exit = 1;
-    //     else if (!strcmp(buffer, "help"))
-    //         imprimir_ayuda();
-    //     else
-    //         parsear_expresion(buffer, tablaListas, tablaFunciones);
-    // }
+    while (!exit) {
+        char buffer[1000];
+        printf("\n> ");
+        scanf(" %[^\n]", buffer);
+
+        if (!strcmp(buffer, "exit"))
+            exit = 1;
+        else if (!strcmp(buffer, "help"))
+            imprimir_ayuda();
+        else
+            parsear_expresion(buffer, tablaListas, tablaFunciones);
+    }
 
     thash_destruir(tablaListas);
     thash_destruir(tablaFunciones);
@@ -92,7 +92,7 @@ unsigned hash(char *key) {
     unsigned hashval;
 
     for (hashval = 0; *key != '\0'; key++) {
-        hashval = *key + 67 * hashval;
+        hashval = *key + 31 * hashval;
     }
 
     return hashval;

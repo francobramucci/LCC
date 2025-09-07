@@ -1,6 +1,4 @@
 Crear make file con flags de compilacion
 Hacer informe
-Generalizar listas
-Cambiar estructuras
 Probar memo
 

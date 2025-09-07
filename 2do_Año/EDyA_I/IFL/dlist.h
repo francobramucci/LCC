@@ -24,12 +24,12 @@ typedef struct {
 DList *dlist_crear(FuncionCopiadora copiar, FuncionDestructora destruir);
 
 /**
- * Inserta un elemento al inicio de la lista. Precondición: 'lista' no es NULL.
+ * Inserta un elemento al inicio de la lista.
  */
 void dlist_agregar_inicio(DList *lista, void *dato);
 
 /**
- * Inserta un elemento al final de la lista. Precondición: 'lista' no es NULL.
+ * Inserta un elemento al final de la lista.
  */
 void dlist_agregar_final(DList *lista, void *dato);
 

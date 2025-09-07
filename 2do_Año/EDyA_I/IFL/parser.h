@@ -1,5 +1,6 @@
 #ifndef __PARSER_H__
 #define __PARSER_H__
+
 #include "search.h"
 #include "token.h"
 
@@ -22,7 +23,7 @@ enum {
     ERROR_FUNCION_YA_DEFINIDA
 };
 
-/*
+/**
  * Parsea una expresión completa desde el input.
  * Según el contenido, delega el análisis a las funciones correspondientes:
  *   - Definición de lista

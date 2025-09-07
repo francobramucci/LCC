@@ -3,7 +3,7 @@
 
 #include "apply.h"
 
-/*
+/**
  * Busca una función de lista que transforme el primer elementro de cada par de listas (posicion par) en el
  * segundo (posicion impar) en paresDeListas.
  * Si se encuentra una función válida, la imprime.
