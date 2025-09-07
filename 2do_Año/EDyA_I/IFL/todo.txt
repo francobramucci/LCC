@@ -1,4 +1,0 @@
-Crear make file con flags de compilacion
-Hacer informe
-Probar memo
-
