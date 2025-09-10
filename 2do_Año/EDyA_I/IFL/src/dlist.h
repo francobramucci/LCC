@@ -4,6 +4,7 @@
 typedef void *(*FuncionCopiadora)(void *dato);
 typedef int (*FuncionComparadora)(void *dato1, void *dato2);
 typedef void (*FuncionDestructora)(void *dato);
+typedef void (*FuncionVisitanteExtra)(void* dato1, void* extra);
 
 typedef struct _DNodo {
         void *dato;
@@ -57,6 +58,11 @@ DList *dlist_copiar(DList *lista);
  * Compara dos listas y devuelve 1 si son iguales elemento a elemento, 0 en caso contrario.
  */
 int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar);
+
+/**
+ * Recorre la lista y aplica una funcion visitante con un parametro extra.
+ */
+void dlist_recorrer(DList *lista, FuncionVisitanteExtra visitar, void* extra);
 
 /**
  * Devuelve si la dlist es vacía o no.

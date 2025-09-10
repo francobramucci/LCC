@@ -69,6 +69,11 @@ int lista_es_vacia(Lista *lista);
 int lista_igual(Lista *l1, Lista *l2);
 
 /**
+ * Dada una lista, retorna un valor unsigned 
+ */
+unsigned lista_hash(Lista* lista);
+
+/**
  * Imprime el contenido de la lista.
  */
 void lista_imprimir(Lista *lista);

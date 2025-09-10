@@ -25,14 +25,14 @@ int main() {
     while (!exit) {
         char buffer[1000];
         printf("\n> ");
-        scanf(" %[^\n]", buffer);
-
-        if (!strcmp(buffer, "exit"))
-            exit = 1;
-        else if (!strcmp(buffer, "help"))
-            imprimir_ayuda();
-        else
-            parsear_expresion(buffer, tablaListas, tablaFunciones);
+        if(scanf(" %[^\n]", buffer)){
+            if (!strcmp(buffer, "exit"))
+                exit = 1;
+            else if (!strcmp(buffer, "help"))
+                imprimir_ayuda();
+            else
+                parsear_expresion(buffer, tablaListas, tablaFunciones);
+        }
     }
 
     thash_destruir(tablaListas);

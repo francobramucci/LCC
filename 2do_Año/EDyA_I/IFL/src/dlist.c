@@ -124,25 +124,13 @@ int dlist_igual(DList *l1, DList *l2, FuncionComparadora comparar) {
     return sonIguales;
 }
 
-// void dlist_recorrer(DList *lista, FuncionVisitante visitar) {
-//     if (lista) {
-//         for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
-//             visitar(temp->dato);
-//         }
-//     }
-// }
-
-// void dlist_imprimir(DList *lista) {
-//     if (lista != NULL) {
-//         printf("[");
-//         for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
-//             printf("%d", temp->dato);
-//             if (temp->sig != NULL)
-//                 printf(",");
-//         }
-//         printf("]");
-//     }
-// }
+void dlist_recorrer(DList *lista, FuncionVisitanteExtra visitar, void* extra) {
+    if (lista) {
+        for (DNodo *temp = lista->primero; temp != NULL; temp = temp->sig) {
+            visitar(temp->dato, extra);
+        }
+    }
+}
 
 int dlist_es_vacia(DList *lista) {
     return (!lista->primero);

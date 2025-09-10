@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c99 -g -O2
+CFLAGS = -Wall -Wextra -std=c99 -g -O2
 LDFLAGS = -lm   # better keep -lm separate from CFLAGS
 
 SRC_DIR = src

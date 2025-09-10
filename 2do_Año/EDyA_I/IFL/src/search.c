@@ -5,9 +5,10 @@
 #include "utils.h"
 #include "vector.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define PROFUNDIDAD_MAX 8
+#define PROFUNDIDAD_MAX 11
 #define MAX_EJEC_APPLY_PARA_SEARCH 10000
 
 /**
@@ -28,7 +29,7 @@
  * Si no se encuentra ninguna, retorna 0.
  */
 static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput, Vector *elementosTabla,
-                          THash *tablaFunciones, Vector *paresDeListas);
+                          THash *tablaFunciones, Vector *paresDeListas, THash *tablaEstadoslista);
 
 /**
  * Determina si conviene podar la búsqueda en función de la última subfunción aplicada.
@@ -50,13 +51,33 @@ static int podar(FLista *funcion, char *subfuncion);
  */
 static int probar_funcion_con_resto_de_pares(FLista *funcion, Vector *listas, THash *tablaFunciones);
 
+typedef struct {
+        Lista *lista;
+        int profundidad;
+} estadoLista;
+
+estadoLista *estadoLista_crear(Lista *lista, int profundidad) {
+    estadoLista *nuevoEstado = malloc(sizeof(estadoLista));
+    nuevoEstado->lista = lista;
+    nuevoEstado->profundidad = profundidad;
+
+    return nuevoEstado;
+}
+
+int lista_comparar(Lista *l1, Lista *l2) {
+    return !lista_igual(l1, l2);
+}
+
 void search(Vector *paresDeListas, THash *tablaFunciones) {
+    THash *tablaEstadosLista =
+        thash_crear(300000, (FuncionHash)lista_hash, retornar_puntero, retornar_puntero,
+                    (FuncionDestructora)lista_destruir, liberar_puntero, (FuncionComparadora)lista_comparar);
     Vector *elementosTabla = thash_elementos_a_vector(tablaFunciones);
     FLista *funcion = flista_crear(PROFUNDIDAD_MAX, retornar_puntero, funcion_vacia);
 
     int funcionEncontrada =
         buscar_funcion(funcion, (Lista *)vector_acceder(paresDeListas, 0), (Lista *)vector_acceder(paresDeListas, 1),
-                       elementosTabla, tablaFunciones, paresDeListas);
+                       elementosTabla, tablaFunciones, paresDeListas, tablaEstadosLista);
 
     if (funcionEncontrada == 1) {
         flista_imprimir(funcion);
@@ -67,12 +88,15 @@ void search(Vector *paresDeListas, THash *tablaFunciones) {
 
     flista_destruir(funcion);
     vector_destruir(elementosTabla);
+    thash_destruir(tablaEstadosLista);
 }
 
 static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput, Vector *elementosTabla,
-                          THash *tablaFunciones, Vector *paresDeListas) {
+                          THash *tablaFunciones, Vector *paresDeListas, THash *tablaEstadosLista) {
 
-    if (flista_largo(funcion) >= PROFUNDIDAD_MAX)
+    int largoFuncion = flista_largo(funcion);
+
+    if (largoFuncion >= PROFUNDIDAD_MAX)
         return 0;
 
     Entrada **funciones = (Entrada **)elementosTabla->arr;
@@ -92,22 +116,44 @@ static int buscar_funcion(FLista *funcion, Lista *listaInput, Lista *listaOutput
             if (resultadoAplicacion != ERROR_DOMINIO && resultadoAplicacion != ERROR_CANT_EJECUCIONES) {
                 flista_insertar(funcion, subFuncion);
 
-                if (lista_igual(copiaInput, listaOutput)) {
-                    int resultadoResto = probar_funcion_con_resto_de_pares(funcion, paresDeListas, tablaFunciones);
+                largoFuncion++;
 
-                    if (resultadoResto == SUCCESS) {
-                        funcionEncontrada = 1;
-                    }
-                    if (resultadoResto == FAIL) {
+                estadoLista *estadoExistente = (estadoLista *)thash_buscar(copiaInput, tablaEstadosLista);
+
+                // Si el estado no existe o existe pero fue generado por una función de mayor profundidad
+                // seguimos por la rama.
+                if (!estadoExistente || (estadoExistente && estadoExistente->profundidad > largoFuncion)) {
+
+                    if (lista_igual(copiaInput, listaOutput)) {
+                        int resultadoResto = probar_funcion_con_resto_de_pares(funcion, paresDeListas, tablaFunciones);
+
+                        if (resultadoResto == SUCCESS) {
+                            funcionEncontrada = 1;
+                        }
+                        if (resultadoResto == FAIL) {
+                            funcionEncontrada = buscar_funcion(funcion, copiaInput, listaOutput, elementosTabla,
+                                                               tablaFunciones, paresDeListas, tablaEstadosLista);
+                        }
+                    } else {
+                        if (estadoExistente && estadoExistente->profundidad > largoFuncion) {
+                            estadoExistente->profundidad = largoFuncion;
+                        } else {
+                            Lista *copiaListaApply = lista_copiar(copiaInput);
+                            estadoLista *estado = estadoLista_crear(copiaListaApply, largoFuncion);
+                            thash_insertar(copiaListaApply, estado, tablaEstadosLista);
+                        }
                         funcionEncontrada = buscar_funcion(funcion, copiaInput, listaOutput, elementosTabla,
-                                                           tablaFunciones, paresDeListas);
+                                                           tablaFunciones, paresDeListas, tablaEstadosLista);
                     }
-                } else
-                    funcionEncontrada =
-                        buscar_funcion(funcion, copiaInput, listaOutput, elementosTabla, tablaFunciones, paresDeListas);
 
-                if (!funcionEncontrada)
+                    if (!funcionEncontrada) {
+                        flista_eliminar_ultimo(funcion);
+                        largoFuncion--;
+                    }
+                } else {
                     flista_eliminar_ultimo(funcion);
+                    largoFuncion--;
+                }
             }
 
             lista_destruir(copiaInput);

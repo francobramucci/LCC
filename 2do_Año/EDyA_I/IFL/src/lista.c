@@ -64,6 +64,17 @@ int lista_igual(Lista *l1, Lista *l2) {
     return dlist_igual(l1->dlist, l2->dlist, (FuncionComparadora)comparar_enteros);
 }
 
+void hash_visit(int* dato, int* hashval) {
+    *hashval = *dato + 31 * *hashval;
+}
+unsigned lista_hash(Lista* lista) {
+    unsigned hashval = 0;
+    
+    dlist_recorrer(lista->dlist, (FuncionVisitanteExtra)hash_visit, &hashval);
+
+    return hashval;
+}
+
 void lista_imprimir(Lista *lista) {
     if (lista->dlist != NULL) {
         printf("[");
