@@ -36,4 +36,19 @@ endfunction
  * no se pierde ninguna cifra significativa.
  */
 
+ // Ejercicio 3
+ // b)
+ // Dado un polinomio y un valor, evalua dicho polinomio en ese valor
+ // mihorner: polinomio, real -> real
+function b0 = mihorner(p, x0)
+    grado = degree(p)
+    b0 = coeff(p, grado)
+
+    for i = grado-1:-1:0
+        b0 = coeff(p, i) + x0 * b0 
+    end
+endfunction
+
+
+
 
