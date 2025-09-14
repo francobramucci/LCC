@@ -1,7 +1,7 @@
 // Ejercicio 1.
 // Recibe un polinomio con discriminante positivo y devuelve un vector
 // con sus raices calculadas de forma robusta.
-// misraices: polinomio -> vector
+// misraices: polinomio -> [real, real]
 function r = misraices(p)
     a = coeff(p, 2)
     b = coeff(p, 1)
@@ -27,6 +27,7 @@ function s = suma2()
     s = 0.2849 * 10**3 + 0.3244 * 10**3 + 0.9123 * 10**3 + 9.222 * 10**3
 endfunction
 
+// Suma normal
 function s = suma3()
     s = 0.9222 * 10**4 + 0.9123 * 10**3 + 0.3244 * 10**3 + 0.2849 * 10**3
 endfunction
@@ -38,7 +39,7 @@ endfunction
 
  // Ejercicio 3
  // b)
- // Dado un polinomio y un valor, evalua dicho polinomio en ese valor
+ // Dado un polinomio p y un valor x0 retorna p(x0)
  // mihorner: polinomio, real -> real
 function b0 = mihorner(p, x0)
     grado = degree(p)
@@ -49,6 +50,10 @@ function b0 = mihorner(p, x0)
     end
 endfunction
 
+//d)
+// Dado un polinomio p y un valor x0. Devuelve un vector con primera componente
+// igual a p(x0) y segunda componente p'(x0)
+// horner_derivat: polinomio, real -> [real, real]
 function v = horner_derivat(p, x0)
     grado = degree(p)
     bi = coeff(p, grado)
@@ -65,6 +70,15 @@ function v = horner_derivat(p, x0)
     v(2) = Dp0
 endfunction
 
+// Ejercicio 4
+
+function Df = derivar(f, v, n, h)
+    if n == 0 then
+        Df = f(v)
+    else
+        Df = (derivar(f, v+h, n-1, h) - derivar(f, v, n-1, h)) / h
+    end
+endfunction
 
 
 
