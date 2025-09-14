@@ -49,6 +49,25 @@ function b0 = mihorner(p, x0)
     end
 endfunction
 
+function v = horner_derivat(p, x0)
+    grado = degree(p)
+    bi = coeff(p, grado)
+    Dp0 = bi 
+
+    for k = grado-1:-1:0
+        bi = coeff(p, k) + x0 * bi
+        if k > 0 then
+            Dp0 = bi + x0 * Dp0
+        end
+    end
+
+    v(1) = bi
+    v(2) = Dp0
+endfunction
+
+
+
+
 
 
 
