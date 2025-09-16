@@ -80,6 +80,36 @@ function Df = derivar(f, v, n, h)
     end
 endfunction
 
+function valor = derivar2(f, v, n, h)
+    deff("y=DF0(x)", "y=f(x)")
+    if n == 0 then 
+        valor = DF0(v)
+    else
+        for i = 1:(n-1)
+            deff("y = DF"+string(i)+"(x)","y = numderivative(DF"+string(i-1) + ", x," + string(h) + ", 4)")
+        end
+
+        deff("y = DFn(x)", "y = numderivative(DF"+string(n-1)+", x, h, 4)")
+        valor = DFn(v)
+    end
+endfunction
+
+// Ejercicio 5
+
+function T = taylor(f, a, n)
+    x = poly(0,"x")
+    p = f(a)
+
+    for i = 1:n
+        p = p + derivar2(f, a, i, 0.0001) * (x-a)^i
+    end
+
+    T = p
+endfunction
+
+
+
+
 
 
 
