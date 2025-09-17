@@ -86,12 +86,21 @@ function valor = derivar2(f, v, n, h)
         valor = DF0(v)
     else
         for i = 1:(n-1)
-            deff("y = DF"+string(i)+"(x)","y = numderivative(DF"+string(i-1) + ", x," + string(h) + ", 4)")
+            deff("y = DF"+string(i)+"(x)","y = numderivative(DF"+string(i-1) + ", x, " + string(h) + ", 4)")
         end
 
-        deff("y = DFn(x)", "y = numderivative(DF"+string(n-1)+", x, h, 4)")
+        deff("y = DFn(x)", "y = numderivative(DF"+string(n-1)+", x, " + string(h) + ", 4)")
         valor = DFn(v)
     end
+endfunction
+
+function Df = derivar_gpt(f, v, n, h)
+    Df = 0
+    for k = 0:n
+        coef = (-1)^k * nchoosek(n, k)
+        Df = Df + coef * f(v + (n-k)*h)
+    end
+    Df = Df / (h^n)
 endfunction
 
 // Ejercicio 5
@@ -101,7 +110,7 @@ function T = taylor(f, a, n)
     p = f(a)
 
     for i = 1:n
-        p = p + derivar2(f, a, i, 0.0001) * (x-a)^i
+        p = p + (1/factorial(i)) * derivar2(f, a, i, 0.001) * (x-a)^i
     end
 
     T = p
