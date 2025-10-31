@@ -76,16 +76,18 @@ function [x,a] = gausselim(A,b)
                 SR = SR + 1
                 MD = MD + 1
             end;
-            for j=1:k        // no hace falta para calcular la solución x
-                a(i,j) = 0;  // no hace falta para calcular la solución x
-            end              // no hace falta para calcular la solución x
-            disp("MD:"+ string(MD))
+            // for j=1:k        // no hace falta para calcular la solución x
+            //     a(i,j) = 0;  // no hace falta para calcular la solución x
+            // end              // no hace falta para calcular la solución x
+            a(i,k) = 0
         end;
 
+        disp("MD:"+ string(MD))
     end;
 
     // Sustitución regresiva
     x(n) = a(n,n+1)/a(n,n);
+    MD = MD + 1
     for i = n-1:-1:1
         sumk = 0
         for k=i+1:n
@@ -97,6 +99,10 @@ function [x,a] = gausselim(A,b)
         MD = MD + 1
         SR = SR + 1
     end;
+
+    disp("Cantidad de sumas y restas realizadas: " + string(SR))
+    disp("Cantidad de multiplicaciones y divisiones realizadas: " + string(MD))
+
 endfunction
 
 disp("i)")
@@ -137,6 +143,8 @@ b2 = [-8 -20 -2 4]'
 
 [x2,a2] = gausselim(A2,b2)
 
+
+A = []
 // !--error 27 
 //Division by zero...
 //at line      24 of function gausselim called by :  
