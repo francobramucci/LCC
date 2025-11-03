@@ -1,4 +1,5 @@
-// 1
+// 1)
+
 function s = resolver_triangular_superior(A, b, n)
     x(n) = b(n) / A(n,n)
 
@@ -40,9 +41,9 @@ function s = resolver_triangular_inferior(A, b, n)
 
     s = x
 endfunction
+//---------------------------------------------------------------------------//
 
-//2
-
+// 2)
 
 // Esta función obtiene la solución del sistema de ecuaciones lineales A*x=b, 
 // dada la matriz de coeficientes A y el vector b.
@@ -144,9 +145,257 @@ b2 = [-8 -20 -2 4]'
 [x2,a2] = gausselim(A2,b2)
 
 
-A = []
-// !--error 27 
-//Division by zero...
-//at line      24 of function gausselim called by :  
-//[x2,a2] = gausselim(A2,b2)
+// Eliminación Gaussiana optimizada usando cálculos con submatrices
+function [x,a] = gausselim2(A,b)
+    [nA,mA] = size(A) 
+    [nb,mb] = size(b)
+
+    if nA<>mA then
+        error('gausselim - La matriz A debe ser cuadrada');
+        abort;
+    elseif mA<>nb then
+        error('gausselim - dimensiones incompatibles entre A y b');
+        abort;
+    end;
+
+    a = [A b]; // Matriz aumentada
+
+    // Eliminación progresiva
+    n = nA;
+    for k=1:n-1
+        // Calculo multiplicadores
+        M = a(k+1:n, k) / a(k,k) 
+
+        // Resto la fila pivote multiplicada por el respectivo multiplicador a 
+        // cada fila debajo de la fila pivote en columnas distintas de la del pivote
+        a(k+1:n, k+1:n+1) = a(k+1:n, k+1:n+1) - M * a(k, k+1:n+1)
+        
+        // Elementos debajo del pivote igualados a 0
+        a(k+1:n, k) = 0
+    end;
+
+    // Sustitución regresiva
+    x(n) = a(n,n+1) / a(n,n);
+    for i = n-1:-1:1
+        sumk = 0
+        for k=i+1:n
+            sumk = sumk + a(i,k) * x(k);
+        end;
+        x(i) = (a(i,n+1)-sumk) / a(i,i);
+    end;
+endfunction
+
+//---------------------------------------------------------------------------//
+
+// 3)
+
+function [x,a] = gausselim_mult(A,B)
+    [nA,mA] = size(A) 
+    [nB,mB] = size(B)
+
+    if nA<>mA then
+        error('gausselim - La matriz A debe ser cuadrada');
+        abort;
+    elseif mA<>nB then
+        error('gausselim - dimensiones incompatibles entre A y B');
+        abort;
+    end;
+
+    a = [A B]; // Matriz aumentada
+
+    // Eliminación progresiva
+    n = nA;
+    for k=1:n-1
+        // Calculo multiplicadores
+        M = a(k+1:n, k) / a(k,k) 
+
+        // Resto la fila pivote multiplicada por el respectivo multiplicador a 
+        // cada fila debajo de la fila pivote en columnas distintas de la del pivote
+        a(k+1:n, k+1:n+nB) = a(k+1:n, k+1:n+nB) - M * a(k, k+1:n+nB)
+        
+        // Elementos debajo del pivote igualados a 0
+        a(k+1:n, k) = 0
+    end;
+
+    // Sustitución regresiva
+    x(n, :) = a(n, n+1:n+nB) / a(n,n)
+    for i = n-1:-1:1
+        sumk = 0
+        for k=i+1:n
+            sumk = sumk + a(i,k) * x(k, 1:n);
+        end;
+        x(i, :) = (a(i, n+1:n+nB)-sumk) / a(i,i);
+    end;
+endfunction
+
+function Ainv = inv_gausselim(A)
+    if nA<>mA then
+        error('gausselim - La matriz A debe ser cuadrada');
+        abort;
+    end
+
+    [n,m] = size(A)
+    Ainv = gausselim_mult(A, eye(n,m))
+endfunction
+
+//---------------------------------------------------------------------------//
+
+// 4)
+
+function d = det_gausselim(A)
+     [n,m] = size(A) 
+
+    if n<>m then
+        error('gausselim - La matriz A debe ser cuadrada');
+        abort;
+    end
+
+    a = A
+    // Eliminación progresiva
+    for k=1:n-1
+        // Calculo multiplicadores
+        M = a(k+1:n, k) / a(k,k) 
+
+        // Resto la fila pivote multiplicada por el respectivo multiplicador a 
+        // cada fila debajo de la fila pivote en columnas distintas de la del pivote
+        a(k+1:n, k+1:n) = a(k+1:n, k+1:n) - M * a(k, k+1:n)
+        
+        // Elementos debajo del pivote igualados a 0
+        a(k+1:n, k) = 0
+    end;
+    
+    d = prod(diag(a))
+endfunction
+
+//---------------------------------------------------------------------------//
+
+// 5)
+
+// Esta función obtiene la solución del sistema de ecuaciones lineales A*x=b, 
+// dada la matriz de coeficientes A y el vector b.
+// La función implementa el método de Eliminación Gaussiana con pivoteo parcial.
+function [x,a] = gausselimPP(A,b)
+    [nA,mA] = size(A) 
+    [nb,mb] = size(b)
+
+    if nA<>mA then
+        error('gausselimPP - La matriz A debe ser cuadrada');
+        abort;
+    elseif mA<>nb then
+        error('gausselimPP - dimensiones incompatibles entre A y b');
+        abort;
+    end;
+
+    a = [A b]; // Matriz aumentada
+    n = nA;    // Tamaño de la matriz
+
+    // Eliminación progresiva con pivoteo parcial
+    for k=1:n-1
+        // Obtener la posición del mayor elemento en valor absoluto para evitar 
+        // errores de redondeo
+        [_, kpivot] = max(abs(a(k:n, k)))
+        kpivot = kpivot + k-1
+
+        // Intercambiar la fila pivot elegida por la fila pivot original 
+        a([kpivot k], :) = a([k kpivot], :)
+        disp("!!")
+        disp(a)
+        disp("!!")
+
+        // Calculo multiplicadores
+        M = a(k+1:n, k) / a(k,k) 
+
+        // Resto la fila pivote multiplicada por el respectivo multiplicador a 
+        // cada fila debajo de la fila pivote en columnas distintas de la del pivote
+        a(k+1:n, k+1:n+1) = a(k+1:n, k+1:n+1) - M * a(k, k+1:n+1)
+        
+        // Elementos debajo del pivote igualados a 0
+        a(k+1:n, k) = 0
+    end;
+
+    // Sustitución regresiva
+    x(n) = a(n,n+1)/a(n,n);
+    for i = n-1:-1:1
+        sumk = 0
+        for k=i+1:n
+            sumk = sumk + a(i,k)*x(k);
+        end;
+        x(i) = (a(i,n+1)-sumk)/a(i,i);
+    end;
+endfunction
+
+// Ejemplo de aplicación
+A2 = [0 2 3; 2 0 3; 8 16 -1]
+b2 = [7 13 -3]'
+
+[x2,a2] = gausselimPP(A2,b2)
+disp(x2)
+disp(a2)
+
+//---------------------------------------------------------------------------//
+
+// 6)
+
+function [x,a] = gausselim_tridiag(A,b)
+    SR = 0
+    MD = 0
+
+    [nA,mA] = size(A) 
+    [nb,mb] = size(b)
+
+    if nA<>mA then
+        error('gausselimPP - La matriz A debe ser cuadrada');
+        abort;
+    elseif mA<>nb then
+        error('gausselimPP - dimensiones incompatibles entre A y b');
+        abort;
+    end;
+    
+    a = [A b]
+    n = nA
+
+    // Eliminación progresiva
+    for k=1:n-1
+        // Calculo multiplicadores
+        M = a(k+1, k) / a(k,k)
+        MD = MD + 1
+    
+        // Resto el elemento de mi tridiagonal c_i por el multiplicador al b_{i+1}
+        // y lo propio en la columna del vector solución
+        a(k+1, [k+1 n+1]) = a(k+1, [k+1 n+1]) - M * a(k, [k+1 n+1])
+        MD = MD + 2
+        SR = SR + 2
+        
+        // Se elimina el elemento debajo del pivote
+        a(k+1, k) = 0
+    end
+
+    // Sustitución regresiva
+    
+    x(n) = a(n, n+1) / a(n,n)
+    MD = MD + 1
+
+    for i=n-1:-1:1
+        x(i) = (a(i, n+1) - a(i, i+1) * x(i+1)) / a(i,i)
+        SR = SR + 1
+        MD = MD + 2
+    end
+
+    disp("La cantidad de sumas y restas es: " + string(SR))
+    disp("La cantidad de multiplicaciones y divisiones es: " + string(MD))
+endfunction
+
+//---------------------------------------------------------------------------//
+
+// 7)
+
+
+
+
+
+
+
+
+
+
 
