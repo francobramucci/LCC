@@ -389,8 +389,47 @@ endfunction
 
 // 7)
 
+function [P, A, L, U] = lu_gauss_pivot(A)
+    [nA, mA] = size(A)
 
+    if nA<>mA then
+        error('lu_gauss_pivot - La matriz A debe ser cuadrada');
+        abort;
+    end
 
+    U = A
+    L = eye(nA, mA)
+    P = eye(nA, mA)
+    
+    n = nA
+    for k=1:n-1
+        [_, i] = max(abs(a(k:n, k)))
+        i = i + k-1
+        
+        U([k i], k:n) = U([i k], k:n)
+        L([k i], 1:k-1) = L([i k], 1:k-1)
+        P([k i], :) = P([i k], :)
+
+        for j=k+1:n
+            L(j,k) = U(j,k)/U(k,k)
+            U(j, k:n) = U(j, k:n) - L(j, k) * U(k, k:n)
+        end
+    end
+
+endfunction
+
+A = [2 1 1 0; 4 3 3 1; 8 7 9 5; 6 7 9 8]
+[P, A, L, U] = lu_gauss_pivot(A)
+
+//---------------------------------------------------------------------------//
+
+// 8)
+
+A = [1.012 -2.132 3.104; -2.132 4.096 -7.013; 3.104 -7.013 0.014]
+[P, A, L, U] = lu_gauss_pivot(A)
+
+A1 = [2.1756 4.0231 -2.1732 5.1967; -4.0231 6.0000 0 1.1973; -1.0000 5.2107 1.1111 0; 6.0235 7.0000 0 4.1561]
+[P1, A1, L1, U1] = lu_gauss_pivot(A1)
 
 
 
