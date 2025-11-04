@@ -1,28 +1,51 @@
 // 1)
 
-function s = resolver_triangular_superior(A, b, n)
+function x = resolver_triangular_superior(A, b)
+	[nA, mA] = size(A)
+	[nb, mb] = size(b)
+
+	if nA<>mA then
+        error('resolver_triangular_superior - La matriz A debe ser cuadrada');
+        abort;
+    elseif mA<>nb then
+        error('resolver_triangular_superior - Dimensiones incompatibles entre A y b');
+        abort;
+    end;
+
+	n = nA
+
     x(n) = b(n) / A(n,n)
 
-    for i = [n-1:-1:1]
+    for i = n-1:-1:1
         x(i) = b(i)
 
-        for j = [i+1:n]
+        for j = i+1:n
             x(i) = x(i) - A(i,j) * x(j)
         end
-
-        // Preguntar que ocurre si A(i,i) = 0
-        if A(i,i) <> 0 then
-            x(i) = x(i) / A(i,i)
+        
+        if A(i,i) == 0 then
+            error('resolver_triangular_superior - La matriz es singular');
         else
-            x(i) = 0
+            x(i) = x(i) / A(i,i);
         end
     end
-
-    s = x
 endfunction
 
 
-function s = resolver_triangular_inferior(A, b, n)
+function x = resolver_triangular_inferior(A, b)
+	[nA, mA] = size(A)
+	[nb, mb] = size(b)
+
+	if nA<>mA then
+        error('resolver_triangular_inferior - La matriz A debe ser cuadrada');
+        abort;
+    elseif mA<>nb then
+        error('resolver_triangular_inferior - Dimensiones incompatibles entre A y b');
+        abort;
+    end;
+
+	n = nA
+
     x(1) = b(1) / A(1,1)
 
     for i = [2:n]
@@ -32,15 +55,14 @@ function s = resolver_triangular_inferior(A, b, n)
            x(i) = x(i) - A(i,j) * x(j)
         end
         
-        if A(i,i) <> 0 then
-            x(i) = x(i) / A(i,i)
+        if A(i,i) == 0 then
+            error('resolver_triangular_inferior - La matriz es singular');
         else
-            x(i) = 0
+            x(i) = x(i) / A(i,i);
         end
     end
-
-    s = x
 endfunction
+
 //---------------------------------------------------------------------------//
 
 // 2)
@@ -59,7 +81,7 @@ function [x,a] = gausselim(A,b)
         error('gausselim - La matriz A debe ser cuadrada');
         abort;
     elseif mA<>nb then
-        error('gausselim - dimensiones incompatibles entre A y b');
+        error('gausselim - Dimensiones incompatibles entre A y b');
         abort;
     end;
 
@@ -154,7 +176,7 @@ function [x,a] = gausselim2(A,b)
         error('gausselim - La matriz A debe ser cuadrada');
         abort;
     elseif mA<>nb then
-        error('gausselim - dimensiones incompatibles entre A y b');
+        error('gausselim - Dimensiones incompatibles entre A y b');
         abort;
     end;
 
@@ -197,7 +219,7 @@ function [x,a] = gausselim_mult(A,B)
         error('gausselim - La matriz A debe ser cuadrada');
         abort;
     elseif mA<>nB then
-        error('gausselim - dimensiones incompatibles entre A y B');
+        error('gausselim - Dimensiones incompatibles entre A y B');
         abort;
     end;
 
@@ -282,7 +304,7 @@ function [x,a] = gausselimPP(A,b)
         error('gausselimPP - La matriz A debe ser cuadrada');
         abort;
     elseif mA<>nb then
-        error('gausselimPP - dimensiones incompatibles entre A y b');
+        error('gausselimPP - Dimensiones incompatibles entre A y b');
         abort;
     end;
 
@@ -298,9 +320,6 @@ function [x,a] = gausselimPP(A,b)
 
         // Intercambiar la fila pivot elegida por la fila pivot original 
         a([kpivot k], :) = a([k kpivot], :)
-        disp("!!")
-        disp(a)
-        disp("!!")
 
         // Calculo multiplicadores
         M = a(k+1:n, k) / a(k,k) 
@@ -347,7 +366,7 @@ function [x,a] = gausselim_tridiag(A,b)
         error('gausselimPP - La matriz A debe ser cuadrada');
         abort;
     elseif mA<>nb then
-        error('gausselimPP - dimensiones incompatibles entre A y b');
+        error('gausselimPP - Dimensiones incompatibles entre A y b');
         abort;
     end;
     
@@ -389,7 +408,7 @@ endfunction
 
 // 7)
 
-function [P, A, L, U] = lu_gauss_pivot(A)
+function [L, U, P] = lu_gauss_pivot(A)
     [nA, mA] = size(A)
 
     if nA<>mA then
@@ -403,38 +422,149 @@ function [P, A, L, U] = lu_gauss_pivot(A)
     
     n = nA
     for k=1:n-1
-        [_, i] = max(abs(a(k:n, k)))
+        [_, i] = max(abs(U(k:n, k)))
         i = i + k-1
-        
+       	
+		// Intercambio de filas 
         U([k i], k:n) = U([i k], k:n)
         L([k i], 1:k-1) = L([i k], 1:k-1)
         P([k i], :) = P([i k], :)
-
-        for j=k+1:n
-            L(j,k) = U(j,k)/U(k,k)
-            U(j, k:n) = U(j, k:n) - L(j, k) * U(k, k:n)
-        end
-    end
+		
+		L(k+1:n, k) = U(k+1:n, k) / U(k,k)
+		U(k+1:n, k+1:n) = U(k+1:n, k+1:n) - L(k+1:n, k) * U(k, k+1:n)
+		U(k+1:n, k) = 0
+	end
 
 endfunction
 
 A = [2 1 1 0; 4 3 3 1; 8 7 9 5; 6 7 9 8]
-[P, A, L, U] = lu_gauss_pivot(A)
+[L, U, P] = lu_gauss_pivot(A)
 
 //---------------------------------------------------------------------------//
 
 // 8)
 
 A = [1.012 -2.132 3.104; -2.132 4.096 -7.013; 3.104 -7.013 0.014]
-[P, A, L, U] = lu_gauss_pivot(A)
+[L, U, P] = lu_gauss_pivot(A)
 
 A1 = [2.1756 4.0231 -2.1732 5.1967; -4.0231 6.0000 0 1.1973; -1.0000 5.2107 1.1111 0; 6.0235 7.0000 0 4.1561]
-[P1, A1, L1, U1] = lu_gauss_pivot(A1)
+[L1, U1, P1] = lu_gauss_pivot(A1)
 
+//---------------------------------------------------------------------------//
 
+// 9)
 
+A9 = [1 2 -2 1; 4 5 -7 6; 5 25 -15 -3; 6 -12 -6 22];
+b9 = [2 2 1 0]'
 
+[L9, U9, P9] = lu_gauss_pivot(A9)
 
+g9 = resolver_triangular_inferior(L9, P9 * b9)
+
+x9 = resolver_triangular_superior(U9, g9)
+
+//---------------------------------------------------------------------------//
+
+// 10
+
+function [L, U] = lu_doolittle(A)
+    [nA, mA] = size(A)
+
+    if nA <> mA then
+        error("lu_doolittle - La matriz debe ser cuadrada.")
+        abort()
+    end
+
+    n = nA
+    U = zeros(n,n)
+    L = eye(n,n)
+    
+    // Inicialización de U y L
+	U(1, 1:n) = A(1, 1:n)
+    L(2:n, 1) = A(2:n, 1) / U(1,1)
+
+	for i=2:n
+        // Calculamos fila de U
+		U(i, i:n) = A(i, i:n) - L(i, 1:i-1) * U(1:i-1, i:n)
+        
+        // Teniendo fila de U calculamos columna de L
+        if i < n then
+            L(i+1:n, i) = (A(i+1:n, i) - L(i+1:n, 1:i-1) * U(1:i-1, i)) / U(i,i)
+        end
+    end
+endfunction
+
+A10 = [1 2 3 4; 1 4 9 16; 1 8 27 64; 1 16 81 256]
+b10 = [2 10 44 190]'
+
+[L10, U10] = lu_doolittle(A10)
+
+g10 = resolver_triangular_inferior(L10, b10)
+x10 = resolver_triangular_superior(U10, g10)
+
+//---------------------------------------------------------------------------//
+
+// 11)
+
+function [U, ind] = cholesky(A)
+    eps = 1.0e-8
+    n = size(A, 1)
+    U = zeros(n, n)
+
+    for k = 1:n
+        if k == 1 then
+            t = A(k, k)
+        else 
+            t = A(k, k) - U(1:k-1, k)' * U(1:k-1, k)
+        end
+
+        if t <= eps
+            printf("Matriz no definida positiva.\n")
+            ind = 0
+            return
+        end
+
+        U(k, k) = sqrt(t)
+        for j = k+1:n
+            if k == 1 then 
+                U(k, j) = A(k, j) / U(k, k)
+            else 
+                U(k, j) = (A(k, j) - U(1:k-1, k)' * U(1:k-1, j)) / U(k, k)
+            end
+        end
+    end
+    ind = 1
+endfunction
+
+A = [4 1 1; 1 2 2; 1 2 3]
+[U,ind] = cholesky(A)
+
+A11 = [16 -12 8 -16; -12 18 -6 9; 8 -6 5 -10; -16 9 -10 46]
+[UA,ind] = cholesky(A11)
+
+B11 = [4 1 1; 8 2 2; 1 2 3]
+[UB,ind] = cholesky(B11)
+
+C11 = [1 2; 2 4]
+[UC,ind] = cholesky(C11)
+
+//---------------------------------------------------------------------------//
+
+// 12)
+
+// a)
+A12 = [16 -12 8; -12 18 -6; 8 -6 8]
+b12 = [76 -66 46]'
+
+[U, ind] = cholesky(A12)
+
+g12 = resolver_triangular_inferior(U', b12)
+x12 = resolver_triangular_superior(U, g12)
+
+// b)
+
+[Q, R] = qr(A12)
+x12b = resolver_triangular_superior(R, Q' * b12)
 
 
 
