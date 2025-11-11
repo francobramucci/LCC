@@ -1,0 +1,15 @@
+1) Hay una convención de que el código de retorno de main se almacena en la
+parte baja del registro %rax. 
+
+En el caso de source1.s, al ejecutar la función main, se modifica el registro
+%al que corresponde a los 8 bits menos significativos de %rax con el valor 255.
+Por lo que el código de salida es 255.
+
+En el caso de source2.s ocurre la suma de los valores 0xFE y 0xFF que se
+almacena en %al cómo se utiliza el operador movb y el resultado no entra en 8
+bits entonces se activa la CF y se guarda el resto de modulo 256, esto es 253.
+
+Los equivalentes en código C son csource1.c y csource2.c respectivamente.
+
+Para obtener el valor de retorno de el último comando ejecutado se utiliza el
+comando echo $?.
