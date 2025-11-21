@@ -106,6 +106,123 @@ Error en el caso lineal es:
     res = horner(p,2.5)
 */
 
+// Resolver sistema
+function [x,a] = gausselimPP(A,b)
+    [nA,mA] = size(A) 
+    [nb,mb] = size(b)
+
+    if nA<>mA then
+        error('gausselimPP - La matriz A debe ser cuadrada');
+        abort;
+    elseif mA<>nb then
+        error('gausselimPP - Dimensiones incompatibles entre A y b');
+        abort;
+    end;
+
+    a = [A b]; // Matriz aumentada
+    n = nA;    // Tamaño de la matriz
+
+    // Eliminación progresiva con pivoteo parcial
+    for k=1:n-1
+        // Obtener la posición del mayor elemento en valor absoluto para evitar 
+        // errores de redondeo
+        [_, kpivot] = max(abs(a(k:n, k)))
+        kpivot = kpivot + k-1
+
+        // Intercambiar la fila pivot elegida por la fila pivot original 
+        a([kpivot k], :) = a([k kpivot], :)
+
+        // Calculo multiplicadores
+        M = a(k+1:n, k) / a(k,k) 
+
+        // Resto la fila pivote multiplicada por el respectivo multiplicador a 
+        // cada fila debajo de la fila pivote en columnas distintas de la del pivote
+        a(k+1:n, k+1:n+1) = a(k+1:n, k+1:n+1) - M * a(k, k+1:n+1)
+        
+        // Elementos debajo del pivote igualados a 0
+        a(k+1:n, k) = 0
+    end;
+
+    // Sustitución regresiva
+    x(n) = a(n,n+1)/a(n,n);
+    for i = n-1:-1:1
+        sumk = 0
+        for k=i+1:n
+            sumk = sumk + a(i,k)*x(k);
+        end;
+        x(i) = (a(i,n+1)-sumk)/a(i,i);
+    end;
+endfunction
+
+// Calcular coeficientes
+function va =  minimos_cuadrados(x, y, vs)
+    n = size(vs,2)
+    m = size(x,2)
+    A = zeros(m, n)
+    for j = 1:n
+        deff( "y = aux(x)", "y = " + vs(j) + "(x)")
+        for i = 1:m
+            A(i,j) = aux(x(i))
+        end
+    end
+    
+    // A' * A * x = A' * y
+    
+    va = gausselimPP(A' * A, A' * y');
+endfunction
+
+// Calcular función aproximación
+function func = funcion_aprox(va, vs)
+    sf = "y = "
+    n = size(vs,2)
+    
+    for i = 1:n
+        a = va(i)
+        s = vs(i)
+        sf = sf + string(a) + "*" + string(s)+ "(x)"
+        if i <> n then
+            sf = sf + "+"
+        end
+    end
+    
+    deff("y = func(x)", sf)
+    
+    disp(sf)
+endfunction
+
+// lineal
+x1=[4 4.2 4.5 4.7 5.1 5.5 5.9 6.3 6.8 7.1]
+y1=[102.56 113.18 130.11 142.05 167.53 195.14 224.87 256.73 299.5 326.72]
+// cubica
+x2=[0,0.2,0.4,0.6]
+y2=[1,1.2214,1.4918,1.8221]
+
+deff("y = f1(x)", "y = 1")
+deff("y = f2(x)", "y = x")
+deff("y = f3(x)", "y = x^2")
+deff("y = f4(x)", "y = x^3")
+deff("y = f5(x)", "y = x^4")
+deff("y = f6(x)", "y = x^5")
+deff("y = f7(x)", "y = x^6")
+deff("y = f8(x)", "y = x^7")
+deff("y = f9(x)", "y = x^8")
+deff("y = f10(x)", "y = x^9")
+
+vs = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10"]
+va = minimos_cuadrados(x1, y1, vs(1:4))
+g = funcion_aprox(va,vs(1:4))
+
+x = 3:0.01:8 
+plot(x,g)
+
+
+
+
+
+
+
+
+
 
 
 
