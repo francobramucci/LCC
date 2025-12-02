@@ -132,11 +132,6 @@ function ESn = error_simpson_compuesto(a, b, n, cot)
     ESn = abs(h^4 * (b-a) * (1/180) * cot)
 endfunction
 
-// Regla del trapecio en dominio bidimensional.
-// Entrada: f función de dos variables; a,b extremos del intervalo en el eje x
-// c,d: extremos del intervalo en el eje y; 
-// Salida: aproximación de la integral de la función f(x,y) para a <= x <= b, c <= y <= d
-
 // a)
 disp("a)")
 deff("y = fa(x)", "y = 1./x");
@@ -190,6 +185,10 @@ valorReal = integrate("(x+1)^(-1)", "x", 0, 1.5)
 
 // 5)
 
+// Regla del trapecio en dominio bidimensional.
+// Entrada: f función de dos variables; a,b extremos del intervalo en el eje x
+// c,d: extremos del intervalo en el eje y; 
+// Salida: aproximación de la integral de la función f(x,y) para a <= x <= b, c <= y <= d
 function v = regla_trapecio_bidimensional(f, a, b, c, d)
     h = (b-a) * (d-c)/4
     v = h * (f(c,a) + f(c,b) + f(d,a) + f(d,b))

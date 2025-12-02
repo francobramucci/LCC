@@ -478,7 +478,7 @@ legend(h, textosLeyenda)
 // 10)
 
 // Calcula las raices del polinomio de chebyshev T_n
-// Entrada: n = grado del polinomio interpolante
+// Entrada: n = grado de T_n
 // Salida: r = vector de 1xn con las raíces de T_n
 function r = raices_chebyshev(n)
     // Valores para los que se anula T_n = cos(n*t)
