@@ -340,7 +340,7 @@ deff("y = f9(x)", "y = x^8");
 deff("y = f10(x)", "y = x^9");
 
 vs = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10"];
-va = minimos_cuadrados(x1, y1, vs(1:4));
+va = minimos_cuadrados_generalizado(x1, y1, vs(1:4));
 g = funcion_aprox(va, vs(1:4));
 
 x = 3:0.01:8;
