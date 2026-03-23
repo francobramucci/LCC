@@ -1,0 +1,4 @@
+Para saber que retona cada programa usaremos "echo $?" que muestra el exit
+status del último comando ejecutado, que es un entero correspondiente a %al al
+momento de terminar la ejecución. En este caso, tras ejecutar el primer
+programa se devolvió el valor 255 y tras ejecutar programa_2.s se devolvió 253.

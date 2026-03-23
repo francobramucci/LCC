@@ -51,25 +51,32 @@ promedio_array:
 
     ret
 
-maximo_array:
+#############################################
+
+maximo_array:                           
     xorq %rax, %rax
     movq %rsi, %rcx
 
     movl -4(%rdi, %rcx, 4), %eax
     decq %rcx
 
+#for:
+#    cmpl -4(%rdi, %rcx, 4), %eax
+#    jnl seguir
+#    movl -4(%rdi, %rcx, 4), %eax
+#seguir:
+#    loop for
+#
+#    ret
+
 for:
     cmpl -4(%rdi, %rcx, 4), %eax
-    jl menor
-    jmp seguir
-
-menor:
-    movl -4(%rdi, %rcx, 4), %eax
-
-seguir:
+    cmovl -4(%rdi, %rcx, 4), %eax
     loop for
-
+    
     ret
+
+#############################################
 
 minimo_array:
     xorq %rax, %rax
@@ -78,17 +85,20 @@ minimo_array:
     movl -4(%rdi, %rcx, 4), %eax
     decq %rcx
 
+#for1:
+#    cmpl -4(%rdi, %rcx, 4), %eax
+#    jng seguir1
+#    movl -4(%rdi, %rcx, 4), %eax
+#seguir1:
+#    loop for1
+#
+#    ret
+
 for1:
     cmpl -4(%rdi, %rcx, 4), %eax
-    jg mayor
-    jmp seguir1
-
-mayor:
-    movl -4(%rdi, %rcx, 4), %eax
-
-seguir1:
+    cmovg -4(%rdi, %rcx, 4), %eax
     loop for1
-
+    
     ret
 
     

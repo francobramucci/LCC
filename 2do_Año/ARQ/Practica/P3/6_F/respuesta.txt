@@ -1,0 +1,3 @@
+En este caso no sería posible utilizar el código de salida para analizar el
+contenido del registro ya que estos almacenan valores de 32 bits y el código de
+salida es de solo 8 bits.

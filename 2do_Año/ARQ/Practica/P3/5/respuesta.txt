@@ -1,0 +1,3 @@
+Este error ocurre porque las instrucciones en x86-64 en modo de 64 bits
+soportan operandos inmediatos con un máximo de 32 bits, excepto mov que puede
+copiar un valor de 64 bits a un registro de proposito general. En este caso particular observamos que el operando inmediato 0x1122334455667788 es de 64 bits y la instrucción utilizada es add.

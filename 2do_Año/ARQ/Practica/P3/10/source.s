@@ -14,27 +14,28 @@ main:
     leaq msg, %rdi              # rdi = 0x404040
     movb (%rdi, %rbx, 2), %sil  # sil = 0x65 ('e')
     xorl %eax, %eax             # rax = 0x0
-    call printf                 # rax = 0xA
+    # Se imprimirá "Imprime e\n".
+    call printf                 # rax = 0xA (printf retorna cant. de caracteres impresos)
     addq $8, %rsp               # rsp = 0x7fffffffebc8
     ret
 
 # Etiqueta          Dirección de memoria            Valor almacenado
-# a                 0x404028                        1 
-#                   0x404029                        0
-#                   0x40402A                        0
-#                   0x40402B                        0
-#                   0x40402C                        2
-#                   0x40402D                        0
-#                   0x40402E                        0
-#                   0x40402F                        0
-#                   0x404030                        3
-#                   0x404031                        0
-#                   0x404032                        0
-#                   0x404033                        0
-#                   0x404034                        4
-#                   0x404035                        0
-#                   0x404036                        0
-#                   0x404037                        0
+# a                 0x404028                        0x01 
+#                   0x404029                        0x00
+#                   0x40402A                        0x00
+#                   0x40402B                        0x00
+#                   0x40402C                        0x02
+#                   0x40402D                        0x00
+#                   0x40402E                        0x00
+#                   0x40402F                        0x00
+#                   0x404030                        0x03
+#                   0x404031                        0x00
+#                   0x404032                        0x00
+#                   0x404033                        0x00
+#                   0x404034                        0x04
+#                   0x404035                        0x00
+#                   0x404036                        0x00
+#                   0x404037                        0x00
 # g                 0x404038                        0x88
 #                   0x404039                        0x77
 #                   0x40403A                        0x66

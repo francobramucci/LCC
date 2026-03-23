@@ -8,8 +8,8 @@ main:
     imull %ecx          # rdx = 0x00000000ffffffff, rax = 0x00000000ffffffffe
 
     # Completar para que el resultado correcto como signed quede en rax
-    rolq $32, %rdx      # rdx = 0xffffffff00000000
-    addq %rdx, %rax     # rax = 0xfffffffffffffffe
+    salq $32, %rdx      # rdx = 0xffffffff00000000
+    orq %rdx, %rax      # rax = 0xfffffffffffffffe
     #
 
     xorq %rax, %rax     # eax = 0x0
@@ -18,8 +18,8 @@ main:
     mulw %cx            # edx = 0x00000001, eax = 0x0000fffe
 
     # Completar para que el resultado correcto como unsigned int quede en eax
-    roll $16, %edx      # edx = 0x00010000
-    addl %edx, %eax     # eax = 0x0001fffe
+    sall $16, %edx      # edx = 0x00010000
+    orl %edx, %eax      # eax = 0x0001fffe
     #
 
     ret
