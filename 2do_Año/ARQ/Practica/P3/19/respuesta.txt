@@ -1,0 +1,18 @@
+a) Se imprime en pantalla lo siguiente:
+
+Ejecutando foo2...
+0x 80000000
+Ejecutando foo1...
+0x 0
+0x 0 0x 80000000
+
+De lo que podemos observar que en la llamada a printf se evalua primero foo2, modificando la variable global a, y luego se evalua foo1.
+
+b)
+a = 0x7fffffff
+Luego de foo2
+a = 0x7fffffff + 1 = 0x80000000. (OF)
+Luego de foo1
+a = 0x80000000 + (1 << 31) = 0x80000000 + 0x80000000 = 0x100000000 
+que excede los 32 bits, por lo tanto a = 0x00000000. (OF y CF)
+

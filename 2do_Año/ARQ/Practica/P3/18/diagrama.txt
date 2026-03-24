@@ -1,0 +1,42 @@
+b)
+
+DIRECCIONES ALTAS
+--------------------------------------------------------------------------------------
+0x7fffffffebc8 | Dir. ret. de main                      | rsp, rsp(8)
+--------------------------------------------------------------------------------------
+0x7fffffffebc0 | rbp anterior                           | rbp, rsp(1), rbp(2), rsp(7)
+--------------------------------------------------------------------------------------
+0x7fffffffebb8 | j (10mo argumento)                     |    
+--------------------------------------------------------------------------------------
+0x7fffffffebb0 | i (9no argumento)                      | rsp(2), rsp(6)
+--------------------------------------------------------------------------------------
+0x7fffffffeba8 | 0x4011aa (Dir. ret. de calculo a main) | rsp(3), rsp(5)
+--------------------------------------------------------------------------------------
+0x7fffffffeba0 | rbp de main                            | rbp(1), rsp(4)
+--------------------------------------------------------------------------------------
+DIRECCIONES BAJAS
+
+La dirección de retorno de calculo a main es la dirección de la insrucción
+siguiente a call.
+
+c) 
+
+Un código equivalente a leave sería:
+movq %rbp, %rsp
+popq %rbp
+
+d)
+La instrucción subq $0x10, %rsp se utiliza para reservar espacio para pasar por
+pila los argumentos i (9no argumento) y j (10mo argumento). Es necesario pasar
+estos argumentos por pila ya que en total hay 8 argumentos de tipo entero
+(char, int) y 2 argumentos de tipo flotante (float, double). Los dos argumentos
+se pasan por %xmm0 y %xmm1, y a, b, c, d, e y f se pasan por los registros de
+proposito general. Luego solo i y j se pasan por pila y por eso son buscados en
+16(%rbp) y 24(%rbp) respectivamente.
+Por otro lado, la instrucción addq $0x10, %rsp se ejecuta para que %rsp vuelva
+a apuntar al valor de rbp anterior para poder así restaurarlo en %rbp con popq
+%rbp. Después de esto, %rsp apuntará a la dirección de retorno de main y con
+ret, %rsp volverá a su valor anterior antes de ejecutarse main. En este caso,
+esta instrucción podría haberse omitido ya que antes se ejecuta la instrucción
+leave, que hace que %rsp apunte también al rbp anterior y además ejecuta popq
+%rbp. Luego, se puede prescindir de la instrucción addq $0x10, %rsp.
