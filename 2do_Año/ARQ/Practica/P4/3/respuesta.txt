@@ -1,0 +1,27 @@
+En primer lugar se ejecuta:
+
+    str r6, [r3] donde r6 = 0xBEEFFACE 
+
+Como consideramos que es little endian, los bits más significativos se
+almacenarán en las direcciones más altas.
+
+0x8003 BE
+0x8002 EF 
+0x8001 FA 
+0x8000 CE
+
+Luego, al ejecutarse:
+
+    ldrb r4, [r3]
+
+Se carga el primer byte desde r3 = 0x8000, es decir que r4 = 0xCE
+
+Si consideramos que la arquitectura es big-endian, entonces el dato se
+almacenará de la siguiente forma:
+
+0x8003 CE
+0x8002 FA
+0x8001 EF
+0x8000 BE
+
+Entonces r4 = 0xBE
