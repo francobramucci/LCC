@@ -1,0 +1,13 @@
+Se puede utilizar la pseudoinstrucción ldr r1, =0x12345678 con un valor
+inmediato de incluso 32 bits ya que dicho valor no se almacena en la
+instrucción, sino, que se utiliza lo que se conoce como literal pool. Una
+literal pool es una porción de almacenamiento donde se alojan constantes, esta
+se ubica al final de la sección ".text". De esta forma se ubica el valor al
+final de ".text" y se traduce la instrucción "ldr r1, =0x12345678" a "ldr r1,
+[pc, #offset]", donde el offset es la diferencia entre el valor del pc al
+ejecutar esa instrucción (no fetchearla) y la ubicación de la constante en la
+literal pool. Considerando que cuando se ejecuta una instrucción el pc se
+encuentra 8 bytes más adelante. De esta forma, se tradujo una instrucción que
+tenía un valor inmediato de 32 bits que no entraba en 32 bits de instrucción, a
+una instrucción de direccionamiento por registro que cabe perfectamente en los
+32 bits de tamaño de instrucción.
