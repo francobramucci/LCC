@@ -1,13 +1,13 @@
 module Lab01 where
 
 import Data.List
+import Data.Char
 
 -- 1) Corregir los siguientes programas de modo que sean aceptados por GHCi.
-    
 
 --a)
-not :: Bool -> Bool 
-not b = case b of 
+my_not :: Bool -> Bool 
+my_not b = case b of 
     True -> False
     False -> True
 
@@ -67,25 +67,23 @@ derive :: Fractional a => (a -> a) -> a -> a
 derive f a = let h = 0.001 in (f (a+h) - f(a)) / h
 
 -- f) sign, la función signo
-
-sign :: Num a => a -> a
+sign :: (Num a, Ord a) => a -> a
 sign x | x > 0 = 1 
        | x < 0 = -1
        | otherwise = 0
 
 -- g) vabs, la función valor absoluto (usando sign y sin usarla)
-vabs1 :: Num a => a -> a
+vabs1 :: (Num a, Ord a) => a -> a
 vabs1 x = x * (sign x)
 
-vabs2 :: Num a => a -> a
-vabs2 x | x > 0 = x
+vabs2 :: (Num a, Ord a) => a -> a
+vabs2 x | x >= 0 = x
         | x < 0 = -x
-        | otherwise = 0
 
 -- h) pot, que toma un entero y un número, y devuelve el resultado de elevar el segundo a la potencia dada por el primero
-pot :: Num a => Int -> a -> Int
-pot x 0 = 1
-pot x n = x * pot x (n-1)
+pot :: Num a => Int -> a -> a 
+pot 0 x = 1
+pot n x = x * pot (n-1) x
 
 -- i) xor, el operador de disyunción exclusiva
 xor :: Bool -> Bool -> Bool
@@ -115,10 +113,7 @@ Espaola, 22ª ed.)
 -}
 
 esBisiesto :: Int -> Bool
-esBisiesto x = ((x mod 4) == 0) && 
-
-div (x % 1000) 100 
-
+esBisiesto x = ((mod x 4) == 0) && not (((mod x 100) == 0) && ((mod x 400) == 0))
 
 {-
 4)
@@ -129,84 +124,132 @@ de Haskell. Así, dada una lista ns y un número n, el valor ns *$ n
 debe ser igual a la lista ns con todos sus elementos multiplicados por
 n. Por ejemplo,
 
-[ 2, 3  ] *$ 5 == [ 10 , 15  ].
+[2, 3] *$ 5 == [10, 15].
 
 El operador *$ debe definirse de manera que la siguiente
 expresión sea válida:
 
+v = [1, 2, 3] *$ 2 *$ 4
 -}
+(*$) :: Num a => [a] -> a -> [a]
+ns *$ n = [n * x | x <- ns]
+infixl 6 *$
 
--- v = [1, 2, 3] *$ 2 *$ 4
+v = [1, 2, 3] *$ 2 *$ 4
 
 
-{-
-5) Definir las siguientes funciones usando listas por comprensión:
+-- 5) Definir las siguientes funciones usando listas por comprensión:
 
-a) 'divisors', que dado un entero positivo 'x' devuelve la
-lista de los divisores de 'x' (o la lista vacía si el entero no es
-positivo)
+-- a) 'divisors', que dado un entero positivo 'x' devuelve la lista de los
+-- divisores de 'x' (o la lista vacía si el entero no es positivo)
+divisors :: Int -> [Int]
+divisors x | x <= 0 = []
+           | otherwise = [y | y <- [1..x], (mod x y) == 0]
 
-b) 'matches', que dados un entero 'x' y una lista de enteros descarta
-de la lista los elementos distintos a 'x'
+-- Otra forma:
+divisors2 x = [y | x > 0, y <- [1..x], mod x y == 0]
 
-c) 'cuadrupla', que dado un entero 'n', devuelve todas las cuadruplas
-'(a,b,c,d)' que satisfacen a^2 + b^2 = c^2 + d^2,
-donde 0 <= a, b, c, d <= 'n'
+-- b) 'matches', que dados un entero 'x' y una lista de enteros descarta de la
+-- lista los elementos distintos a 'x'
+matches :: Int -> [Int] -> [Int]
+matches x xs = [y | y <- xs, y /= x]
 
-(d) 'unique', que dada una lista 'xs' de enteros, devuelve la lista
-'xs' sin elementos repetidos
--}
 
---unique :: [Int] -> [Int]
---unique xs = [x | (x,i) <- zip xs [0..], not (elem x (take i xs))]
+-- c) 'cuadrupla', que dado un entero 'n', devuelve todas las cuadruplas
+-- '(a,b,c,d)' que satisfacen a^2 + b^2 = c^2 + d^2, donde 0 <= a, b, c, d <= 'n'
+cuadrupla :: Int -> [(Int, Int, Int, Int)]
+cuadrupla n = [(a, b, c, d) | a <- [0..n], b <- [0..n], c <- [0..n], d <- [0..n], a^2 + b^2 == c^2 + d^2]
+
+-- d) 'unique', que dada una lista 'xs' de enteros, devuelve la lista 'xs' sin
+-- elementos repetidos
+unique :: [Int] -> [Int]
+unique xs = [a | (a, b) <- zip xs [1..], [m | (m, n) <- zip xs [1..], m == a, n > b] == []]
+
+-- unique xs = [x | (x,i) <- zip xs [0..], not (elem x (take i xs))]
+
 
 {- 
-6) El producto escalar de dos listas de enteros de igual longitud
-es la suma de los productos de los elementos sucesivos (misma
-posición) de ambas listas.  Definir una función 'scalarProduct' que
-devuelva el producto escalar de dos listas.
+6) El producto escalar de dos listas de enteros de igual longitud es la suma de
+los productos de los elementos sucesivos (misma posición) de ambas listas.
+Definir una función 'scalarProduct' que devuelva el producto escalar de dos
+listas.
 
 Sugerencia: Usar las funciones 'zip' y 'sum'. -}
 
-{-
-7) Definir mediante recursión explícita
-las siguientes funciones y escribir su tipo más general:
+scalarProduct :: Num a => [a] -> [a] -> a
+scalarProduct xs ys = sum [x * y | (x, y) <- zip xs ys]
 
-a) 'suma', que suma todos los elementos de una lista de números
 
-b) 'alguno', que devuelve True si algún elemento de una
-lista de valores booleanos es True, y False en caso
-contrario
+ -- 7) Definir mediante recursión explícita las siguientes funciones y escribir
+ -- su tipo más general:
 
-c) 'todos', que devuelve True si todos los elementos de
-una lista de valores booleanos son True, y False en caso
-contrario
+-- a) 'suma', que suma todos los elementos de una lista de números
+suma :: Num a => [a] -> a
+suma [] = 0
+suma (x:xs) = x + suma xs
 
-d) 'codes', que dada una lista de caracteres, devuelve la
-lista de sus ordinales
+-- b) 'alguno', que devuelve True si algún elemento de una lista de valores
+-- booleanos es True, y False en caso contrario
+alguno :: [Bool] -> Bool
+alguno [] = False
+alguno (x:xs) = x || alguno xs
 
-e) 'restos', que calcula la lista de los restos de la
-división de los elementos de una lista de números dada por otro
-número dado
+-- c) 'todos', que devuelve True si todos los elementos de una lista de valores
+-- booleanos son True, y False en caso contrario
+todos :: [Bool] -> Bool
+todos [] = True
+todos (x:xs) = x && todos xs
 
-f) 'cuadrados', que dada una lista de números, devuelva la
-lista de sus cuadrados
+-- d) 'codes', que dada una lista de caracteres, devuelve la lista de sus
+-- ordinales
+codes :: [Char] -> [Int]
+codes [] = []
+codes (x:xs) = ord x : codes xs
 
-g) 'longitudes', que dada una lista de listas, devuelve la
-lista de sus longitudes
+-- e) 'restos', que calcula la lista de los restos de la división de los
+-- elementos de una lista de números dada por otro número dado
+restos :: [Int] -> Int -> [Int]
+restos [] _ = []
+restos (x:xs) n = mod x n : restos xs n
 
-h) 'orden', que dada una lista de pares de números, devuelve
-la lista de aquellos pares en los que la primera componente es
-menor que el triple de la segunda
+-- f) 'cuadrados', que dada una lista de números, devuelva la
+-- lista de sus cuadrados
+cuadrados :: [Int] -> [Int]
+cuadrados [] = []
+cuadrados (x:xs) = x * x : cuadrados xs
 
-i) 'pares', que dada una lista de enteros, devuelve la lista
-de los elementos pares
+-- g) 'longitudes', que dada una lista de listas, devuelve la
+-- lista de sus longitudes
+longitudes :: [[a]] -> [Int]
+longitudes [] = []
+longitudes (x:xs) = length x : longitudes xs
 
-j) 'letras', que dada una lista de caracteres, devuelve la
-lista de aquellos que son letras (minúsculas o mayúsculas)
+-- h) 'orden', que dada una lista de pares de números, devuelve
+-- la lista de aquellos pares en los que la primera componente es
+-- menor que el triple de la segunda
+orden :: (Num a, Ord a) => [(a, a)] -> [(a, a)]
+orden [] = []
+orden ((x,y):xs) | x < 3*y = (x,y) : orden xs
+                 | otherwise = orden xs
 
-k) 'masDe', que dada una lista de listas 'xss' y un
-número 'n', devuelve la lista de aquellas listas de 'xss'
-con longitud mayor que 'n' 
--}
+-- i) 'pares', que dada una lista de enteros, devuelve la lista
+-- de los elementos pares
+pares :: [Int] -> [Int]
+pares [] = []
+pares (x:xs) = if mod x 2 then x : pares xs else pares xs
+
+-- j) 'letras', que dada una lista de caracteres, devuelve la
+-- lista de aquellos que son letras (minúsculas o mayúsculas)
+letras :: [Char] -> [Char]
+letras [] = []
+letras (c:cs) | c elem ['a'..'z'] || c elem ['A'.. 'Z'] = c : letras cs
+              | otherwise = letras cs
+
+-- k) 'masDe', que dada una lista de listas 'xss' y un
+-- número 'n', devuelve la lista de aquellas listas de 'xss'
+-- con longitud mayor que 'n'
+masDe :: [[a]] -> Int -> [[a]]
+masDe [] _ = []
+masDe (xs:xss) n | length xs > n = xs : masDe xss n
+                 | otherwise = masDe xss n
 
