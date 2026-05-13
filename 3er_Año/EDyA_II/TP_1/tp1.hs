@@ -91,4 +91,83 @@ merge (xs, []) _ = xs
 merge (xss@(x:xs), yss@(y:ys)) comp | (comp x y) <= 0 = x : merge (xs, yss) comp
                                     | otherwise = y : merge (xss, ys) comp
 
+-- 3)
+
+insertar :: Punto p => p -> NdTree p -> NdTree p
+insertar p t = ins p t 0
+    where
+        ins p Empty n = Node Empty p Empty (mod n (dimension p))
+        ins p (Node l x r k) n | coord k p <= coord k x = Node (ins p l (k+1)) x r k
+                               | otherwise = Node l x (ins p r (k+1)) k
+
+
+-- 4)
+
+equal_punto :: Punto p => p -> p -> Bool
+equal_punto x y = eq x y (dimension x - 1)
+    where
+        eq x y 0 = (coord 0 x) == (coord 0 y)
+        eq x y n = (coord n x) == (coord n y) && eq x y (n-1)
+
+instance Eq Punto2d where
+    x == y = x `equal_punto` y
+
+instance Eq Punto3d where
+    x == y = x `equal_punto` y
+
+eliminar :: (Eq p, Punto p) => p -> NdTree p -> NdTree p
+eliminar p Empty = Empty
+eliminar p t@(Node l x r k) | p == x = replace t
+                            | coord k p <= coord k x = Node (eliminar p l) x r k 
+                            | coord k p > coord k x = Node l x (eliminar p r) k 
+
+replace :: (Eq p, Punto p) => NdTree p -> NdTree p
+replace (Node Empty x Empty _) = Empty
+replace (Node l x Empty e) = let max_e_left = maxETree l e in Node (eliminar max_e_left l) max_e_left Empty e 
+replace (Node l x r e) = let min_e_right = minETree r e in Node l min_e_right (eliminar min_e_right r) e 
+
+minE :: Punto p => p -> p -> Int -> p
+minE p q e = if coord e p < coord e q then p else q
+
+minETree :: Punto p => NdTree p -> Int -> p
+minETree (Node Empty p Empty _) _ = p
+minETree (Node Empty p r _) e = minE p (minETree r e) e
+minETree (Node l p Empty _) e = minE p (minETree l e) e
+minETree (Node l p r _) e = minE p (minE (minETree r e) (minETree l e) e) e
+
+maxE :: Punto p => p -> p -> Int -> p
+maxE p q e = if coord e p > coord e q then p else q
+
+maxETree :: Punto p => NdTree p -> Int -> p
+maxETree (Node Empty p Empty _) _ = p
+maxETree (Node Empty p r _) e = maxE p (maxETree r e) e
+maxETree (Node l p Empty _) e = maxE p (maxETree l e) e
+maxETree (Node l p r _) e = maxE p (maxE (maxETree r e) (maxETree l e) e) e
+
+-- 5)
+
+type Rect = (Punto2d, Punto2d)
+
+-- a)
+
+inRegion :: Punto2d -> Rect -> Bool
+inRegion (P2d (x, y)) (P2d (a, b), P2d (c, d)) = x >= a && x <= c && y >= b && y <= d
+
+-- b)
+
+ortogonalSearch :: NdTree Punto2d -> Rect -> [Punto2d]
+ortogonalSearch Empty _ = []
+ortogonalSearch t rec = ortaux t rec []
+
+ortaux :: NdTree Punto2d -> Rect -> [Punto2d] -> [Punto2d]
+ortaux Empty _ xs = xs
+ortaux (Node l p@(P2d (x,y)) r e) rec@(P2d (a,b), P2d (c,d)) xs
+    | e == 0 && x < a = ortaux r rec ys
+    | e == 0 && x > c = ortaux l rec ys
+    | e == 0 && x >= a && x <= c = ortaux l (P2d (a,b), P2d (x,d)) (ortaux r (P2d (x,b), P2d (c,d)) ys)
+    | e == 1 && y < b = ortaux r rec ys
+    | e == 1 && y > d = ortaux l rec ys
+    | e == 1 && y >= b && y <= d = ortaux l (P2d (a,b), P2d (c, y)) (ortaux r (P2d (a,y), P2d (c,d)) ys)
+    where
+        ys = if inRegion p rec then p:xs else xs
 
