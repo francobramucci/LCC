@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+   <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BKM4SGPKNX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BKM4SGPKNX');
+</script>
+
+
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="Common/style.css">
+        <link rel="stylesheet" type="text/css" href="Common/bottomBar.css">
+        <link rel="stylesheet" type="text/css" href="JSKingfisher/CIMean.css">
+        <script type="text/javascript" src="Common/bottomBar.js"></script>        
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+        <script> var demoOrTutorial = "demo"; </script>
+        <script type="text/javascript" src="d3.min.js"></script>
+        <script type="text/javascript" src="Common/common.js"></script>
+        <script type="text/javascript" src="Common/statsFunctions.js"></script>
+        <script type="text/javascript" src="JSKingfisher/CLT.js"></script>
+
+        <title>Sampling means from a Non-normal Distribution</title>
+    </head>
+    <body style="background-color:#1A1A1A">
+        <div id="applet"></div>
+
+                <div id="equationDiv" style="display: none">
+            
+            
+            <div style="background-color: #be5627; left:0px; top: 0px;  width: 100%; height: 35px; font-size: 150%">
+                <p style="text-align: center; color: white"> How to draw your own distribution</p>
+                <div  style="position: absolute; right: 5px; top: 0px; width: 20px; height:20px;  cursor: pointer">
+                <p  id="eqFrameX" style="font-size:100%; color: white; margin-left: 0px">×</p>
+                </div>
+            </div>
+
+            
+
+            
+            <div style="position: absolute; left: 25px;top: 50px; width: 450px; text-align: center; font-size: 75%">
+                <p >Using the mouse, click anywhere inside the individual distribution graph and draw while holding down the mouse button.  (You don't need to use the pencil and you don't need to drag the line that is already there.)</p>
+                <br>
+
+                <p >When you lift the mouse button, the program will re-scale the graph so that the histogram for each sample will better fit into the window.  It will still be the same distribution that you drew. </p>
+            </div>
+        </div>
+
+         <ul id="trans-nav">
+            <li><a href="KFhomepage.htm">UBC Statistics Visualizations</a></li>
+            <li><a href="#">About</a>
+                <ul>
+                    <li><a href="#openModal" onclick="credits()">Credits</a></li>
+                    <li><a href="#openModal" onclick="license()">License</a></li>
+                    <li><a href="#openModal" onclick="contactInfo()">Contact info</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Topics</a>
+                <ul>
+                    <li><a href="SamplingNormal.htm">Sampling from a normal distribution</a></li>
+                    <li><a href="CIMean.htm">Confidence intervals for the mean</a></li>
+                    <li><a href="CLT.htm">Central limit theorem</a></li>
+                    <li><a href="ContingencyAnalysis.htm">Contingency analysis</a></li>
+                </ul>
+            </li>
+            <li><a href="CLT.htm">Return to start</a></li>
+        </ul>
+    
+        <!-- Open Modal -->
+        <div id="openModal" class="modalDialog">
+            <div>   <a href="#close" title="Close" class="close">x</a>
+
+                <h2 id="modalTitle">About</h2>
+                <hr>
+                <div id="modalDiv1"></div>
+                <div id="modalDiv2"></div>
+                <div id="modalDiv3"></div>
+                <div id="modalDiv4"></div>
+                <div id="modalDiv5"></div>
+                <div id="modalDiv6"></div>
+                <div id="modalDiv7"></div>               
+            </div>
+        </div>
+    </body>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-66493174-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+    
+</html>
