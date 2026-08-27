@@ -164,3 +164,62 @@ auxstring' = do symbol "Int"
                do t3 <- symbol "Float"
                   return DFloat'
 
+-- 9
+-- int*a[5] != int(*a)[5];
+-- direct_declarator -> '(' direct_declarator ')' brackets | identifier brackets
+-- brackets -> '[' constant_expression ']' brackets | epsilon
+
+
+data CType = Pointer CType | CInt | CChar | CFloat deriving Show
+
+type CVar = (String, CType, [Int])
+
+
+declaration :: Parser CVar
+declaration = do ts <- typeSpecifier
+                 d <- declarator
+                 symbol ";"
+                 return (d ts)
+
+
+declarator :: Parser (CType -> CVar)
+declarator = do symbol "*"
+                d <- declarator
+                return (d . (\typ -> Pointer typ))
+              <|>
+              do d <- directDeclarator
+                 return d
+
+directDeclarator :: Parser (CType -> CVar)
+directDeclarator = do symbol "("
+                      dd <- directDeclarator
+                      symbol ")"
+                      b <- brackets
+                      return ((\(id, typ, xs) -> (id, typ, xs ++ b)) . dd)
+                    <|>
+                    do id <- identifier
+                       b <- brackets
+                       return (\typ -> (id, typ, b))
+
+typeSpecifier :: Parser CType
+typeSpecifier = do symbol "int"
+                   return CInt
+                 <|>
+                 do symbol "char"
+                    return CChar
+                  <|>
+                  do symbol "float"
+                     return CFloat
+
+brackets :: Parser [Int]
+brackets = Parsing.many ((symbol "[" >> natural) >>= (\v -> symbol "]" >>= (\v1 -> return v)))
+
+
+
+
+
+
+
+
+
+
