@@ -45,7 +45,14 @@ lis = makeTokenParser
 --- Parser de expresiones enteras
 -----------------------------------
 intexp :: Parser (Exp Int)
-intexp = undefined
+intexp = chainl1 intterm addop
+
+addop :: Parser (Exp Int -> Exp Int -> Exp Int)
+addop = (reservedOp lis "+" >> return Plus)
+  <|> (reservedOp lis "-" >> return Minus)
+
+intterm :: Parser (Exp Int)
+intterm = undefined
 
 ------------------------------------
 --- Parser de expresiones booleanas
