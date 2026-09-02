@@ -48,7 +48,7 @@ lis = makeTokenParser
 -----------------------------------
 -- chainl1 devuelve el valor obtenido por la aplicación asociativa a izquierda
 -- de las funciones retornadas por addop a los valores retornados por intterm
--- es decir que intexp "5+3-2" = (5 `Plus` 3) `Minus` 2
+-- es decir que intexp "5-3-2" = (5 `Minus` 3) `Minus` 2
 
 intexp :: Parser (Exp Int)
 intexp = chainl1 intterm addop
@@ -82,20 +82,24 @@ intfactor = (parens lis intexp)
 ------------------------------------
 
 boolexp :: Parser (Exp Bool)
-boolexp = chainl1 boolatom boolop
+boolexp = chainl1 boolterm booladd
 
-boolop :: Parser (Exp Bool -> Exp Bool -> Exp Bool)
-boolop = (reservedOp lis "&&" >> return And)
-    <|>  (reservedOp lis "||" >> return Or)
+booladd :: Parser (Exp Bool -> Exp Bool -> Exp Bool)
+booladd = reservedOp lis "||" >> return Or
 
+boolterm :: Parser (Exp Bool)
+boolterm = chainl1 boolfactor boolmul
+
+boolmul :: Parser (Exp Bool -> Exp Bool -> Exp Bool)
+boolmul = reservedOp lis "&&" >> return And
 
 -- Intenta leer "==", reservedOp no consume la entrada si falla, entonces <|>
 -- ejecuta el siguiente parser. Si alguno lee correctamente el op entonces
 -- reservedOp si consume entrada, luego si se falla al leer la exp2 el <|> no
 -- intenta probar otro parser.
 
-boolatom :: Parser (Exp Bool)
-boolatom = (parens lis boolexp)
+boolfactor :: Parser (Exp Bool)
+boolfactor = (parens lis boolexp)
     <|>    (reserved lis "true" >> return BTrue)
     <|>    (reserved lis "false" >> return BFalse)
     <|>    do {reservedOp lis "!"; e <- boolexp; return (Not e)} 
