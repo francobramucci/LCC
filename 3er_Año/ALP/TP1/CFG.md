@@ -2,37 +2,37 @@
 Utilizando precedencia para desambiguar. También se resuelven recursiones a
 izquierda. Se muestra en forma factorizada.
 
-digit    ::= '0' | '1' | ... | '9'
-letter   ::= 'a' | ... | 'Z'
-nat      ::= digit | digit nat
-var      ::= letter | letter var
+digit     ::= '0' | '1' | ... | '9'
+letter    ::= 'a' | ... | 'Z'
+nat       ::= digit | digit nat
+var       ::= letter | letter var
 
-intexp   ::= term ('+' intexp | '-' intexp | e)
+intexp    ::= intterm ('+' intexp | '-' intexp | e)
 
-term     ::= factor ('*' term | '\\' term | e)
+intterm   ::= intfactor ('*' intterm | '/' intterm | e)
 
-factor   ::= '(' intexp ')' 
-         |   nat 
-         |   var 
-         |   '-' intexp 
-         |   '++' var
-         |   '--' var
+intfactor ::= '(' intexp ')' 
+          |   nat 
+          |   var 
+          |   '-' intexp 
+          |   '++' var
+          |   '--' var
 
 
-boolexp  ::= boolatom ('&&' boolexp | '||' boolexp | e)
+boolexp   ::= boolatom ('&&' boolexp | '||' boolexp | e)
 
-boolatom ::= 'true' | 'false'
-         |   intexp '==' intexp
-         |   intexp '!=' intexp
-         |   intexp '<' intexp
-         |   intexp '>' intexp
-         |   '(' boolexp ')'
-         |   '!' boolexp
+boolatom  ::= 'true' | 'false'
+          |   intexp '==' intexp
+          |   intexp '!=' intexp
+          |   intexp '<' intexp
+          |   intexp '>' intexp
+          |   '(' boolexp ')'
+          |   '!' boolexp
 
-comm     ::= commatom (';' comm | e)
+comm      ::= commatom (';' comm | e)
 
-commatom ::= skip
-         |   var '=' intexp
-         |   'if' boolexp '{' comm '}'
-         |   'if' boolexp '{' comm '}' 'else' '{' comm '}'
-         |   'repeat' '{' comm '}' 'until' boolexp
+commatom  ::= skip
+          |   var '=' intexp
+          |   'if' boolexp '{' comm '}'
+          |   'if' boolexp '{' comm '}' 'else' '{' comm '}'
+          |   'repeat' '{' comm '}' 'until' boolexp

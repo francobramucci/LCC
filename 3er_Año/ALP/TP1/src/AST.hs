@@ -1,4 +1,6 @@
-module AST where
+-- El "(module AST)" es para indicar que se exporta el modulo entero
+-- y evitar warnings con respecto a la export list del modulo
+module AST (module AST) where
 
 -- Identificadores de Variable
 type Variable = String
@@ -14,8 +16,8 @@ data Exp a where
   Minus  :: Exp Int -> Exp Int -> Exp Int
   Times  :: Exp Int -> Exp Int -> Exp Int
   Div    :: Exp Int -> Exp Int -> Exp Int
-  Inc    :: Variable -> Exp Int
-  Dec    :: Variable -> Exp Int
+  VarInc :: Variable -> Exp Int
+  VarDec :: Variable -> Exp Int
 
   -- Expresiones booleanas
   BTrue  :: Exp Bool
