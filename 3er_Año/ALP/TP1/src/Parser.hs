@@ -66,15 +66,12 @@ mulop = (reservedOp lis "*" >> return Times)
 
 intfactor :: Parser (Exp Int)
 intfactor = (parens lis intexp)
-    <|>     do {n <- natural lis; return (Const (fromIntegral n))}
-    <|>     do {reservedOp lis "-"; iexp <- intexp; return (UMinus iexp)}
-    <|>     do {varid <- identifier lis;
-                do {reservedOp lis "++"; return (VarInc varid)}
-                <|> 
-                do {reservedOp lis "--"; return (VarDec varid)}
-                <|>
-                return (Var varid)
-               }
+    <|> do {n <- natural lis; return (Const (fromIntegral n))}
+    <|> do {reservedOp lis "-"; iexp <- intexp; return (UMinus iexp)}
+    <|> do varid <- identifier lis
+           (do {reservedOp lis "++"; return (VarInc varid)}
+            <|> do {reservedOp lis "--"; return (VarDec varid)}
+            <|> return (Var varid))
 
 
 ------------------------------------
@@ -100,26 +97,46 @@ boolmul = reservedOp lis "&&" >> return And
 
 boolfactor :: Parser (Exp Bool)
 boolfactor = (parens lis boolexp)
-    <|>    (reserved lis "true" >> return BTrue)
-    <|>    (reserved lis "false" >> return BFalse)
-    <|>    do {reservedOp lis "!"; e <- boolexp; return (Not e)} 
-    <|>    do {e1 <- intexp; 
-               do {reservedOp lis "=="; e2 <- intexp; return (Eq e1 e2)}
-               <|>
-               do {reservedOp lis "!="; e2 <- intexp; return (NEq e1 e2)}
-               <|>
-               do {reservedOp lis "<"; e2 <- intexp; return (Lt e1 e2)}
-               <|>
-               do {reservedOp lis ">"; e2 <- intexp; return (Gt e1 e2)}
-              }
+    <|> (reserved lis "true" >> return BTrue)
+    <|> (reserved lis "false" >> return BFalse)
+    <|> do {reservedOp lis "!"; e <- boolexp; return (Not e)} 
+    <|> do e1 <- intexp
+           (do {reservedOp lis "=="; e2 <- intexp; return (Eq e1 e2)}
+            <|> do {reservedOp lis "!="; e2 <- intexp; return (NEq e1 e2)}
+            <|> do {reservedOp lis "<"; e2 <- intexp; return (Lt e1 e2)}
+            <|> do {reservedOp lis ">"; e2 <- intexp; return (Gt e1 e2)})
+              
 
 -----------------------------------
 --- Parser de comandos
 -----------------------------------
 
 comm :: Parser Comm
-comm = undefined
+comm = chainl1 commatom commseq
 
+commseq :: Parser (Comm -> Comm -> Comm)
+commseq = reservedOp lis ";" >> return Seq
+
+commatom :: Parser Comm
+commatom = (reserved lis "skip" >> return Skip)
+    <|> do varid <- identifier lis
+           reservedOp lis "="
+           e <- intexp
+           return (Let varid e)
+    <|> do reserved lis "if"
+           b <- boolexp
+           commif <- braces lis comm
+
+           (do reserved lis "else"
+               commelse <- braces lis comm
+               return (IfThenElse b commif commelse)
+            <|> 
+            return (IfThen b commif))
+    <|> do reserved lis "repeat"
+           commrep <- braces lis comm
+           reserved lis "until"
+           b <- braces lis boolexp
+           return (RepeatUntil commrep b)
 
 ------------------------------------
 -- Función de parseo
