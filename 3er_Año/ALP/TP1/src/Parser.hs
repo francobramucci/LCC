@@ -125,8 +125,9 @@ commatom = (reserved lis "skip" >> return Skip)
            return (Let varid e)
     <|> do reserved lis "if"
            b <- boolexp
+           reserved lis "then"
            commif <- braces lis comm
-
+           
            (do reserved lis "else"
                commelse <- braces lis comm
                return (IfThenElse b commif commelse)
@@ -135,7 +136,7 @@ commatom = (reserved lis "skip" >> return Skip)
     <|> do reserved lis "repeat"
            commrep <- braces lis comm
            reserved lis "until"
-           b <- braces lis boolexp
+           b <- boolexp
            return (RepeatUntil commrep b)
 
 ------------------------------------
