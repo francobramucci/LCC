@@ -50,8 +50,7 @@ stepComm (Seq c0 c1) s = let (c0' :!: s') = stepComm c0 s
                          in (Seq c0' c1 :!: s')
 
 stepComm (IfThenElse b c0 c1) s = let (bv :!: s') = evalExp b s
-                                  in let c = if bv then c0 else c1
-                                     in (c :!: s')
+                                  in ((if bv then c0 else c1) :!: s')
 
 stepComm (RepeatUntil c b) s = (Seq c (IfThenElse b Skip (RepeatUntil c b)) :!: s)
 
