@@ -1,15 +1,17 @@
 ## Gramática libre de contexto para la sintaxis concreta de LIS
-Utilizando precedencia para desambiguar. También se resuelven recursiones a
-izquierda. Se muestra en forma factorizada.
+Utilizando precedencia a izquierda para desambiguar. 
+También se resuelven recursiones a izquierda. 
 
 digit     ::= '0' | '1' | ... | '9'
 letter    ::= 'a' | ... | 'Z'
 nat       ::= digit | digit nat
 var       ::= letter | letter var
 
-intexp    ::= intterm ('+' intexp | '-' intexp | e)
+intexp    ::= intterm intexp'
+intexp'   ::= '+' intterm intexp' | '-' intterm intexp' | e
 
-intterm   ::= intfactor ('*' intterm | '/' intterm | e)
+intterm   ::= intfactor intterm'
+intterm'  ::= '*' intfactor interm' | '/' intfactor interm' | e
 
 intfactor ::= '(' intexp ')' 
           |   nat 
@@ -18,8 +20,11 @@ intfactor ::= '(' intexp ')'
           |   '++' var
           |   '--' var
 
+boolexp   ::= boolterm boolexp'
+boolexp'  ::= '||' boolterm boolexp' | e
 
-boolexp   ::= boolatom ('&&' boolexp | '||' boolexp | e)
+boolterm  ::= boolatom boolterm'
+boolterm' ::= '&&' boolatom boolterm' | e
 
 boolatom  ::= 'true' | 'false'
           |   intexp '==' intexp
@@ -29,10 +34,13 @@ boolatom  ::= 'true' | 'false'
           |   '(' boolexp ')'
           |   '!' boolexp
 
-comm      ::= commatom (';' comm | e)
+
+comm      ::= commatom comm'
+comm'     ::= ';' commatom comm' | e
 
 commatom  ::= skip
           |   var '=' intexp
           |   'if' boolexp '{' comm '}'
           |   'if' boolexp '{' comm '}' 'else' '{' comm '}'
           |   'repeat' '{' comm '}' 'until' boolexp
+
