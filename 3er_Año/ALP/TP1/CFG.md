@@ -1,6 +1,24 @@
 ## Gramática libre de contexto para la sintaxis concreta de LIS
-Utilizando precedencia a izquierda para desambiguar. 
-También se resuelven recursiones a izquierda. 
+Gramática no ambigua utilizando precedencia de operadores.
+La gramática en sí es asociativa a derecha, no puede escribirse asociativa
+a izquierda sin recursión a izquierda. Sin embargo, de esta forma, pueden
+parsearse los operadores como funciones e invertir el orden de los argumentos.
+Por ejemplo:
+
+exp :: Parser (Exp Int)
+exp = do
+    t <- term
+    f <- exp'
+    return (f t)
+
+exp' :: Parser (Exp Int -> Exp Int)
+exp' = do
+    symbol "-"
+    t <- term
+    f' <- exp'
+    return (\n -> f' (Minus n t)) 
+  <|> return id
+
 
 digit     ::= '0' | '1' | ... | '9'
 letter    ::= 'a' | ... | 'Z'
