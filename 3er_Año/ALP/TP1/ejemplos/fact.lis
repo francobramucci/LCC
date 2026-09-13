@@ -1,0 +1,11 @@
+// Se calcula n factorial y se almacena el resultado en res
+
+n = 10;
+res = 1;
+
+if n != 0 {
+    n = n++;
+    repeat {
+        res = res * n--
+    } until n == 1 
+}

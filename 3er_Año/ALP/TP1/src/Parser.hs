@@ -90,9 +90,10 @@ boolterm = chainl1 boolfactor boolmul
 boolmul :: Parser (Exp Bool -> Exp Bool -> Exp Bool)
 boolmul = reservedOp lis "&&" >> return And
 
+-- Para las expresiones booleanas que comparan expresiones enteras:
 -- Intenta leer "==", reservedOp no consume la entrada si falla, entonces <|>
 -- ejecuta el siguiente parser. Si alguno lee correctamente el op entonces
--- reservedOp si consume entrada, luego si se falla al leer la exp2 el <|> no
+-- reservedOp sí consume entrada, luego si se falla al leer la exp2 el <|> no
 -- intenta probar otro parser.
 
 boolfactor :: Parser (Exp Bool)
@@ -125,7 +126,6 @@ commatom = (reserved lis "skip" >> return Skip)
            return (Let varid e)
     <|> do reserved lis "if"
            b <- boolexp
-           reserved lis "then"
            commif <- braces lis comm
            
            (do reserved lis "else"

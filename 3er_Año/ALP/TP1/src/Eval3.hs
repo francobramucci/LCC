@@ -31,6 +31,7 @@ update v n (m, t)= (M.insert v n m, t)
 -- Agrega una traza dada al estado
 -- Completar la definición
 addTrace :: String -> State -> State
+addTrace t' (m, []) = (m, t')
 addTrace t' (m, t) = (m, t ++ " " ++ t')
 
 -- Formatea una asignación para añadirla a la traza
@@ -83,20 +84,11 @@ evalExp (UMinus e) s = do
     (n :!: s') <- evalExp e s
     return (-n :!: s')
 
-evalExp (Plus e0 e1) s = do
-    (n0 :!: s') <- evalExp e0 s
-    (n1 :!: s'') <- evalExp e1 s'
-    return (n0 + n1 :!: s'')
+evalExp (Plus e0 e1) s = evalBinOp e0 e1 s (+)
 
-evalExp (Minus e0 e1) s = do
-    (n0 :!: s') <- evalExp e0 s
-    (n1 :!: s'') <- evalExp e1 s'
-    return (n0 - n1 :!: s'')
+evalExp (Minus e0 e1) s = evalBinOp e0 e1 s (-)
 
-evalExp (Times e0 e1) s = do
-    (n0 :!: s') <- evalExp e0 s
-    (n1 :!: s'') <- evalExp e1 s'
-    return (n0 * n1 :!: s'')
+evalExp (Times e0 e1) s = evalBinOp e0 e1 s (*)
 
 evalExp (Div e0 e1) s = do
     (n0 :!: s') <- evalExp e0 s
@@ -116,37 +108,30 @@ evalExp BTrue s = return (True :!: s)
 
 evalExp BFalse s = return (False :!: s)
 
-evalExp (Lt e0 e1) s = do
-    (n0 :!: s') <- evalExp e0 s
-    (n1 :!: s'') <- evalExp e1 s'
-    return (n0 < n1 :!: s'')
+evalExp (Lt e0 e1) s = evalBinOp e0 e1 s (<)
     
-evalExp (Gt e0 e1) s = do
-    (n0 :!: s') <- evalExp e0 s
-    (n1 :!: s'') <- evalExp e1 s'
-    return (n0 > n1 :!: s'')
+evalExp (Gt e0 e1) s = evalBinOp e0 e1 s (>)
 
-evalExp (Eq e0 e1) s = do
-    (n0 :!: s') <- evalExp e0 s
-    (n1 :!: s'') <- evalExp e1 s'
-    return (n0 == n1 :!: s'')
+evalExp (Eq e0 e1) s = evalBinOp e0 e1 s (==)
 
-evalExp (NEq e0 e1) s = do
-    (n0 :!: s') <- evalExp e0 s
-    (n1 :!: s'') <- evalExp e1 s'
-    return (n0 /= n1 :!: s'')
+evalExp (NEq e0 e1) s = evalBinOp e0 e1 s (/=)
 
-evalExp (And p0 p1) s = do
-    (b0 :!: s') <- evalExp p0 s
-    (b1 :!: s'') <- evalExp p1 s'
-    return (b0 && b1 :!: s'')
+evalExp (And p0 p1) s = evalBinOp p0 p1 s (&&)
 
-evalExp (Or p0 p1) s = do
-    (b0 :!: s') <- evalExp p0 s
-    (b1 :!: s'') <- evalExp p1 s'
-    return ((b0 || b1) :!: s'')
+evalExp (Or p0 p1) s = evalBinOp p0 p1 s (||)
 
 evalExp (Not p0) s = do
     (b0 :!: s') <- evalExp p0 s
     return (not b0 :!: s')
+
+-- Evalúa operaciones binarias
+evalBinOp :: Exp a -> Exp a -> State -> (a -> a -> b) -> Either Error (Pair b State)
+evalBinOp e0 e1 s op = do
+    (a0 :!: s') <- evalExp e0 s
+    (a1 :!: s'') <- evalExp e1 s'
+    return ((a0 `op` a1) :!: s'')
+
+
+
+
 
