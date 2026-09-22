@@ -28,6 +28,12 @@ lookfor v (m, _) = case M.lookup v m of
 update :: Variable -> Int -> State -> State
 update v n (m, t)= (M.insert v n m, t)
 
+{- Aclaración: en la traza del programa se agregan tanto las asignaciones con
+ - el operador '=' como los incrementos y decrementos causados como efectos
+ - secundarios de los operadores '++' y '--'. De esta forma puede observarse la
+ - evolución del estado del programa a lo largo de su ejecución.
+ - -}
+
 -- Agrega una traza dada al estado
 -- Completar la definición
 addTrace :: String -> State -> State
