@@ -67,7 +67,7 @@ mulop = (reservedOp lis "*" >> return Times)
 intfactor :: Parser (Exp Int)
 intfactor = (parens lis intexp)
     <|> do {n <- natural lis; return (Const (fromIntegral n))}
-    <|> do {reservedOp lis "-"; iexp <- intexp; return (UMinus iexp)}
+    <|> do {reservedOp lis "-"; ifact <- intfactor; return (UMinus ifact)}
     <|> do varid <- identifier lis
            (do {reservedOp lis "++"; return (VarInc varid)}
             <|> do {reservedOp lis "--"; return (VarDec varid)}
@@ -100,7 +100,7 @@ boolfactor :: Parser (Exp Bool)
 boolfactor = (parens lis boolexp)
     <|> (reserved lis "true" >> return BTrue)
     <|> (reserved lis "false" >> return BFalse)
-    <|> do {reservedOp lis "!"; e <- boolexp; return (Not e)} 
+    <|> do {reservedOp lis "!"; e <- boolfactor; return (Not e)} 
     <|> do e1 <- intexp
            (do {reservedOp lis "=="; e2 <- intexp; return (Eq e1 e2)}
             <|> do {reservedOp lis "!="; e2 <- intexp; return (NEq e1 e2)}
