@@ -9,9 +9,9 @@ type Modelo = (DVector, DVector)
 
 
 m2Picture :: Modelo -> Picture
-m2Picture ((x, y), _) = scale 1e-7 1e-7 (pictures [
-    color yellow (circleSolid 6.96e8),
-    color green (translate x y (circleSolid 4e8))
+m2Picture ((x, y), _) = scale 1e-10 1e-10 (pictures [
+    color yellow (circleSolid 6.96e10),
+    color green (translate x y (circleSolid 4e10))
     ])
 
 transition :: ViewPort -> Float -> Modelo -> Modelo
@@ -40,9 +40,9 @@ main = do
     -- putStrLn "\nIngrese la masa del planeta: "
     -- mp <- getFloat "mp = "
 
-    simulate (InWindow "TP" (640, 480) (100, 100)) 
+    simulate (InWindow "TP" (1920, 1080) (100, 100)) 
              black 
-             600
+             (60*60)
              ((x,y), (vx,vy))
              m2Picture
              transition
@@ -59,7 +59,7 @@ masaSol = 1.98847e30
 
 -- Segundos en un dia
 deltaT :: Float 
-deltaT = 60
+deltaT = 365*24
 
 -- Calcula la norma euclidea
 norma2 :: DVector -> Float 
