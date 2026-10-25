@@ -5,21 +5,30 @@ import Text.Read
 import GHC.Float
 
 type DVector = (Double, Double)
-
-type Modelo = (DVector, DVector, [Point])
+type Planet = (DVector, DVector, [Point], Color, Int)
+type Modelo = [Planet]
 
 m2Picture :: Modelo -> Picture
-m2Picture ((x, y), _, ps) = scale 1e-10 1e-10 (pictures [
+m2Picture planets = scale 1e-10 1e-10 (pictures [
     color yellow (circleSolid 6.96e10),
-    color green (translate (double2Float x) (double2Float y) (circleSolid 4e10)),
-    color white (line ps)
+    pictures (map drawPlanet planets)
     ])
 
-transition :: ViewPort -> Float -> Modelo -> Modelo
-transition _ _ (r@(x, y), v, ps) = (nuevaPos r v deltaT, 
-                                    nuevaVel v (accelPos masaSol r) deltaT, 
-                                    (double2Float x, double2Float y) : (take 10000 ps))
+drawPlanet :: Planet -> Picture
+drawPlanet ((x, y), _, ps, c, _) = pictures [
+    color c (translate (double2Float x) (double2Float y) (circleSolid 4e10)),
+    color c (line ps)
+    ]
 
+transition :: ViewPort -> Float -> Modelo -> Modelo
+transition _ _ planets = map transitionPlanet planets
+
+transitionPlanet :: Planet -> Planet
+transitionPlanet (r@(x, y), v, ps, c, n) = (nuevaPos r v deltaT, 
+                                            nuevaVel v (accelPos masaSol r) deltaT, 
+                                            if n == 0 then ((double2Float x, double2Float y) : (take 5000 ps)) else ps,
+                                            c, mod (n+1) 100)
+ 
 getDouble:: String -> IO Double
 getDouble prompt = do
     putStr prompt
@@ -41,8 +50,12 @@ main = do
 
     simulate (InWindow "TP" (1920, 1080) (100, 100)) 
              black 
-             (60)
-             ((x,y), (vx,vy), [])
+             (600)
+             [
+              ((x,y), (vx,vy), [], green, 0), 
+              ((7.406e11, 0), (0, 1.304e4), [], orange, 0),
+              ((1.496e11, 0), (0, 29780), [], blue, 0)
+             ]
              m2Picture
              transition
 
@@ -58,7 +71,7 @@ masaSol = 1.98847e30
 
 -- Segundos en un mes
 deltaT :: Double 
-deltaT = 30*24*60
+deltaT = 30*24*60/10
 
 -- Calcula la norma euclidea
 norma2 :: DVector -> Double 
