@@ -147,7 +147,6 @@ rSol = 6.96e10
 masaSol :: Double
 masaSol = 1.98847e30
 
--- Segundos en un mes
 deltaT :: Double 
 deltaT = 30*24*60/60
 
