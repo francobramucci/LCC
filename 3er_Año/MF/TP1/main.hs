@@ -17,7 +17,7 @@ m2Picture (planets, iface, f, (_, _, (tx, ty))) =
         translate tx ty (
             scale f f (
                 pictures [
-                    color yellow (circleSolid 6.96e10),
+                    color yellow (circleSolid rSol),
                     pictures (map drawPlanet planets)
                 ]
             )
@@ -36,12 +36,15 @@ ifacePicture (s, (x,y)) =
 drawPlanet :: Planet -> Picture
 drawPlanet ((x, y), _, ps, c, _) = 
     pictures [
-        color c (translate (double2Float x) (double2Float y) (circleSolid 4e10)),
+        color c (translate (double2Float x) (double2Float y) (circleSolid rPlaneta)),
         color c (line ps)
     ]
 
 transition :: Float -> World -> World
-transition _ (planets, iface, f, t) = (map transitionPlanet planets, iface, f, t)
+transition _ (planets, iface, f, t) = (map transitionPlanet (filter colisionSol planets), iface, f, t)
+
+colisionSol :: Planet -> Bool
+colisionSol (r, _, _, _, _) = double2Float (norma2 r) > rPlaneta + rSol
 
 transitionPlanet :: Planet -> Planet
 transitionPlanet (r@(x, y), v, ps, c, n) = (nuevaPos r v deltaT, 
@@ -132,8 +135,16 @@ main = do
 constG :: Double 
 constG = 6.67430e-11
 
+
+-- Radio planeta (artificial)
+rPlaneta :: Float
+rPlaneta = 4e10
+
+rSol :: Float
+rSol = 6.96e10
+
 -- Masa del sol
-masaSol :: Double 
+masaSol :: Double
 masaSol = 1.98847e30
 
 -- Segundos en un mes
