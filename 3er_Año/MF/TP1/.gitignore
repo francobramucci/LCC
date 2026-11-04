@@ -1,0 +1,8 @@
+# Ejecutables
+main
+Main
+Main.exe
+
+# Archivos de compilación de Haskell
+*.hi
+*.o
